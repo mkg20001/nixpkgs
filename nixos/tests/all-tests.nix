@@ -127,6 +127,7 @@ in
   influxdb = handleTest ./influxdb.nix {};
   initrd-network-ssh = handleTest ./initrd-network-ssh {};
   initrdNetwork = handleTest ./initrd-network.nix {};
+  initialHomeContents = callTest ./initial-home-contents.nix {};
   installer = handleTest ./installer.nix {};
   ipv6 = handleTest ./ipv6.nix {};
   jackett = handleTest ./jackett.nix {};
