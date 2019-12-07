@@ -1131,6 +1131,8 @@ in {
 
   cirq = callPackage ../development/python-modules/cirq { };
 
+  pick-colour-picker = callPackage ../development/python-modules/pick-colour-picker {};
+
   ciso8601 = callPackage ../development/python-modules/ciso8601 { };
 
   citeproc-py = callPackage ../development/python-modules/citeproc-py { };
