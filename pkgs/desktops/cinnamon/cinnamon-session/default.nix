@@ -1,4 +1,29 @@
-{ cinnamon-desktop, cinnamon-settings-daemon, dbus-glib, docbook_xsl, docbook_xml_dtd_412, fetchFromGitHub, glib, gsettings-desktop-schemas, gtk3, libcanberra, libxslt, makeWrapper, meson, ninja, pkgconfig, python3, stdenv, systemd, wrapGAppsHook, xapps, xmlto, xorg, gnome2, cmake, libexecinfo }:
+{ fetchFromGitHub
+, cinnamon-desktop
+, cinnamon-settings-daemon
+, dbus-glib
+, docbook_xsl
+, docbook_xml_dtd_412
+, glib
+, gsettings-desktop-schemas
+, gtk3
+, libcanberra
+, libxslt
+, makeWrapper
+, meson
+, ninja
+, pkgconfig
+, python3
+, stdenv
+, systemd
+, wrapGAppsHook
+, xapps
+, xmlto
+, xorg
+, gnome2
+, cmake
+, libexecinfo
+}:
 
 stdenv.mkDerivation rec {
   pname = "cinnamon-session";
@@ -16,8 +41,34 @@ stdenv.mkDerivation rec {
   Run-time dependency libsystemd-login found: NO (tried pkgconfig and cmake)
   Run-time dependency libsystemd found: NO (tried pkgconfig and cmake) */
 
-  buildInputs = [ cinnamon-desktop cinnamon-settings-daemon dbus-glib glib gsettings-desktop-schemas gtk3 libcanberra libxslt makeWrapper pkgconfig xapps xmlto xorg.xtrans xorg.libXtst gnome2.GConf systemd ];
-  nativeBuildInputs = [ meson ninja wrapGAppsHook cmake libexecinfo docbook_xsl docbook_xml_dtd_412 python3 ];
+  buildInputs = [
+    cinnamon-desktop
+    cinnamon-settings-daemon
+    dbus-glib
+    glib
+    gsettings-desktop-schemas
+    gtk3
+    libcanberra
+    libxslt
+    makeWrapper
+    xapps
+    xmlto
+    xorg.xtrans
+    xorg.libXtst
+    gnome2.GConf
+    systemd
+  ];
+  nativeBuildInputs = [
+    meson
+    ninja
+    wrapGAppsHook
+    cmake
+    libexecinfo
+    docbook_xsl
+    docbook_xml_dtd_412
+    python3
+    pkgconfig
+  ];
 
   NIX_CFLAGS_COMPILE = "-I${glib.dev}/include/gio-unix-2.0";  # TODO: https://github.com/NixOS/nixpkgs/issues/36468
   configureFlags = [ "--enable-systemd" ];
@@ -45,7 +96,6 @@ stdenv.mkDerivation rec {
   meta = with stdenv.lib; {
     homepage = "https://github.com/linuxmint/cinnamon-session";
     description = "The Cinnamon session manager" ;
-
     platforms = platforms.linux;
     maintainers = [ maintainers.mkg20001 ];
   };
