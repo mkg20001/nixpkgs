@@ -62,7 +62,16 @@ stdenv.mkDerivation rec {
     NOCONFIGURE=1 bash ./autogen.sh
     '';
 
-  nativeBuildInputs = [ pkgconfig autoreconfHook wrapGAppsHook gettext intltool libxslt libtool gobject-introspection ];
+  nativeBuildInputs = [
+    pkgconfig
+    autoreconfHook
+    wrapGAppsHook
+    gettext
+    intltool
+    libxslt
+    libtool
+    gobject-introspection
+  ];
 
   meta = with stdenv.lib; {
     homepage = "https://github.com/linuxmint/cinnamon-screensaver";
