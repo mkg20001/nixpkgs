@@ -1,4 +1,24 @@
-{ autoreconfHook, cinnamon-desktop, fetchFromGitHub, glib, gnome3, gnome-doc-utils, fetchpatch, gobject-introspection, gtk3, intltool, json-glib, libinput, libstartup_notification, libxkbcommon, libXtst, pkgconfig, stdenv, udev, xorg, wrapGAppsHook }:
+{ fetchFromGitHub
+, autoreconfHook
+, cinnamon-desktop
+, glib
+, gnome3
+, gnome-doc-utils
+, fetchpatch
+, gobject-introspection
+, gtk3
+, intltool
+, json-glib
+, libinput
+, libstartup_notification
+, libxkbcommon
+, libXtst
+, pkgconfig
+, stdenv
+, udev
+, xorg
+, wrapGAppsHook
+}:
 
 stdenv.mkDerivation rec {
   pname = "muffin";
@@ -32,13 +52,33 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  buildInputs = [ cinnamon-desktop glib gtk3 gnome3.zenity gnome-doc-utils intltool json-glib libinput libstartup_notification libxkbcommon libXtst pkgconfig udev xorg.xkeyboardconfig xorg.libxkbfile ];
-  nativeBuildInputs = [ autoreconfHook wrapGAppsHook gobject-introspection ];
+  buildInputs = [
+    cinnamon-desktop
+    glib
+    gtk3
+    gnome3.zenity
+    gnome-doc-utils
+    json-glib
+    libinput
+    libstartup_notification
+    libxkbcommon
+    libXtst
+    udev
+    xorg.xkeyboardconfig
+    xorg.libxkbfile
+  ];
+
+  nativeBuildInputs = [
+    autoreconfHook
+    wrapGAppsHook
+    gobject-introspection
+    pkgconfig
+    intltool
+  ];
 
   meta = with stdenv.lib; {
     homepage = "https://github.com/linuxmint/muffin";
     description = "The window management library for the Cinnamon desktop (libmuffin) and its sample WM binary (muffin)";
-
     platforms = platforms.linux;
     maintainers = [ maintainers.mkg20001 ];
   };
