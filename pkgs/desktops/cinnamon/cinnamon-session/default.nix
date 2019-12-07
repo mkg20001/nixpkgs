@@ -58,6 +58,7 @@ stdenv.mkDerivation rec {
     gnome2.GConf
     systemd
   ];
+
   nativeBuildInputs = [
     meson
     ninja
