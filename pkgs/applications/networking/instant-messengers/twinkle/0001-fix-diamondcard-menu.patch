@@ -1,0 +1,25 @@
+From 28cc1e2e54083dea5ad5d79a4d2ebfe2d688b8d3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Maciej=20Kr=C3=BCger?= <mkg20001@gmail.com>
+Date: Sun, 1 Dec 2019 22:40:59 +0100
+Subject: [PATCH] fix: diamondcard menu
+
+---
+ src/gui/mphoneform.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gui/mphoneform.cpp b/src/gui/mphoneform.cpp
+index 6c447a8..6c003b3 100644
+--- a/src/gui/mphoneform.cpp
++++ b/src/gui/mphoneform.cpp
+@@ -241,7 +241,7 @@ void MphoneForm::init()
+ 		
+ #ifdef WITH_DIAMONDCARD
+ 		// Diamondcard menu
+-		menu->insertItem("Diamondcard", Diamondcard);
++		menu->insertMenu("Diamondcard", Diamondcard);
+         menu->addSeparator();
+ #endif
+ 		
+-- 
+2.20.1
+
