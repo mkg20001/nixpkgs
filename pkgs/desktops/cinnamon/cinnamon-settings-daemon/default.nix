@@ -29,7 +29,9 @@ stdenv.mkDerivation rec {
    #include "csd-power-proxy.h"
             ^~~~~~~~~~~~~~~~~~~
   compilation terminated. */
-  # enableParallelBuilding = true;
+
+  # but this occurs only sometimes, so disabling parallel building
+  enableParallelBuilding = false;
 
   src = fetchFromGitHub {
     owner = "linuxmint";
