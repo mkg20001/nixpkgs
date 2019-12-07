@@ -19,7 +19,7 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
-      mv usr $out # files get installed like so: msgfmt -o usr/share/locale/$lang/LC_MESSAGES/$dir.mo $file
+    mv usr $out # files get installed like so: msgfmt -o usr/share/locale/$lang/LC_MESSAGES/$dir.mo $file
     '';
 
   meta = with stdenv.lib; {
