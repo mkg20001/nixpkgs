@@ -919,6 +919,8 @@ in {
 
   piccata = callPackage ../development/python-modules/piccata {};
 
+  pick-colour-picker = callPackage ../development/python-modules/pick-colour-picker {};
+
   pims = callPackage ../development/python-modules/pims { };
 
   poetry = callPackage ../development/python-modules/poetry { };
