@@ -3,7 +3,12 @@
 stdenv.mkDerivation rec {
   pname = "cinnamon-settings-daemon";
   version = "4.4.0";
-  enableParallelBuilding = true;
+
+  /* csd-power-manager.c:50:10: fatal error: csd-power-proxy.h: No such file or directory
+   #include "csd-power-proxy.h"
+            ^~~~~~~~~~~~~~~~~~~
+  compilation terminated. */
+  # enableParallelBuilding = true;
 
   src = fetchFromGitHub {
     owner = "linuxmint";
