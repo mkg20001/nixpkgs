@@ -1,4 +1,21 @@
-{ fetchFromGitHub, glib, gobject-introspection, meson, ninja, pkgconfig, stdenv, wrapGAppsHook, libxml2, cmake, gtk3, libnotify, cinnamon-desktop, xapps, libexif, exempi, intltool }:
+{ fetchFromGitHub
+, glib
+, gobject-introspection
+, meson
+, ninja
+, pkgconfig
+, stdenv
+, wrapGAppsHook
+, libxml2
+, cmake
+, gtk3
+, libnotify
+, cinnamon-desktop
+, xapps
+, libexif
+, exempi
+, intltool
+}:
 
 stdenv.mkDerivation rec {
   pname = "nemo";
@@ -16,13 +33,30 @@ stdenv.mkDerivation rec {
 
   NIX_CFLAGS_COMPILE = [ "-I${glib.dev}/include/gio-unix-2.0" ];  # TODO: https://github.com/NixOS/nixpkgs/issues/36468
 
-  buildInputs = [ glib pkgconfig gtk3 libnotify cinnamon-desktop libxml2 xapps libexif exempi ];
-  nativeBuildInputs = [ meson gobject-introspection ninja wrapGAppsHook cmake intltool ];
+  buildInputs = [
+    glib
+    gtk3
+    libnotify
+    cinnamon-desktop
+    libxml2
+    xapps
+    libexif
+    exempi
+  ];
+
+  nativeBuildInputs = [
+    meson
+    pkgconfig
+    gobject-introspection
+    ninja
+    wrapGAppsHook
+    cmake
+    intltool
+  ];
 
   meta = with stdenv.lib; {
     homepage = "https://github.com/linuxmint/nemo";
     description = "File browser for Cinnamon";
-
     platforms = platforms.linux;
     maintainers = [ maintainers.mkg20001 ];
   };
