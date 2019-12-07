@@ -22,8 +22,17 @@ stdenv.mkDerivation rec {
     sha256 = "0q4qj28swi2y93fj7pfil68l2cf9gmhbk6jmr8d70l54xf7sigsh";
   };
 
-  buildInputs = [ glib pkgconfig ];
-  nativeBuildInputs = [ meson gobject-introspection ninja wrapGAppsHook ];
+  buildInputs = [
+    glib
+  ];
+
+  nativeBuildInputs = [
+    meson
+    gobject-introspection
+    ninja
+    wrapGAppsHook
+    pkgconfig
+  ];
 
   meta = with stdenv.lib; {
     homepage = "https://github.com/linuxmint/cinnamon-menus";
