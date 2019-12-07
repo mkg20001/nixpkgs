@@ -1,4 +1,25 @@
-{ autoconf-archive, autoreconfHook, cinnamon-desktop, colord, fetchFromGitHub, glib, gsettings-desktop-schemas, gtk3, intltool, lcms2, libcanberra, libcanberra-gtk3, libgnomekbd, libnotify, libxklavier, makeWrapper, pkgconfig, pulseaudio, stdenv, systemd, upower }:
+{ fetchFromGitHub
+, autoconf-archive
+, autoreconfHook
+, cinnamon-desktop
+, colord
+, glib
+, gsettings-desktop-schemas
+, gtk3
+, intltool
+, lcms2
+, libcanberra
+, libcanberra-gtk3
+, libgnomekbd
+, libnotify
+, libxklavier
+, makeWrapper
+, pkgconfig
+, pulseaudio
+, stdenv
+, systemd
+, upower
+}:
 
 stdenv.mkDerivation rec {
   pname = "cinnamon-settings-daemon";
@@ -19,8 +40,30 @@ stdenv.mkDerivation rec {
 
   NIX_CFLAGS_COMPILE = "-I${glib.dev}/include/gio-unix-2.0"; # TODO: https://github.com/NixOS/nixpkgs/issues/36468
 
-  buildInputs = [ autoconf-archive cinnamon-desktop colord gtk3 glib gsettings-desktop-schemas intltool lcms2 libcanberra libcanberra-gtk3 libgnomekbd libnotify libxklavier makeWrapper pkgconfig pulseaudio systemd upower ];
-  nativeBuildInputs = [ autoreconfHook ];
+  buildInputs = [
+    autoconf-archive
+    cinnamon-desktop
+    colord
+    gtk3
+    glib
+    gsettings-desktop-schemas
+    lcms2
+    libcanberra
+    libcanberra-gtk3
+    libgnomekbd
+    libnotify
+    libxklavier
+    makeWrapper
+    pulseaudio
+    systemd
+    upower
+  ];
+
+  nativeBuildInputs = [
+    autoreconfHook
+    intltool
+    pkgconfig
+  ];
 
   postFixup  = ''
     for f in "$out/libexec/"*; do
@@ -31,7 +74,6 @@ stdenv.mkDerivation rec {
   meta = with stdenv.lib; {
     homepage = "https://github.com/linuxmint/cinnamon-settings-daemon";
     description = "The settings daemon for the Cinnamon desktop";
-
     platforms = platforms.linux;
     maintainers = [ maintainers.mkg20001 ];
   };
