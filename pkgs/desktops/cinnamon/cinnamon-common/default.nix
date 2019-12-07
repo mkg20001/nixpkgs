@@ -1,35 +1,36 @@
-{ atk,
-  autoreconfHook,
-  cacert,
-  cinnamon-desktop,
-  cinnamon-menus,
-  cjs,
-  dbus-glib,
-  fetchFromGitHub,
-  gdk-pixbuf,
-  glib,
-  gobject-introspection,
-  gtk3,
-  intltool,
-  json-glib,
-  libcroco,
-  libsoup,
-  libstartup_notification,
-  libXtst,
-  muffin,
-  networkmanager,
-  pkgconfig,
-  polkit,
-  stdenv,
-  wrapGAppsHook,
-  libxml2,
-  gnome2,
-  gnome3,
-  python3,
-  keybinder3,
-  cairo,
-  xapps,
-  upower }:
+{ atk
+, autoreconfHook
+, cacert
+, cinnamon-desktop
+, cinnamon-menus
+, cjs
+, dbus-glib
+, fetchFromGitHub
+, gdk-pixbuf
+, glib
+, gobject-introspection
+, gtk3
+, intltool
+, json-glib
+, libcroco
+, libsoup
+, libstartup_notification
+, libXtst
+, muffin
+, networkmanager
+, pkgconfig
+, polkit
+, stdenv
+, wrapGAppsHook
+, libxml2
+, gnome2
+, gnome3
+, python3
+, keybinder3
+, cairo
+, xapps
+, upower
+}:
 
 stdenv.mkDerivation rec {
   pname = "cinnamon-common";
@@ -91,4 +92,6 @@ stdenv.mkDerivation rec {
       --replace "\$(libdir)/muffin" "${muffin}/lib/muffin"
     patchShebangs autogen.sh
   '';
+
+  # TODO: meta
 }
