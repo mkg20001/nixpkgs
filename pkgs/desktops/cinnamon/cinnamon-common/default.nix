@@ -23,7 +23,7 @@
 , stdenv
 , wrapGAppsHook
 , libxml2
-, gnome2
+, gtk-doc
 , gnome3
 , python3
 , keybinder3
@@ -77,7 +77,7 @@ stdenv.mkDerivation rec {
     autoreconfHook
     wrapGAppsHook
     intltool
-    gnome2.gtkdoc
+    gtk-doc
     gobject-introspection
   ];
 
