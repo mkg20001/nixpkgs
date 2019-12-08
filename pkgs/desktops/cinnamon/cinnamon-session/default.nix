@@ -70,7 +70,7 @@ stdenv.mkDerivation rec {
   ];
 
   NIX_CFLAGS_COMPILE = "-I${glib.dev}/include/gio-unix-2.0";  # TODO: https://github.com/NixOS/nixpkgs/issues/36468
-  configureFlags = [ "--enable-systemd" "--disable-gconf" ];
+  mesonFlags = [ "-Dgconf=false" ];
 
   postPatch = ''
     chmod +x data/meson_install_schemas.py # patchShebangs requires executable file
