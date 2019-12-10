@@ -12,18 +12,8 @@ let
   { ... }:
   { options =
     { password = mkOption {
-        type = types.str;
-        description = "Authorized password to the opposite end of the tunnel.";
-      };
-      login = mkOption {
-        default = "";
-        type = types.str;
-        description = "(optional) name your peer has for you";
-      };
-      peerName = {
-        default = "";
-        type = types.str;
-        description = "(optional) human-readable name for peer";
+      type = types.str;
+      description = "Authorized password to the opposite end of the tunnel.";
       };
       publicKey = mkOption {
         type = types.str;
