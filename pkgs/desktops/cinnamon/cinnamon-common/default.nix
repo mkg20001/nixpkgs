@@ -7,6 +7,7 @@
 , dbus-glib
 , fetchFromGitHub
 , gdk-pixbuf
+, libgnomekbd
 , glib
 , gobject-introspection
 , gtk3
@@ -64,6 +65,7 @@ stdenv.mkDerivation rec {
     pkgconfig
     polkit
     libxml2
+    libgnomekbd
 
     # bindings
     cairo
