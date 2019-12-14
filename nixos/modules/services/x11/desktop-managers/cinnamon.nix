@@ -82,6 +82,9 @@ in
       pkgs.gnome3.networkmanagerapplet
       # cinnamon-killer-daemon: provided by cinnamon-common
 
+      # utils
+      inxi # required by xapps.upload-system-info
+
       # packages
       nemo
       cinnamon-control-center
