@@ -82,8 +82,6 @@ in
       pkgs.gnome3.networkmanagerapplet
       # cinnamon-killer-daemon: provided by cinnamon-common
 
-      # utils
-
       # packages
       nemo
       cinnamon-control-center
