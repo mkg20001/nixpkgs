@@ -83,7 +83,6 @@ in
       # cinnamon-killer-daemon: provided by cinnamon-common
 
       # utils
-      inxi # required by xapps.upload-system-info
 
       # packages
       nemo
