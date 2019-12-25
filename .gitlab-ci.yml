@@ -1,0 +1,4 @@
+build-and-push:
+  image: nixos/nix
+  script:
+    - "true"
