@@ -66,6 +66,7 @@ in
   dhparams = handleTest ./dhparams.nix {};
   dnscrypt-proxy = handleTestOn ["x86_64-linux"] ./dnscrypt-proxy.nix {};
   docker = handleTestOn ["x86_64-linux"] ./docker.nix {};
+  docker-clean = handleTestOn ["x86_64-linux"] ./docker-clean.nix {};
   docker-containers = handleTestOn ["x86_64-linux"] ./docker-containers.nix {};
   docker-edge = handleTestOn ["x86_64-linux"] ./docker-edge.nix {};
   docker-preloader = handleTestOn ["x86_64-linux"] ./docker-preloader.nix {};

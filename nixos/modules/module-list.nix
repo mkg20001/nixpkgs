@@ -416,6 +416,7 @@
   ./services/misc/dwm-status.nix
   ./services/misc/dysnomia.nix
   ./services/misc/disnix.nix
+  ./services/misc/docker-clean.nix
   ./services/misc/docker-registry.nix
   ./services/misc/errbot.nix
   ./services/misc/etcd.nix
