@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, makeWrapper, makeDesktopItem, zlib, glib, libpng, freetype, openssl
+{ stdenv, fetchurl, makeWrapper, makeDesktopItem, zlib, glib, libpng, freetype, openssl, imagemagick
 , xorg, fontconfig, qtbase, qtwebengine, qtwebchannel, qtsvg, xkeyboard_config, alsaLib
 , libpulseaudio ? null, libredirect, quazip, which, unzip, llvmPackages, writeShellScriptBin
 }:
@@ -48,7 +48,7 @@ stdenv.mkDerivation rec {
     sha256 = "1bywmdj54glzd0kffvr27r84n4dsd0pskkbmh59mllbxvj0qwy7f";
   };
 
-  nativeBuildInputs = [ makeWrapper fakeLess which unzip ];
+  nativeBuildInputs = [ makeWrapper fakeLess which unzip imagemagick ];
 
   unpackPhase =
     ''
@@ -81,10 +81,12 @@ stdenv.mkDerivation rec {
       mv * $out/lib/teamspeak/
 
       # Make a desktop item
-      mkdir -p $out/share/applications/ $out/share/icons/
-      unzip ${pluginsdk}
-      cp pluginsdk/docs/client_html/images/logo.png $out/share/icons/teamspeak.png
-      cp ${desktopItem}/share/applications/* $out/share/applications/
+      unzip ${pluginsdk} pluginsdk/docs/client_html/images/logo.png
+      convert pluginsdk/docs/client_html/images/logo.png -resize 48x48 48.png
+
+      install -D ${desktopItem}/share/applications/teamspeak.desktop $out/share/applications/teamspeak.desktop
+      install -D pluginsdk/docs/client_html/images/logo.png          $out/share/icons/hicolor/64x64/apps/teamspeak.png
+      install -D 48.png                                              $out/share/icons/hicolor/48x48/apps/teamspeak.png
 
       # Make a symlink to the binary from bin.
       mkdir -p $out/bin/
