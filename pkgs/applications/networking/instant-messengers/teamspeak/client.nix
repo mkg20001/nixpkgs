@@ -25,6 +25,7 @@
   which,
   perl,
   llvmPackages,
+  imagemagick,
 }:
 
 let
@@ -92,6 +93,7 @@ stdenv.mkDerivation rec {
     makeWrapper
     which
     perl # Installer script needs `shasum`
+    imagemagick
   ];
 
   # This just runs the installer script. If it gets stuck at something like
@@ -128,7 +130,10 @@ stdenv.mkDerivation rec {
 
       # Make a desktop item
       mkdir -p $out/share/applications/ $out/share/icons/hicolor/64x64/apps/
-      cp ${pluginsdk}/doc/_static/logo.png $out/share/icons/hicolor/64x64/apps/teamspeak.png
+      magick convert ${pluginsdk}/doc/_static/logo.png -resize 48x48 48.png
+
+      install -D ${pluginsdk}/doc/_static/logo.png                   $out/share/icons/hicolor/64x64/apps/teamspeak.png
+      install -D 48.png                                              $out/share/icons/hicolor/48x48/apps/teamspeak.png
       cp ${desktopItem}/share/applications/* $out/share/applications/
 
       # Make a symlink to the binary from bin.
