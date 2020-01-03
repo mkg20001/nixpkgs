@@ -46,6 +46,7 @@ in stdenv.mkDerivation {
   '';
 
   configureFlags = [
+    "CFLAGS=-Wno-error"
     "--with-nspr-prefix=${nspr}"
     "--with-system-zlib"
     "--with-system-icu"
