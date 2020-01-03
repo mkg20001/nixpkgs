@@ -40,7 +40,7 @@ in stdenv.mkDerivation {
   configurePlatforms = [ ];
 
   preConfigure = ''
-    export CXXFLAGS="-fpermissive"
+    export CXXFLAGS="-fpermissive -Wno-error"
     export LIBXUL_DIST=$out
     export PYTHON="${buildPackages.python2.interpreter}"
     configureFlagsArray+=("--includedir=$dev/include")
