@@ -21,13 +21,17 @@ in stdenv.mkDerivation {
   # on ARMv6 causes polkit testsuite to break with an assertion failure in spidermonkey.
   # These flags were stolen from:
   # https://git.archlinux.org/svntogit/packages.git/tree/trunk/PKGBUILD?h=packages/js52
-  NIX_CFLAGS_COMPILE = "-fno-delete-null-pointer-checks -fno-strict-aliasing -fno-tree-vrp -Wno-error";
+  NIX_CFLAGS_COMPILE = "-fno-delete-null-pointer-checks -fno-strict-aliasing -fno-tree-vrp -fformat-overflow -Wno-error";
 
   patches = [
     # needed to build gnome3.gjs
     (fetchpatch {
       name = "mozjs52-disable-mozglue.patch";
       url = https://git.archlinux.org/svntogit/packages.git/plain/trunk/mozjs52-disable-mozglue.patch?h=packages/js52&id=4279d2e18d9a44f6375f584911f63d13de7704be;
+      sha256 = "18wkss0agdyff107p5lfflk72qiz350xqw2yqc353alkx4fsfpz0";
+    })
+    (fetchpatch {
+      url = https://git.archlinux.org/svntogit/packages.git/plain/trunk/no-error.diff?h=packages/js52;
       sha256 = "18wkss0agdyff107p5lfflk72qiz350xqw2yqc353alkx4fsfpz0";
     })
   ];
