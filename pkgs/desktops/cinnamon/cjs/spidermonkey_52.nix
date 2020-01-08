@@ -34,6 +34,7 @@ in stdenv.mkDerivation {
       url = https://git.archlinux.org/svntogit/packages.git/plain/trunk/no-error.diff?h=packages/js52;
       sha256 = "1vsw6558lxiy0r1mg6y49cgddan1mfqvqlkyv734bgxyg6n3pb9i";
     })
+    ./0001-fix-werror.patch
   ];
 
   configurePlatforms = [ ];
