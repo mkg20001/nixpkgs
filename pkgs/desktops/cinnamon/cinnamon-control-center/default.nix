@@ -47,31 +47,31 @@ stdenv.mkDerivation rec {
   };
 
   # TODO: fix network manager integration
- configureFlags = [ "--enable-systemd" "--disable-networkmanager" "--disable-modemmanager" ];
+  configureFlags = [ "--enable-systemd" "--disable-networkmanager" "--disable-modemmanager" ];
 
- # patches = [ ./region.patch ];
+  # patches = [ ./region.patch ];
 
- buildInputs = [
-  gtk3
-  glib
-  cinnamon-desktop
-  libnotify
-  cinnamon-menus
-  libxml2
-  dbus-glib
-  systemd
-  polkit
-  libgnomekbd
-  libxklavier
-  /* networkmanager */
-  colord
-  cinnamon-settings-daemon
-  libwacom
-  gnome3.gnome-online-accounts
-  tzdata
+  buildInputs = [
+    gtk3
+    glib
+    cinnamon-desktop
+    libnotify
+    cinnamon-menus
+    libxml2
+    dbus-glib
+    systemd
+    polkit
+    libgnomekbd
+    libxklavier
+    /* networkmanager */
+    colord
+    cinnamon-settings-daemon
+    libwacom
+    gnome3.gnome-online-accounts
+    tzdata
   ];
 
- #buildInputs = [
+  #buildInputs = [
   #  glib gtk3 cinnamon-desktop
   #  libnotify gnome-menus libxml2 systemd
   #  upower cinnamon-settings-daemon colord
@@ -88,11 +88,11 @@ stdenv.mkDerivation rec {
     sed 's|TZ_DIR "/usr/share/zoneinfo/"|TZ_DIR "${tzdata}/share/zoneinfo/"|g' -i ./panels/datetime/test-timezone.c
     sed 's|TZ_DATA_FILE "/usr/share/zoneinfo/zone.tab"|TZ_DATA_FILE "${tzdata}/share/zoneinfo/zone.tab"|g' -i ./panels/datetime/tz.h
     sed 's|"/usr/share/i18n/locales/"|"${glibc}/share/i18n/locales/"|g' -i panels/datetime/test-endianess.c
-    '';
+  '';
 
   autoreconfPhase = ''
     NOCONFIGURE=1 bash ./autogen.sh
-    '';
+  '';
 
 
   preBuildPhases = "hackyDatetimeBackward";
@@ -103,17 +103,17 @@ stdenv.mkDerivation rec {
   hackyDatetimeBackward = ''
     mkdir -p $out/share/cinnamon-control-center/
     ln -s $PWD/panels/datetime $out/share/cinnamon-control-center/
-    '';
+  '';
 
   undoHackyDatetimeBackward = ''
     rm -rfv $out
-    '';
+  '';
 
   nativeBuildInputs = [ pkgconfig autoreconfHook wrapGAppsHook gettext /*gnome_common*/ intltool libxslt libtool ];
 
   meta = with stdenv.lib; {
     homepage = "https://github.com/linuxmint/cinnamon-control-center";
-    description = "A collection of configuration plugins used in cinnamon-settings" ;
+    description = "A collection of configuration plugins used in cinnamon-settings";
     platforms = platforms.linux;
     maintainers = [ maintainers.mkg20001 ];
   };
