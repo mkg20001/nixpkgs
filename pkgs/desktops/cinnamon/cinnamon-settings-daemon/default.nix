@@ -67,7 +67,7 @@ stdenv.mkDerivation rec {
     pkgconfig
   ];
 
-  postFixup  = ''
+  postFixup = ''
     for f in "$out/libexec/"*; do
       wrapProgram "$f" --prefix XDG_DATA_DIRS : "$GSETTINGS_SCHEMAS_PATH"
     done
