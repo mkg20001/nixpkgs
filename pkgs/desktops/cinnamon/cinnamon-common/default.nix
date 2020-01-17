@@ -45,7 +45,8 @@ stdenv.mkDerivation rec {
     sha256 = "0sv7nqd1l6c727qj30dcgdkvfh1wxpszpgmbdyh58ilmc8xklnqd";
   };
 
-  buildInputs = [ # TODO: review if we really need this all
+  buildInputs = [
+    # TODO: review if we really need this all
     (python3.withPackages (pp: with pp; [ setproctitle pygobject3 pycairo ]))
     atk
     cacert
@@ -60,7 +61,8 @@ stdenv.mkDerivation rec {
     libcroco
     libsoup
     libstartup_notification
-    libXtst muffin
+    libXtst
+    muffin
     networkmanager
     pkgconfig
     polkit
@@ -85,7 +87,7 @@ stdenv.mkDerivation rec {
 
   autoreconfPhase = ''
     GTK_DOC_CHECK=false NOCONFIGURE=1 bash ./autogen.sh
-    '';
+  '';
 
   configureFlags = [ "--disable-static" "--with-ca-certificates=${cacert}/etc/ssl/certs/ca-bundle.crt" "--with-libxml=${libxml2.dev}/include/libxml2" "--enable-gtk-doc=no" ];
 
