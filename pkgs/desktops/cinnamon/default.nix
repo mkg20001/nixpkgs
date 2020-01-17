@@ -6,5 +6,6 @@ lib.makeScope pkgs.newScope (self: with self; {
   cinnamon-translations = callPackage ./cinnamon-translations { };
   cjs = callPackage ./cjs { };
   muffin = callPackage ./muffin { };
+  nemo = callPackage ./nemo { };
   xapps = callPackage ./xapps { };
 })
