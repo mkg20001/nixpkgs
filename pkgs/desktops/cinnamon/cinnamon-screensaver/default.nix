@@ -41,26 +41,26 @@ stdenv.mkDerivation rec {
     sha256 = "03v41wk1gmgmyl31j7a3pav52gfv2faibj1jnpj3ycwcv4cch5w5";
   };
 
- buildInputs = [
-  glib
-  (python3.withPackages (pp: with pp; [ pygobject3 setproctitle xapp pycairo ]))
-  xapps
-  gtk3
-  pam
-  accountsservice
-  cairo
-];
+  buildInputs = [
+    glib
+    (python3.withPackages (pp: with pp; [ pygobject3 setproctitle xapp pycairo ]))
+    xapps
+    gtk3
+    pam
+    accountsservice
+    cairo
+  ];
 
- NIX_CFLAGS_COMPILE = "-I${glib.dev}/include/gio-unix-2.0"; # TODO: https://github.com/NixOS/nixpkgs/issues/36468
+  NIX_CFLAGS_COMPILE = "-I${glib.dev}/include/gio-unix-2.0"; # TODO: https://github.com/NixOS/nixpkgs/issues/36468
 
   postPatch = ''
     patchShebangs autogen.sh
     sed "s|/usr/share/locale|/run/current-system/sw/share/locale|g" -i ./src/cinnamon-screensaver-main.py
-    '';
+  '';
 
   autoreconfPhase = ''
     NOCONFIGURE=1 bash ./autogen.sh
-    '';
+  '';
 
   nativeBuildInputs = [
     pkgconfig
