@@ -69,7 +69,7 @@ stdenv.mkDerivation rec {
     pkgconfig
   ];
 
-  NIX_CFLAGS_COMPILE = "-I${glib.dev}/include/gio-unix-2.0";  # TODO: https://github.com/NixOS/nixpkgs/issues/36468
+  NIX_CFLAGS_COMPILE = "-I${glib.dev}/include/gio-unix-2.0"; # TODO: https://github.com/NixOS/nixpkgs/issues/36468
   mesonFlags = [ "-Dgconf=false" ];
 
   postPatch = ''
@@ -94,7 +94,7 @@ stdenv.mkDerivation rec {
 
   meta = with stdenv.lib; {
     homepage = "https://github.com/linuxmint/cinnamon-session";
-    description = "The Cinnamon session manager" ;
+    description = "The Cinnamon session manager";
     platforms = platforms.linux;
     maintainers = [ maintainers.mkg20001 ];
   };
