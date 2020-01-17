@@ -53,11 +53,11 @@ stdenv.mkDerivation rec {
     description = "Library and data for various Cinnamon modules";
 
     longDescription = ''
-       The libcinnamon-desktop library provides API shared by several applications
-       on the desktop, but that cannot live in the platform for various
-       reasons. There is no API or ABI guarantee, although we are doing our
-       best to provide stability. Documentation for the API is available with
-       gtk-doc.
+      The libcinnamon-desktop library provides API shared by several applications
+      on the desktop, but that cannot live in the platform for various
+      reasons. There is no API or ABI guarantee, although we are doing our
+      best to provide stability. Documentation for the API is available with
+      gtk-doc.
     '';
 
     platforms = platforms.linux;
