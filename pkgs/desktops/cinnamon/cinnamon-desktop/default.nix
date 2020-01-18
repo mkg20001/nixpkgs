@@ -33,6 +33,7 @@ stdenv.mkDerivation rec {
     xkeyboard_config
     xorg.libxkbfile
   ];
+
   nativeBuildInputs = [
     meson
     gobject-introspection
