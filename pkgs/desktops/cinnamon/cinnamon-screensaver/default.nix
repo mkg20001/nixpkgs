@@ -27,6 +27,7 @@
 , accountsservice
 , cairo
 , xapps
+, xorg
 }:
 
 stdenv.mkDerivation rec {
@@ -42,10 +43,18 @@ stdenv.mkDerivation rec {
   };
 
   buildInputs = [
+    # from configure.ac
+    gobject-introspection
+    gtk3
     glib
+
+    xorg.libXext
+    xorg.libXinerama
+    xorg.libX11
+    xorg.libXrandr
+
     (python3.withPackages (pp: with pp; [ pygobject3 setproctitle xapp pycairo ]))
     xapps
-    gtk3
     pam
     accountsservice
     cairo
@@ -71,7 +80,6 @@ stdenv.mkDerivation rec {
     intltool
     libxslt
     libtool
-    gobject-introspection
   ];
 
   meta = with stdenv.lib; {
