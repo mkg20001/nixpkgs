@@ -19,6 +19,7 @@
 , stdenv
 , systemd
 , upower
+, dconf
 }:
 
 stdenv.mkDerivation rec {
@@ -59,6 +60,7 @@ stdenv.mkDerivation rec {
     pulseaudio
     systemd
     upower
+    dconf
   ];
 
   nativeBuildInputs = [
