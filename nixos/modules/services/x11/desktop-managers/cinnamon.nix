@@ -67,6 +67,11 @@ in
     # Enable dconf
     programs.dconf.enable = true;
 
+    # Fix lockscreen
+    security.pam.services = {
+      cinnamon-screensaver = {};
+    };
+
     # Override GSettings schemas
     environment.sessionVariables.NIX_GSETTINGS_OVERRIDES_DIR = "${nixos-gsettings-desktop-schemas}/share/gsettings-schemas/nixos-gsettings-overrides/glib-2.0/schemas";
 
