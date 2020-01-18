@@ -32,6 +32,7 @@
 , wrapGAppsHook
 , tzdata
 , glibc
+, networkmanagerapplet
 }:
 
 stdenv.mkDerivation rec {
@@ -47,7 +48,7 @@ stdenv.mkDerivation rec {
   };
 
   # TODO: fix network manager integration
-  configureFlags = [ "--enable-systemd" "--disable-networkmanager" "--disable-modemmanager" ];
+  configureFlags = [ "--enable-systemd" "--disable-modemmanager" ];
 
   # patches = [ ./region.patch ];
 
@@ -69,6 +70,7 @@ stdenv.mkDerivation rec {
     libwacom
     gnome3.gnome-online-accounts
     tzdata
+    networkmanagerapplet
   ];
 
   #buildInputs = [
