@@ -83,9 +83,5 @@ in stdenv.mkDerivation {
     license = licenses.gpl2; # TODO: MPL/GPL/LGPL tri-license.
     maintainers = [ maintainers.abbradar ];
     platforms = platforms.linux;
-
-    knownVulnerabilities = [
-      "The runtime was extracted from Firefox 52, which EOL’d on September 5, 2018."
-    ];
   };
 }
