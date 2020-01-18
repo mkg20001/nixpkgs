@@ -48,7 +48,7 @@ stdenv.mkDerivation rec {
   };
 
   # TODO: fix network manager integration
-  configureFlags = [ "--enable-systemd" "--disable-modemmanager" ];
+  configureFlags = [ "--enable-systemd" "--disable-networkmanager" "--disable-modemmanager" ];
 
   # patches = [ ./region.patch ];
 
@@ -64,12 +64,12 @@ stdenv.mkDerivation rec {
     polkit
     libgnomekbd
     libxklavier
-    /* networkmanager */
     colord
     cinnamon-settings-daemon
     libwacom
     gnome3.gnome-online-accounts
     tzdata
+    networkmanager
     networkmanagerapplet
   ];
 
