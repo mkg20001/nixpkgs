@@ -49,6 +49,7 @@ stdenv.mkDerivation rec {
     pam
     accountsservice
     cairo
+    cinnamon-desktop
   ];
 
   NIX_CFLAGS_COMPILE = "-I${glib.dev}/include/gio-unix-2.0"; # TODO: https://github.com/NixOS/nixpkgs/issues/36468
