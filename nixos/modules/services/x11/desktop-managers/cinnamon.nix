@@ -65,12 +65,15 @@ in
     services.colord.enable = mkDefault true;
 
     # Enable dconf
-    programs.dconf.enable = true;
+    programs.dconf.enable = mkDefault true;
 
     # Fix lockscreen
     security.pam.services = {
       cinnamon-screensaver = {};
     };
+
+    # Power managment support
+    services.upower.enable = mkDefault true;
 
     # Override GSettings schemas
     environment.sessionVariables.NIX_GSETTINGS_OVERRIDES_DIR = "${nixos-gsettings-desktop-schemas}/share/gsettings-schemas/nixos-gsettings-overrides/glib-2.0/schemas";
