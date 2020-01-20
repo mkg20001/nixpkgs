@@ -67,6 +67,9 @@ in
     # Enable dconf
     programs.dconf.enable = mkDefault true;
 
+    # Enable org.a11y.Bus
+    services.gnome3.at-spi2-core.enable = true;
+
     # Fix lockscreen
     security.pam.services = {
       cinnamon-screensaver = {};
