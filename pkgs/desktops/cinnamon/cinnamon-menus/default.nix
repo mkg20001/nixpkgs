@@ -13,7 +13,6 @@
 stdenv.mkDerivation rec {
   pname = "cinnamon-menus";
   version = "4.4.0";
-  enableParallelBuilding = true;
 
   src = fetchFromGitHub {
     owner = "linuxmint";
@@ -24,11 +23,11 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     glib
+    gobject-introspection
   ];
 
   nativeBuildInputs = [
     meson
-    gobject-introspection
     ninja
     wrapGAppsHook
     pkgconfig

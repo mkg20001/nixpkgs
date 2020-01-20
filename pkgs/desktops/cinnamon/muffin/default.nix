@@ -23,7 +23,6 @@
 stdenv.mkDerivation rec {
   pname = "muffin";
   version = "4.4.1";
-  enableParallelBuilding = true;
 
   src = fetchFromGitHub {
     owner = "linuxmint";
@@ -66,12 +65,12 @@ stdenv.mkDerivation rec {
     udev
     xorg.xkeyboardconfig
     xorg.libxkbfile
+    gobject-introspection
   ];
 
   nativeBuildInputs = [
     autoreconfHook
     wrapGAppsHook
-    gobject-introspection
     pkgconfig
     intltool
   ];

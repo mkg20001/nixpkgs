@@ -5,7 +5,6 @@
 stdenv.mkDerivation rec {
   pname = "cinnamon-translations";
   version = "4.4.0";
-  enableParallelBuilding = true;
 
   src = fetchFromGitHub {
     owner = "linuxmint";
