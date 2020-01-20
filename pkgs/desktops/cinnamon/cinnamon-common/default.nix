@@ -36,7 +36,6 @@
 stdenv.mkDerivation rec {
   pname = "cinnamon-common";
   version = "4.4.1";
-  enableParallelBuilding = true;
 
   src = fetchFromGitHub {
     owner = "linuxmint";
@@ -68,6 +67,7 @@ stdenv.mkDerivation rec {
     polkit
     libxml2
     libgnomekbd
+    gobject-introspection
 
     # bindings
     cairo
@@ -82,7 +82,6 @@ stdenv.mkDerivation rec {
     wrapGAppsHook
     intltool
     gtk-doc
-    gobject-introspection
   ];
 
   autoreconfPhase = ''
