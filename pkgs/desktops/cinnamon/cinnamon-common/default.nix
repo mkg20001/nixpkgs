@@ -88,6 +88,7 @@ stdenv.mkDerivation rec {
     polkit
     libxml2
     libgnomekbd
+    gobject-introspection
 
     # bindings
     cairo
