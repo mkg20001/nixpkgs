@@ -106,7 +106,12 @@ in
       pkgs.gnome3.adwaita-icon-theme
       pkgs.hicolor-icon-theme
       pkgs.gnome3.gnome-themes-extra
-      pkgs.gnome3.gtk
+      pkgs.gtk3.out # for gtk-launch
+
+      # other
+      pkgs.glib # for gsettings
+      pkgs.shared-mime-info # for update-mime-database
+      pkgs.xdg-user-dirs
     ];
 
     environment.pathsToLink = [
