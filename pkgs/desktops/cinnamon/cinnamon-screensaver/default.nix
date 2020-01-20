@@ -33,7 +33,6 @@
 stdenv.mkDerivation rec {
   pname = "cinnamon-screensaver";
   version = "4.4.0";
-  enableParallelBuilding = true;
 
   src = fetchFromGitHub {
     owner = "linuxmint";
