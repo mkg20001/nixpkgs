@@ -27,7 +27,6 @@
 stdenv.mkDerivation rec {
   pname = "cinnamon-session";
   version = "4.4.0";
-  enableParallelBuilding = true;
 
   src = fetchFromGitHub {
     owner = "linuxmint";
