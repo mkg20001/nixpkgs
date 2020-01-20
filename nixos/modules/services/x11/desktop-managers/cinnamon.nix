@@ -78,6 +78,9 @@ in
     # Power managment support
     services.upower.enable = mkDefault true;
 
+    # Network manager
+    networking.networkmanager.enable = mkDefault true;
+
     # Override GSettings schemas
     environment.sessionVariables.NIX_GSETTINGS_OVERRIDES_DIR = "${nixos-gsettings-desktop-schemas}/share/gsettings-schemas/nixos-gsettings-overrides/glib-2.0/schemas";
 
