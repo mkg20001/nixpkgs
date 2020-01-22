@@ -115,6 +115,7 @@ stdenv.mkDerivation rec {
   meta = with stdenv.lib; {
     homepage = "https://github.com/linuxmint/cinnamon-control-center";
     description = "A collection of configuration plugins used in cinnamon-settings";
+    license = licenses.gpl2;
     platforms = platforms.linux;
     maintainers = [ maintainers.mkg20001 ];
   };
