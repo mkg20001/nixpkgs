@@ -247,6 +247,7 @@ in {
   env = handleTest ./env.nix {};
   envfs = handleTest ./envfs.nix {};
   envoy = handleTest ./envoy.nix {};
+  environmentSkel = callTest ./environment-skel.nix {};
   ergo = handleTest ./ergo.nix {};
   ergochat = handleTest ./ergochat.nix {};
   esphome = handleTest ./esphome.nix {};
