@@ -224,7 +224,16 @@ foreach my $u (@{$spec->{users}}) {
 
     # Ensure home directory incl. ownership and permissions.
     if ($u->{createHome}) {
-        make_path($u->{home}, { mode => 0700 }) if ! -e $u->{home} and ! $is_dry;
+        my $new_home = 0;
+        if ( ! -e $u->{home} and ! $is_dry ) {
+            make_path($u->{home}, { mode => 0700 });
+            $new_home = 1;
+        }
+        if (defined $new_home && $spec->{skel} && $u->{copySkel}) {
+            system("cp --recursive --preserve=mode --no-preserve=owner $spec->{skel}/. $u->{home}");
+            system("chmod +w -R $u->{home}");
+            system("chown -R $u->{uid}:$u->{gid} $u->{home}");
+        }
         chown $u->{uid}, $u->{gid}, $u->{home};
         chmod 0700, $u->{home};
     }
