@@ -213,6 +213,15 @@ let
         '';
       };
 
+      copySkel = mkOption {
+        type = types.bool;
+        default = config.createHome;
+        description = ''
+          If this is true, createHome is true, and environment.skel is set, the skel directory's contents
+          will be copied into the home directory when it is first created.
+        '';
+      };
+
       useDefaultShell = mkOption {
         type = types.bool;
         default = false;
@@ -417,13 +426,15 @@ let
     inherit (cfg) mutableUsers;
     users = mapAttrsToList (_: u:
       { inherit (u)
-          name uid group description home createHome isSystemUser
+          name uid group description isSystemUser
+          home createHome copySkel
           password passwordFile hashedPassword
           isNormalUser subUidRanges subGidRanges
           initialPassword initialHashedPassword;
         shell = utils.toShellPath u.shell;
       }) cfg.users;
     groups = attrValues cfg.groups;
+    skel = config.environment.skel;
   });
 
   systemShells =
@@ -447,6 +458,20 @@ in {
   ###### interface
 
   options = {
+
+    environment.skel = mkOption {
+      type = types.nullOr types.path;
+      default = null;
+      description = ''
+        Specifies the directory that represents the contents of a newly
+        created home directory. The contents of this directory is copied
+        to the home directory when the home directory is being created.
+        This represents the behavior of
+        <filename>/etc/skel</filename>.
+        This option only applies when <option>createHome</option>
+        and <option>copySkel</option> are enabled for a particular user.
+      '';
+    };
 
     users.mutableUsers = mkOption {
       type = types.bool;
