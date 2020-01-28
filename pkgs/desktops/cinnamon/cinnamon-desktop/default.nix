@@ -13,6 +13,7 @@
 , xorg
 , wrapGAppsHook
 , glib
+, updateScript
 }:
 
 stdenv.mkDerivation rec {
@@ -57,6 +58,13 @@ stdenv.mkDerivation rec {
     patchShebangs install-scripts/meson_install_schemas.py
     sed "s|/usr/share|/run/current-system/sw/share|g" -i ./schemas/* # NOTE: unless this causes a circular dependency, we could link it to cinnamon-common/share/cinnamon
   '';
+
+  passthru = {
+    updateScript = updateScript {
+      inherit pname;
+      semver = "4.*.*";
+    };
+  };
 
   meta = with stdenv.lib; {
     homepage = "https://github.com/linuxmint/cinnamon-desktop";
