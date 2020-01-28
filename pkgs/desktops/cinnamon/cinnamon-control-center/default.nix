@@ -37,6 +37,7 @@
 , xorg
 , gdk-pixbuf
 , cups
+, updateScript
 }:
 
 stdenv.mkDerivation rec {
@@ -113,6 +114,13 @@ stdenv.mkDerivation rec {
     libxslt
     libtool
   ];
+
+  passthru = {
+    updateScript = updateScript {
+      inherit pname;
+      semver = "4.*.*";
+    };
+  };
 
   meta = with stdenv.lib; {
     homepage = "https://github.com/linuxmint/cinnamon-control-center";
