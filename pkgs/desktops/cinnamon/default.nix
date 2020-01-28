@@ -12,6 +12,8 @@ lib.makeScope pkgs.newScope (self: with self; {
     installPhase = "mv svg $out/share/iso-flags-svg";
   });
 
+  updateScript = callPackage ./update.nix { };
+
   cinnamon-common = callPackage ./cinnamon-common { };
   cinnamon-control-center = callPackage ./cinnamon-control-center { };
   cinnamon-desktop = callPackage ./cinnamon-desktop { };
