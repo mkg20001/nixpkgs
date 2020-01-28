@@ -31,6 +31,7 @@
 , cairo
 , xapps
 , upower
+, updateScript
 }:
 
 stdenv.mkDerivation rec {
@@ -95,6 +96,14 @@ stdenv.mkDerivation rec {
       --replace "\$(libdir)/muffin" "${muffin}/lib/muffin"
     patchShebangs autogen.sh
   '';
+
+  passthru = {
+    updateScript = updateScript {
+      inherit pname;
+      gh_name = "cinnamon";
+      semver = "4.*.*";
+    };
+  };
 
   # TODO: meta
 }
