@@ -1,6 +1,7 @@
 { atk
 , autoreconfHook
 , cacert
+, cinnamon-control-center
 , cinnamon-desktop
 , cinnamon-menus
 , cjs
