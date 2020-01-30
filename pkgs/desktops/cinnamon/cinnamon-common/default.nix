@@ -95,6 +95,24 @@ stdenv.mkDerivation rec {
     substituteInPlace src/Makefile.am \
       --replace "\$(libdir)/muffin" "${muffin}/lib/muffin"
     patchShebangs autogen.sh
+
+    find . -type f -exec sed -i \
+      -e s,/usr/share/cinnamon,$out/share/cinnamon,g \
+      -e s,/usr/share/locale,/run/current-system/sw/share/locale,g \
+      {} +
+
+    sed "s|/usr/share/sounds|/run/current-system/sw/share/sounds|g" -i ./files/usr/share/cinnamon/cinnamon-settings/bin/SettingsWidgets.py
+
+    sed "s|/usr/bin/upload-system-info|${xapps}/bin/upload-system-info|g" -i ./files/usr/share/cinnamon/cinnamon-settings/modules/cs_info.py
+    sed "s|upload-system-info|${xapps}/bin/upload-system-info|g" -i ./files/usr/share/cinnamon/cinnamon-settings/modules/cs_info.py
+
+    sed "s|/usr/bin/cinnamon-control-center|${cinnamon-control-center}/bin/cinnamon-control-center|g" -i ./files/usr/bin/cinnamon-settings
+    # this one really IS optional
+    sed "s|/usr/bin/gnome-control-center|/run/current-system/sw/bin/gnome-control-center|g" -i ./files/usr/bin/cinnamon-settings
+
+    # another bunch of optional stuff
+    sed "s|/usr/bin|/run/current-system/sw/bin|g" -i ./files/usr/bin/cinnamon-launcher
+
   '';
 
   passthru = {
