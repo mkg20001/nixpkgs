@@ -187,6 +187,7 @@ in {
   enlightenment = handleTest ./enlightenment.nix {};
   env = handleTest ./env.nix {};
   envoy = handleTest ./envoy.nix {};
+  environmentAliases = callTest ./environment-aliases.nix {};
   environmentSkel = callTest ./environment-skel.nix {};
   ergo = handleTest ./ergo.nix {};
   ergochat = handleTest ./ergochat.nix {};
