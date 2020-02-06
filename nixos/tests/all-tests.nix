@@ -139,6 +139,7 @@ in
   engelsystem = handleTest ./engelsystem.nix {};
   enlightenment = handleTest ./enlightenment.nix {};
   env = handleTest ./env.nix {};
+  environmentAliases = callTest ./environment-aliases.nix {};
   environmentSkel = callTest ./environment-skel.nix {};
   ergo = handleTest ./ergo.nix {};
   ergochat = handleTest ./ergochat.nix {};
