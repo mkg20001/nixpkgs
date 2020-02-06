@@ -493,6 +493,7 @@ in
   ente = runTest ./ente;
   env = runTest ./env.nix;
   envfs = runTest ./envfs.nix;
+  environmentAliases = callTest ./environment-aliases.nix {};
   envoy = runTest {
     imports = [ ./envoy.nix ];
     _module.args.envoyPackage = pkgs.envoy;
