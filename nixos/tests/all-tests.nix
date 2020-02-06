@@ -89,6 +89,7 @@ in
   elk = handleTestOn ["x86_64-linux"] ./elk.nix {};
   enlightenment = handleTest ./enlightenment.nix {};
   env = handleTest ./env.nix {};
+  environmentAliases = callTest ./environment-aliases.nix {};
   environmentSkel = callTest ./environment-skel.nix {};
   etcd = handleTestOn ["x86_64-linux"] ./etcd.nix {};
   etcd-cluster = handleTestOn ["x86_64-linux"] ./etcd-cluster.nix {};
