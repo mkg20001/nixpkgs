@@ -100,6 +100,7 @@
   ./i18n/input-method/uim.nix
   ./i18n/input-method/kime.nix
   ./installer/tools/tools.nix
+  ./misc/aliases.nix
   ./misc/assertions.nix
   ./misc/crashdump.nix
   ./misc/documentation.nix
