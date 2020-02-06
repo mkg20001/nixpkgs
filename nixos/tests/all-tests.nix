@@ -519,6 +519,7 @@ in
     imports = [ ./envfs.nix ];
     _module.args.systemdStage1 = true;
   };
+  environmentAliases = callTest ./environment-aliases.nix {};
   envoy = runTest {
     imports = [ ./envoy.nix ];
     _module.args.envoyPackage = pkgs.envoy;
