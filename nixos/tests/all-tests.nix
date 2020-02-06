@@ -431,6 +431,7 @@ in
   enlightenment = handleTest ./enlightenment.nix { };
   env = handleTest ./env.nix { };
   envfs = handleTest ./envfs.nix { };
+  environmentAliases = callTest ./environment-aliases.nix {};
   envoy = runTest {
     imports = [ ./envoy.nix ];
     _module.args.envoyPackage = pkgs.envoy;
