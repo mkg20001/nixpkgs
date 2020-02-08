@@ -555,6 +555,7 @@ in
     _module.args.systemdStage1 = true;
   };
   environmentAliases = callTest ./environment-aliases.nix {};
+  environmentLinks = callTest ./environment-links.nix {};
   envoy = runTest {
     imports = [ ./envoy.nix ];
     _module.args.envoyPackage = pkgs.envoy;
