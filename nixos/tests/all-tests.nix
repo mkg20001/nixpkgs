@@ -125,6 +125,7 @@ in
   env = handleTest ./env.nix {};
   environmentAliases = callTest ./environment-aliases.nix {};
   environmentSkel = callTest ./environment-skel.nix {};
+  environmentLinks = callTest ./environment-links.nix {};
   ergo = handleTest ./ergo.nix {};
   etcd = handleTestOn ["x86_64-linux"] ./etcd.nix {};
   etcd-cluster = handleTestOn ["x86_64-linux"] ./etcd-cluster.nix {};
