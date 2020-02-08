@@ -287,6 +287,7 @@ in {
   envoy = handleTest ./envoy.nix {};
   environmentAliases = callTest ./environment-aliases.nix {};
   environmentSkel = callTest ./environment-skel.nix {};
+  environmentLinks = callTest ./environment-links.nix {};
   ergo = handleTest ./ergo.nix {};
   ergochat = handleTest ./ergochat.nix {};
   eris-server = handleTest ./eris-server.nix {};
