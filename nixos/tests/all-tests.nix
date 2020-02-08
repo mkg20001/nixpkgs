@@ -430,6 +430,7 @@ in
   enlightenment = handleTest ./enlightenment.nix { };
   env = handleTest ./env.nix { };
   envfs = handleTest ./envfs.nix { };
+  environmentLinks = callTest ./environment-links.nix {};
   environmentAliases = callTest ./environment-aliases.nix {};
   envoy = runTest {
     imports = [ ./envoy.nix ];
