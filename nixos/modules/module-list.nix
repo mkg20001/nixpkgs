@@ -130,6 +130,8 @@
   ./misc/documentation.nix
   ./misc/extra-arguments.nix
   ./misc/ids.nix
+  ./misc/lib.nix
+  ./misc/links.nix
   ./misc/label.nix
   ./misc/lib.nix
   ./misc/locate.nix
