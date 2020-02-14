@@ -88,6 +88,44 @@ in
         };
       };
 
+      background = {
+        file = mkOption {
+          type = types.nullOr types.path;
+          default = null;
+          description = "Path to use for background image";
+        };
+
+        pictureOptions = mkOption {
+          type = types.str;
+          default = "scaled";
+          description = "Rendering options for the background image";
+        };
+
+        primaryColor = mkOption {
+          type = types.str;
+          default = "000000";
+          description = "Specify the left or top color when drawing gradients, or the solid color";
+        };
+
+        secondaryColor = mkOption {
+          type = types.str;
+          default = "FFFFFF";
+          description = "Specify the right or bottom color when drawing gradients";
+        };
+      };
+
+      theme = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Theme to use";
+      };
+
+      extraDConf = mkOption {
+        type = types.lines;
+        default = "";
+        description = "Extra DConf values to append";
+      };
+
       wayland = mkOption {
         default = true;
         description = ''
@@ -241,6 +279,7 @@ in
       customDconf = pkgs.writeTextFile {
         name = "gdm-dconf";
         destination = "/dconf/gdm-custom";
+        # helpful ref https://people.gnome.org/~pmkovar/system-admin-guide/
         text = ''
           ${optionalString (!cfg.gdm.autoSuspend) ''
             [org/gnome/settings-daemon/plugins/power]
@@ -249,6 +288,26 @@ in
             sleep-inactive-ac-timeout=0
             sleep-inactive-battery-timeout=0
           ''}
+
+          ${optionalString (cfg.gdm.background.file != null) ''
+            # https://people.gnome.org/~pmkovar/system-admin-guide/login-background.html
+            [org/gnome/desktop/background]
+            # Specify the path to the desktop background image file
+            picture-uri='file://${cfg.gdm.background.file}'
+            # Specify one of the rendering options for the background image:
+            picture-options='${cfg.gdm.background.pictureOptions}'
+            # Specify the left or top color when drawing gradients, or the solid color
+            primary-color='${cfg.gdm.background.primaryColor}'
+            # Specify the right or bottom color when drawing gradients
+            secondary-color='${cfg.gdm.background.secondaryColor}'
+          ''}
+
+          ${optionalString (cfg.gdm.theme != null) ''
+            [org/gnome/settings-daemon/plugins/xsettings]
+
+          ''}
+
+          ${cfg.gdm.extraDConf}
         '';
       };
 
