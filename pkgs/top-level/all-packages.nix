@@ -11774,6 +11774,8 @@ in
     inherit (darwin.apple_sdk.frameworks) ApplicationServices;
   };
 
+  pangox_compat = callPackage ../development/libraries/pangox-compat { };
+
   gdata-sharp = callPackage ../development/libraries/gdata-sharp { };
 
   gdk-pixbuf = callPackage ../development/libraries/gdk-pixbuf { };
