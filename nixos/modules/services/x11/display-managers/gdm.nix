@@ -274,6 +274,11 @@ in
 
     systemd.user.services.dbus.wantedBy = [ "default.target" ];
 
+    # HACK: NO
+    environment.etc."gdm-bg.jpg".source = cfg.gdm.background.file;
+
+    # environment.etc."dconf/db/gdm" = customDConfDb;
+
     programs.dconf.profiles.gdm =
     let
       customDconf = pkgs.writeTextFile {
@@ -329,6 +334,36 @@ in
         sed '2ifile-db:${customDconfDb}' ${gdm}/share/dconf/profile/gdm > $out
       '';
     };
+
+    environment.etc."dconf/db/gdm.d/nixos".text = ''
+      ${optionalString (!cfg.gdm.autoSuspend) ''
+        [org/gnome/settings-daemon/plugins/power]
+        sleep-inactive-ac-type='nothing'
+        sleep-inactive-battery-type='nothing'
+        sleep-inactive-ac-timeout=0
+        sleep-inactive-battery-timeout=0
+      ''}
+
+      ${optionalString (cfg.gdm.background.file != null) ''
+        # https://people.gnome.org/~pmkovar/system-admin-guide/login-background.html
+        [org/gnome/desktop/background]
+        # Specify the path to the desktop background image file
+        picture-uri='file://${cfg.gdm.background.file}'
+        # Specify one of the rendering options for the background image:
+        picture-options='${cfg.gdm.background.pictureOptions}'
+        # Specify the left or top color when drawing gradients, or the solid color
+        primary-color='${cfg.gdm.background.primaryColor}'
+        # Specify the right or bottom color when drawing gradients
+        secondary-color='${cfg.gdm.background.secondaryColor}'
+      ''}
+
+      ${optionalString (cfg.gdm.theme != null) ''
+        [org/gnome/desktop/interface]
+        gtk-theme='${cfg.gdm.theme}'
+      ''}
+
+      ${cfg.gdm.extraDConf}
+    '';
 
     # Use AutomaticLogin if delay is zero, because it's immediate.
     # Otherwise with TimedLogin with zero seconds the prompt is still

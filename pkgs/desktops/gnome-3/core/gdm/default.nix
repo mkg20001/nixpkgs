@@ -1,7 +1,7 @@
 { stdenv, fetchurl, substituteAll, pkgconfig, glib, itstool, libxml2, xorg
 , accountsservice, libX11, gnome3, systemd, autoreconfHook, dconf
 , gtk3, libcanberra-gtk3, pam, libtool, gobject-introspection, plymouth
-, librsvg, coreutils, xwayland, nixos-icons, fetchpatch }:
+, librsvg, coreutils, xwayland, nixos-icons, fetchpatch, isocodes }:
 
 let
 
@@ -48,6 +48,7 @@ stdenv.mkDerivation rec {
     glib accountsservice systemd
     gobject-introspection libX11 gtk3
     libcanberra-gtk3 pam plymouth librsvg
+    isocodes
   ];
 
   enableParallelBuilding = true;
