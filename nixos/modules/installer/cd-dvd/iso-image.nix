@@ -7,6 +7,13 @@
 with lib;
 
 let
+  bootItems = config.isoImage.prependItems ++ [
+      { class = "installer"; }
+      { class = "nomodeset"; params = "nomodeset"; }
+      { class = "copytoram"; params = "copytoram"; }
+      { class = "debug";     params = "debug loglevel=7"; }
+    ] ++ config.isoImage.appendItems;
+
   /**
    * Given a list of `options`, concats the result of mapping each options
    * to a menuentry for use in grub.
@@ -56,12 +63,7 @@ let
   in
     menuBuilderGrub2
     finalCfg
-    (config.isoImage.prependItems ++ [
-      { class = "installer"; }
-      { class = "nomodeset"; params = "nomodeset"; }
-      { class = "copytoram"; params = "copytoram"; }
-      { class = "debug";     params = "debug"; }
-    ] ++ config.isoImage.appendItems)
+    (bootItems)
   ;
 
   # Timeout in syslinux is in units of 1/10 of a second.
@@ -117,34 +119,15 @@ let
     MENU COLOR UNSEL        37;44      #FF000000    #00000000   none
     MENU COLOR SEL          7;37;40    #FFFFFFFF    #FF5277C3   std
 
-    DEFAULT boot
+    DEFAULT boot-installer
 
-    LABEL boot
-    MENU LABEL NixOS ${config.system.nixos.label}${config.isoImage.appendToMenuLabel}
+    ${concatStringsSep "\n" (forEach bootItems (v: ''
+    LABEL boot-${v.class}
+    MENU LABEL NixOS ${config.system.nixos.label}${config.isoImage.appendToMenuLabel}${if hasAttrByPath [ "params" ] v then " (${v.class})" else ""}
     LINUX /boot/${config.system.boot.loader.kernelFile}
-    APPEND init=${config.system.build.toplevel}/init ${toString config.boot.kernelParams}
+    APPEND init=${config.system.build.toplevel}/init ${toString config.boot.kernelParams} ${if hasAttrByPath [ "params" ] v then v.params else ""}
     INITRD /boot/${config.system.boot.loader.initrdFile}
-
-    # A variant to boot with 'nomodeset'
-    LABEL boot-nomodeset
-    MENU LABEL NixOS ${config.system.nixos.label}${config.isoImage.appendToMenuLabel} (nomodeset)
-    LINUX /boot/${config.system.boot.loader.kernelFile}
-    APPEND init=${config.system.build.toplevel}/init ${toString config.boot.kernelParams} nomodeset
-    INITRD /boot/${config.system.boot.loader.initrdFile}
-
-    # A variant to boot with 'copytoram'
-    LABEL boot-copytoram
-    MENU LABEL NixOS ${config.system.nixos.label}${config.isoImage.appendToMenuLabel} (copytoram)
-    LINUX /boot/${config.system.boot.loader.kernelFile}
-    APPEND init=${config.system.build.toplevel}/init ${toString config.boot.kernelParams} copytoram
-    INITRD /boot/${config.system.boot.loader.initrdFile}
-
-    # A variant to boot with verbose logging to the console
-    LABEL boot-debug
-    MENU LABEL NixOS ${config.system.nixos.label}${config.isoImage.appendToMenuLabel} (debug)
-    LINUX /boot/${config.system.boot.loader.kernelFile}
-    APPEND init=${config.system.build.toplevel}/init ${toString config.boot.kernelParams} loglevel=7
-    INITRD /boot/${config.system.boot.loader.initrdFile}
+    ''))}
   '';
 
   isolinuxMemtest86Entry = ''
