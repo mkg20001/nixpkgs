@@ -56,12 +56,12 @@ let
   in
     menuBuilderGrub2
     finalCfg
-    [
+    (config.isoImage.prependItems ++ [
       { class = "installer"; }
       { class = "nomodeset"; params = "nomodeset"; }
       { class = "copytoram"; params = "copytoram"; }
       { class = "debug";     params = "debug"; }
-    ]
+    ] ++ config.isoImage.appendItems)
   ;
 
   # Timeout in syslinux is in units of 1/10 of a second.
@@ -86,6 +86,8 @@ let
   #     the LINUX entries.
   #   * COM32 entries (chainload, reboot, poweroff) are not recognized. They
   #     result in incorrect boot entries.
+
+  # TODO: make generated aswell
 
   baseIsolinuxCfg = ''
     SERIAL 0 115200
@@ -512,6 +514,17 @@ in
       '';
     };
 
+    isoImage.appendItems = mkOption {
+      default = [];
+      type = types.listOf types.attrs;
+      description = "Append menuItems ({ class = \"copytoram+persistent\"; params = \"boot.persistence=/dev/disk/by-label/mkg-portable copytoram\"; })";
+    };
+
+    isoImage.prependItems = mkOption {
+      default = [];
+      type = types.listOf types.attrs;
+      description = "Prepend menuItems ({ class = \"copytoram+persistent\"; params = \"boot.persistence=/dev/disk/by-label/mkg-portable copytoram\"; })";
+    };
   };
 
   config = {
