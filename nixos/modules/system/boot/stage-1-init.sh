@@ -534,6 +534,13 @@ while read -u 3 mountPoint; do
       continue
     fi
 
+    if [ "$mountPoint" = / ] && [ "$device" = tmpfs ] && [ -e "/dev/disk/by-label/mkg-portable" ]; then
+        echo enabling persistence...
+        sleep .1s
+        mountFS "/dev/disk/by-label/mkg-portable" "$mountPoint" "rw" "ext4"
+        continue
+    fi
+
     mountFS "$device" "$mountPoint" "$options" "$fsType"
 done
 
