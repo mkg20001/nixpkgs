@@ -1,107 +1,95 @@
-{ lib, stdenv, fetchFromGitHub, pkg-config, which, perl, autoconf, automake, libtool, openssl, systemd, pam, fuse, libjpeg, libopus, nasm, xorg }:
+{ stdenv, lib, fetchFromGitHub, fetchpatch
+, pkg-config, which, autoconf, automake, libtool, nasm, perl
+, openssl, systemd, pam, fuse, libjpeg, libopus, pixman, xorg, xorgxrdp }:
 
-let
-  xorgxrdp = stdenv.mkDerivation rec {
-    pname = "xorgxrdp";
-    version = "0.9.19";
+stdenv.mkDerivation rec {
+  version = "0.9.12";
+  pname = "xrdp";
 
-    src = fetchFromGitHub {
-      owner = "neutrinolabs";
-      repo = "xorgxrdp";
-      rev = "v${version}";
-      hash = "sha256-WI1KyJDQkmNHwweZMbNd2KUfawaieoGMDMQfeD12cZs=";
-    };
-
-    nativeBuildInputs = [ pkg-config autoconf automake which libtool nasm ];
-
-    buildInputs = [ xorg.xorgserver ];
-
-    postPatch = ''
-      # patch from Debian, allows to run xrdp daemon under unprivileged user
-      substituteInPlace module/rdpClientCon.c \
-        --replace 'g_sck_listen(dev->listen_sck);' 'g_sck_listen(dev->listen_sck); g_chmod_hex(dev->uds_data, 0x0660);'
-
-      substituteInPlace configure.ac \
-        --replace 'moduledir=`pkg-config xorg-server --variable=moduledir`' "moduledir=$out/lib/xorg/modules" \
-        --replace 'sysconfdir="/etc"' "sysconfdir=$out/etc"
-    '';
-
-    preConfigure = "./bootstrap";
-
-    configureFlags = [ "XRDP_CFLAGS=-I${xrdp.src}/common"  ];
-
-    enableParallelBuilding = true;
+  src = fetchFromGitHub {
+    owner = "neutrinolabs";
+    repo = "xrdp";
+    rev = "v${version}";
+    fetchSubmodules = true;
+    sha256 = "155yixhhq64gyacjhd5llvhxc1ys4smkhlk5573vc9n1h4f49nix";
   };
 
-  xrdp = stdenv.mkDerivation rec {
-    version = "0.9.21.1";
-    pname = "xrdp";
+  patches = [
+    # patch to allow to specify runtime config
+    (fetchpatch {
+      url = "https://github.com/xtruder/xrdp/commit/fd437b3500d763bb1a9958aefa9506fa363530ea.patch";
+      sha256 = "1xijqpvp7mzzwcja2mz0nmb5n344zgmx3knnigkfd96y60xf4rj4";
+    })
+  ];
 
-    src = fetchFromGitHub {
-      owner = "neutrinolabs";
-      repo = "xrdp";
-      rev = "v${version}";
-      fetchSubmodules = true;
-      hash = "sha256-/o052ij+Tpcw5/k1UyP6OGOzrtBwh3jRkftStIEhUF0=";
-    };
+  nativeBuildInputs = [ pkg-config autoconf automake which libtool nasm perl ];
 
-    nativeBuildInputs = [ pkg-config autoconf automake which libtool nasm perl ];
+  buildInputs = with xorg; [
+    openssl systemd pam fuse
+    libjpeg libopus
+    libX11 libXfixes libXrandr pixman
+  ];
 
-    buildInputs = [ openssl systemd pam fuse libjpeg libopus xorg.libX11 xorg.libXfixes xorg.libXrandr ];
+  postPatch = ''
+    substituteInPlace sesman/xauth.c --replace "xauth -q" "${xorg.xauth}/bin/xauth -q"
+  '';
 
-    patches = [ ./dynamic_config.patch ];
+  preConfigure = ''
+    (cd librfxcodec && ./bootstrap && ./configure --prefix=$out --enable-static --disable-shared)
+    ./bootstrap
+  '';
+  dontDisableStatic = true;
+  configureFlags = [
+    "--with-systemdsystemunitdir=/var/empty"
+    "--enable-ipv6"
+    "--enable-jpeg"
+    "--enable-fuse"
+    "--enable-rfxcodec"
+    "--enable-pixman"
+    "--enable-painter"
+    "--enable-vsock"
+    "--enable-opus"
+  ];
 
-    postPatch = ''
-      substituteInPlace sesman/xauth.c --replace "xauth -q" "${xorg.xauth}/bin/xauth -q"
-    '';
+  installFlags = [ "DESTDIR=$(out)" "prefix=" ];
 
-    preConfigure = ''
-      (cd librfxcodec && ./bootstrap && ./configure --prefix=$out --enable-static --disable-shared)
-      ./bootstrap
-    '';
-    dontDisableStatic = true;
-    configureFlags = [ "--with-systemdsystemunitdir=/var/empty" "--enable-ipv6" "--enable-jpeg" "--enable-fuse" "--enable-rfxcodec" "--enable-opus" "--enable-pam-config=unix" ];
+  postInstall = ''
+    # remove generated keys (as non-determenistic) and upstart script
+    rm $out/etc/xrdp/{rsakeys.ini,key.pem,cert.pem}
 
-    installFlags = [ "DESTDIR=$(out)" "prefix=" ];
+    cp $src/keygen/openssl.conf $out/share/xrdp/openssl.conf
 
-    postInstall = ''
-      # remove generated keys (as non-deterministic)
-      rm $out/etc/xrdp/{rsakeys.ini,key.pem,cert.pem}
+    substituteInPlace $out/etc/xrdp/sesman.ini --replace /etc/xrdp/pulse $out/etc/xrdp/pulse
 
-      cp $src/keygen/openssl.conf $out/share/xrdp/openssl.conf
+    # remove all session types except Xorg (they are not supported by this setup)
+    ${perl}/bin/perl -i -ne 'print unless /\[(X11rdp|Xvnc|console|vnc-any|sesman-any|rdp-any|neutrinordp-any)\]/ .. /^$/' $out/etc/xrdp/xrdp.ini
 
-      substituteInPlace $out/etc/xrdp/sesman.ini --replace /etc/xrdp/pulse $out/etc/xrdp/pulse
+    # remove all session types and then add Xorg
+    ${perl}/bin/perl -i -ne 'print unless /\[(X11rdp|Xvnc|Xorg)\]/ .. /^$/' $out/etc/xrdp/sesman.ini
 
-      # remove all session types except Xorg (they are not supported by this setup)
-      perl -i -ne 'print unless /\[(X11rdp|Xvnc|console|vnc-any|sesman-any|rdp-any|neutrinordp-any)\]/ .. /^$/' $out/etc/xrdp/xrdp.ini
+    cat >> $out/etc/xrdp/sesman.ini <<EOF
 
-      # remove all session types and then add Xorg
-      perl -i -ne 'print unless /\[(X11rdp|Xvnc|Xorg)\]/ .. /^$/' $out/etc/xrdp/sesman.ini
+    [Xorg]
+    param=${xorg.xorgserver}/bin/Xorg
+    param=-modulepath
+    param=${xorgxrdp}/lib/xorg/modules,${xorg.xorgserver}/lib/xorg/modules
+    param=-config
+    param=${xorgxrdp}/etc/X11/xrdp/xorg.conf
+    param=-noreset
+    param=-nolisten
+    param=tcp
+    param=-logfile
+    param=.xorgxrdp.%s.log
+    EOF
+  '';
 
-      cat >> $out/etc/xrdp/sesman.ini <<EOF
+  enableParallelBuilding = true;
 
-      [Xorg]
-      param=${xorg.xorgserver}/bin/Xorg
-      param=-modulepath
-      param=${xorgxrdp}/lib/xorg/modules,${xorg.xorgserver}/lib/xorg/modules
-      param=-config
-      param=${xorgxrdp}/etc/X11/xrdp/xorg.conf
-      param=-noreset
-      param=-nolisten
-      param=tcp
-      param=-logfile
-      param=.xorgxrdp.%s.log
-      EOF
-    '';
-
-    enableParallelBuilding = true;
-
-    meta = with lib; {
-      description = "An open source RDP server";
-      homepage = "https://github.com/neutrinolabs/xrdp";
-      license = licenses.asl20;
-      maintainers = with maintainers; [ chvp ];
-      platforms = platforms.linux;
-    };
+  meta = with lib; {
+    description = "An open source RDP server";
+    homepage = "https://github.com/neutrinolabs/xrdp";
+    license = licenses.asl20;
+    maintainers = [ ];
+    platforms = platforms.linux;
   };
-in xrdp
+}
