@@ -204,6 +204,7 @@ in
             { hostName = "linux64.example.org";
               sshUser = "buildfarm";
               sshKey = "/root/.ssh/id_buildfarm";
+              sshPort = 1234;
               system = "x86_64-linux";
               maxJobs = 2;
               speedFactor = 2;
@@ -222,8 +223,9 @@ in
           element of the list should be an attribute set containing
           the machine's host name (<varname>hostname</varname>), the
           user name to be used for the SSH connection
-          (<varname>sshUser</varname>), the Nix system type
-          (<varname>system</varname>, e.g.,
+          (<varname>sshUser</varname>), the port to be used for the
+          SSH connection (<varname>sshPort</varname>),
+          the Nix system type (<varname>system</varname>), e.g.,
           <literal>"i686-linux"</literal>), the maximum number of
           jobs to be run in parallel on that machine
           (<varname>maxJobs</varname>), the path to the SSH private
@@ -396,7 +398,7 @@ in
       { enable = cfg.buildMachines != [];
         text =
           concatMapStrings (machine:
-            "${if machine ? sshUser then "${machine.sshUser}@" else ""}${machine.hostName} "
+            "${if machine ? sshUser then "${machine.sshUser}@" else ""}${machine.hostName}${if machine ? sshPort then ":${toString machine.sshPort}" else ""} "
             + machine.system or (concatStringsSep "," machine.systems)
             + " ${machine.sshKey or "-"} ${toString machine.maxJobs or 1} "
             + toString (machine.speedFactor or 1)
