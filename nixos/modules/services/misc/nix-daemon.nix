@@ -296,6 +296,15 @@ in
                 <option>nix.trustedUsers</option>.
               '';
             };
+            sshPort = mkOption {
+              type = types.nullOr types.int;
+              default = null;
+              example = 2222;
+              description = ''
+                The port to connect to. If not specified the default 22 or
+                the value specified in $HOME/.ssh/config will be used
+              '';
+            };            
             sshKey = mkOption {
               type = types.nullOr types.str;
               default = null;
@@ -583,7 +592,7 @@ in
       { enable = cfg.buildMachines != [];
         text =
           concatMapStrings (machine:
-            "${if machine.sshUser != null then "${machine.sshUser}@" else ""}${machine.hostName} "
+            "${if machine.sshUser != null then "${machine.sshUser}@" else ""}${machine.hostName}${if machine.sshPort != null then ":${toString machine.sshPort}" else ""} "
             + (if machine.system != null then machine.system else concatStringsSep "," machine.systems)
             + " ${if machine.sshKey != null then machine.sshKey else "-"} ${toString machine.maxJobs} "
             + toString (machine.speedFactor)
