@@ -221,4 +221,14 @@ in rec {
     inherit storeDir stateDir confDir boehmgc;
   });
 
+  nixMkg = callPackage common rec {
+    name = "nix-2.4${suffix}";
+    suffix = "pre_mkg";
+    src = fetchurl {
+      url = "https://github.com/mkg20001/nix-1/releases/download/2.4mkg/nix.tar.gz";
+      sha256 = "0d79pix5l877626li18k3m9snpdwjyxcn4xyxvl5cbf2ykayq45n";
+    };
+
+    inherit storeDir stateDir confDir boehmgc;
+  };
 }

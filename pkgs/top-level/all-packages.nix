@@ -25231,7 +25231,8 @@ in
     nix1
     nixStable
     nixUnstable
-    nixFlakes;
+    nixFlakes
+    nixMkg;
 
   nixops = callPackage ../tools/package-management/nixops { };
 
