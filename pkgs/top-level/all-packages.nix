@@ -25285,6 +25285,8 @@ in
     nixUnstable
     nixFlakes;
 
+  nixMkg = "/nix/store/r82gpld9rjsyr8lkx2l9275yj8czi5y9-nix-2.4pre7307_c1f1e6f"; # let s = { drvPath = "/nix/store/43ak31a4saxl8cjilrxv0l3jad3qipvf-nix-2.4pre7307_c1f1e6f.drv"; name = "nix-2.4pre7307_c1f1e6f"; outputName = "out"; type = "derivation"; }; s.out = "/nix/store/r82gpld9rjsyr8lkx2l9275yj8czi5y9-nix-2.4pre7307_c1f1e6f"; in s;
+
   nixops = callPackage ../tools/package-management/nixops { };
 
   nixops_1_6_1 = callPackage ../tools/package-management/nixops/nixops-v1_6_1.nix {};
