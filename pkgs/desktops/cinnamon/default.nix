@@ -17,4 +17,5 @@ lib.makeScope pkgs.newScope (self: with self; {
   mint-y-icons = callPackage ./mint-y-icons { };
   muffin = callPackage ./muffin { };
   xapps = callPackage ./xapps { };
+  warp = callPackage ./warp { };
 })
