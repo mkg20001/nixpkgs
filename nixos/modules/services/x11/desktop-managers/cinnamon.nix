@@ -89,6 +89,7 @@ in
       cinnamon-common
       cinnamon-session
       cinnamon-desktop
+      mint-themes
 
       # utils needed by some scripts
       pkgs.killall
