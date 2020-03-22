@@ -105,6 +105,7 @@ in
       cinnamon-control-center
       cinnamon-settings-daemon
       gnome3.libgnomekbd
+      warp
 
       # theme
       pkgs.gnome3.adwaita-icon-theme
