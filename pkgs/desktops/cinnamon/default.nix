@@ -16,4 +16,5 @@ lib.makeScope pkgs.newScope (self: with self; {
   mint-themes = callPackage ./mint-themes { };
   muffin = callPackage ./muffin { };
   xapps = callPackage ./xapps { };
+  warp = callPackage ./warp { };
 })
