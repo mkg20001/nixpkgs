@@ -14,6 +14,7 @@ lib.makeScope pkgs.newScope (self: with self; {
   cjs = callPackage ./cjs { };
   nemo = callPackage ./nemo { };
   mint-themes = callPackage ./mint-themes { };
+  mint-y-icons = callPackage ./mint-y-icons { };
   muffin = callPackage ./muffin { };
   xapps = callPackage ./xapps { };
   warp = callPackage ./warp { };
