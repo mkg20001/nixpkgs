@@ -90,6 +90,7 @@ in
       cinnamon-session
       cinnamon-desktop
       mint-themes
+      mint-y-icons
 
       # utils needed by some scripts
       pkgs.killall
