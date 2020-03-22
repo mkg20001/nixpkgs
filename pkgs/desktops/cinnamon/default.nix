@@ -13,6 +13,7 @@ lib.makeScope pkgs.newScope (self: with self; {
   cinnamon-screensaver = callPackage ./cinnamon-screensaver { };
   cjs = callPackage ./cjs { };
   nemo = callPackage ./nemo { };
+  mint-themes = callPackage ./mint-themes { };
   muffin = callPackage ./muffin { };
   xapps = callPackage ./xapps { };
 })
