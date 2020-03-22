@@ -89,8 +89,6 @@ in
       cinnamon-common
       cinnamon-session
       cinnamon-desktop
-      mint-themes
-      mint-y-icons
 
       # utils needed by some scripts
       pkgs.killall
@@ -113,6 +111,8 @@ in
       pkgs.hicolor-icon-theme
       pkgs.gnome3.gnome-themes-extra
       pkgs.gtk3.out # for gtk-launch
+      mint-themes
+      mint-y-icons
 
       # other
       pkgs.glib # for gsettings
