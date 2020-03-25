@@ -2013,6 +2013,8 @@ in
 
   marlin-calc = callPackage ../tools/misc/marlin-calc {};
 
+  mate-tweak = python3Packages.callPackage ../tools/misc/mate-tweak { };
+
   mathics = with python2Packages; toPythonApplication mathics;
 
   masscan = callPackage ../tools/security/masscan {
