@@ -3379,6 +3379,8 @@ with pkgs;
 
   masscan = callPackage ../tools/security/masscan { };
 
+  mate-tweak = python3Packages.callPackage ../tools/misc/mate-tweak { };
+
   massren = callPackage ../tools/misc/massren { };
 
   mat2 = with python3.pkgs; toPythonApplication mat2;
