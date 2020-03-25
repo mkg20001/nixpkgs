@@ -2515,6 +2515,8 @@ with pkgs;
   maple-mono-woff2 = (callPackage ../data/fonts/maple-font { }).woff2;
   maple-mono-autohint = (callPackage ../data/fonts/maple-font { }).autohint;
 
+  mate-tweak = python3Packages.callPackage ../tools/misc/mate-tweak { };
+
   mat2 = with python3.pkgs; toPythonApplication mat2;
 
   materialx = with python3Packages; toPythonApplication materialx;
