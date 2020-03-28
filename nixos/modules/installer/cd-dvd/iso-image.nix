@@ -89,63 +89,12 @@ let
   #   * COM32 entries (chainload, reboot, poweroff) are not recognized. They
   #     result in incorrect boot entries.
 
-  # TODO: make generated aswell
-
-  baseIsolinuxCfg = ''
-    SERIAL 0 115200
-    TIMEOUT ${builtins.toString syslinuxTimeout}
-    UI vesamenu.c32
-    MENU TITLE NixOS
-    MENU BACKGROUND /isolinux/background.png
-    MENU RESOLUTION 800 600
-    MENU CLEAR
-    MENU ROWS 6
-    MENU CMDLINEROW -4
-    MENU TIMEOUTROW -3
-    MENU TABMSGROW  -2
-    MENU HELPMSGROW -1
-    MENU HELPMSGENDROW -1
-    MENU MARGIN 0
-
-    #                                FG:AARRGGBB  BG:AARRGGBB   shadow
-    MENU COLOR BORDER       30;44      #00000000    #00000000   none
-    MENU COLOR SCREEN       37;40      #FF000000    #00E2E8FF   none
-    MENU COLOR TABMSG       31;40      #80000000    #00000000   none
-    MENU COLOR TIMEOUT      1;37;40    #FF000000    #00000000   none
-    MENU COLOR TIMEOUT_MSG  37;40      #FF000000    #00000000   none
-    MENU COLOR CMDMARK      1;36;40    #FF000000    #00000000   none
-    MENU COLOR CMDLINE      37;40      #FF000000    #00000000   none
-    MENU COLOR TITLE        1;36;44    #00000000    #00000000   none
-    MENU COLOR UNSEL        37;44      #FF000000    #00000000   none
-    MENU COLOR SEL          7;37;40    #FFFFFFFF    #FF5277C3   std
-
-    DEFAULT boot-installer
-
-    ${concatStringsSep "\n" (forEach bootItems (v: ''
-    LABEL boot-${v.class}
-    MENU LABEL NixOS ${config.system.nixos.label}${config.isoImage.appendToMenuLabel}${if hasAttrByPath [ "params" ] v then " (${v.class})" else ""}
-    LINUX /boot/${config.system.boot.loader.kernelFile}
-    APPEND init=${config.system.build.toplevel}/init ${toString config.boot.kernelParams} ${if hasAttrByPath [ "params" ] v then v.params else ""}
-    INITRD /boot/${config.system.boot.loader.initrdFile}
-    ''))}
-  '';
-
-  isolinuxMemtest86Entry = ''
-    LABEL memtest
-    MENU LABEL Memtest86+
-    LINUX /boot/memtest.bin
-    APPEND ${toString config.boot.loader.grub.memtest86.params}
-  '';
-
-  isolinuxCfg = concatStringsSep "\n"
-    ([ baseIsolinuxCfg ] ++ optional config.boot.loader.grub.memtest86.enable isolinuxMemtest86Entry);
-
   # Setup instructions for rEFInd.
   refind =
     if targetArch == "x64" then
       ''
       # Adds rEFInd to the ISO.
-      cp -v ${pkgs.refind}/share/refind/refind_x64.efi $out/EFI/boot/
+      cp -v ${pkgs.refind}/share/refind/refind_x64.efi $out/boot/
       ''
     else
       "# No refind for ${targetArch}"
@@ -164,7 +113,7 @@ let
 
     # Fonts can be loaded?
     # (This font is assumed to always be provided as a fallback by NixOS)
-    if loadfont (hd0)/EFI/boot/unicode.pf2; then
+    if loadfont (hd0)/boot/unicode.pf2; then
       # Use graphical term, it can be either with background image or a theme.
       # input is "console", while output is "gfxterm".
       # This enables "serial" input and output only when possible.
@@ -185,11 +134,11 @@ let
     ${ # When there is a theme configured, use it, otherwise use the background image.
     if config.isoImage.grubTheme != null then ''
       # Sets theme.
-      set theme=(hd0)/EFI/boot/grub-theme/theme.txt
+      set theme=(hd0)/boot/grub-theme/theme.txt
       # Load theme fonts
       $(find ${config.isoImage.grubTheme} -iname '*.pf2' -printf "loadfont (hd0)/EFI/boot/grub-theme/%P\n")
     '' else ''
-      if background_image (hd0)/EFI/boot/efi-background.png; then
+      if background_image (hd0)/boot/efi-background.png; then
         # Black background means transparent background when there
         # is a background image set... This seems undocumented :(
         set color_normal=black/black
@@ -206,8 +155,11 @@ let
   # Notes about grub:
   #  * Yes, the grubMenuCfg has to be repeated in all submenus. Otherwise you
   #    will get white-on-black console-like text on sub-menus. *sigh*
-  efiDir = pkgs.runCommand "efi-directory" {} ''
-    mkdir -p $out/EFI/boot/
+  grubDir = pkgs.runCommand "grub-directory" {} ''
+    mkdir -p $out/boot/
+
+    cp -p "${config.boot.kernelPackages.kernel}/${config.system.boot.loader.kernelFile}" \
+      "${config.system.build.initialRamdisk}/${config.system.boot.loader.initrdFile}" $out/boot/
 
     # ALWAYS required modules.
     MODULES="fat iso9660 part_gpt part_msdos \
@@ -220,27 +172,9 @@ let
              echo serial \
             "
 
-    echo "Building GRUB with modules:"
-    for mod in $MODULES; do
-      echo " - $mod"
-    done
+    cp ${grubPkgs.grub2_efi}/share/grub/unicode.pf2 $out/boot/
 
-    # Modules that may or may not be available per-platform.
-    echo "Adding additional modules:"
-    for mod in efi_uga; do
-      if [ -f ${grubPkgs.grub2_efi}/lib/grub/${grubPkgs.grub2_efi.grubTarget}/$mod.mod ]; then
-        echo " - $mod"
-        MODULES+=" $mod"
-      fi
-    done
-
-    # Make our own efi program, we can't rely on "grub-install" since it seems to
-    # probe for devices, even with --skip-fs-probe.
-    ${grubPkgs.grub2_efi}/bin/grub-mkimage -o $out/EFI/boot/boot${targetArch}.efi -p /EFI/boot -O ${grubPkgs.grub2_efi.grubTarget} \
-      $MODULES
-    cp ${grubPkgs.grub2_efi}/share/grub/unicode.pf2 $out/EFI/boot/
-
-    cat <<EOF > $out/EFI/boot/grub.cfg
+    cat <<EOF > $out/boot/grub.cfg
 
     # If you want to use serial for "terminal_*" commands, you need to set one up:
     #   Example manual configuration:
@@ -251,6 +185,9 @@ let
     export with_serial
     clear
     set timeout=10
+
+    search --set=root --file /${config.isoImage.volumeID}
+
     ${grubMenuCfg}
 
     # If the parameter iso_path is set, append the findiso parameter to the kernel
@@ -318,7 +255,7 @@ let
     menuentry 'rEFInd' --class refind {
       # UUID is hard-coded in the derivation.
       search --set=root --no-floppy --fs-uuid 1234-5678
-      chainloader (\$root)/EFI/boot/refind_x64.efi
+      chainloader (\$root)/boot/refind_x64.efi
     }
     menuentry 'Firmware Setup' --class settings {
       fwsetup
@@ -334,32 +271,6 @@ let
 
     ${refind}
   '';
-
-  efiImg = pkgs.runCommand "efi-image_eltorito" { buildInputs = [ pkgs.mtools pkgs.libfaketime ]; }
-    # Be careful about determinism: du --apparent-size,
-    #   dates (cp -p, touch, mcopy -m, faketime for label), IDs (mkfs.vfat -i)
-    ''
-      mkdir ./contents && cd ./contents
-      cp -rp "${efiDir}"/EFI .
-      mkdir ./boot
-      cp -p "${config.boot.kernelPackages.kernel}/${config.system.boot.loader.kernelFile}" \
-        "${config.system.build.initialRamdisk}/${config.system.boot.loader.initrdFile}" ./boot/
-      touch --date=@0 ./EFI ./boot
-
-      usage_size=$(du -sb --apparent-size . | tr -cd '[:digit:]')
-      # Make the image 110% as big as the files need to make up for FAT overhead
-      image_size=$(( ($usage_size * 110) / 100 ))
-      # Make the image fit blocks of 1M
-      block_size=$((1024*1024))
-      image_size=$(( ($image_size / $block_size + 1) * $block_size ))
-      echo "Usage size: $usage_size"
-      echo "Image size: $image_size"
-      truncate --size=$image_size "$out"
-      ${pkgs.libfaketime}/bin/faketime "2000-01-01 00:00:00" ${pkgs.dosfstools}/sbin/mkfs.vfat -i 12345678 -n EFIBOOT "$out"
-      mcopy -psvm -i "$out" ./EFI ./boot ::
-      # Verify the FAT partition.
-      ${pkgs.dosfstools}/sbin/fsck.vfat -vn "$out"
-    ''; # */
 
   # Name used by UEFI for architectures.
   targetArch =
@@ -518,9 +429,7 @@ in
     # here and it causes a cyclic dependency.
     boot.loader.grub.enable = false;
 
-    environment.systemPackages =  [ grubPkgs.grub2 grubPkgs.grub2_efi ]
-      ++ optional canx86BiosBoot pkgs.syslinux
-    ;
+    environment.systemPackages =  [ grubPkgs.grub2 grubPkgs.grub2_efi ];
 
     # In stage 1 of the boot, mount the CD as the root FS by label so
     # that we don't need to know its device.  We pass the label of the
@@ -604,31 +513,18 @@ in
           target = "/nix-store.squashfs";
         }
         { source = config.isoImage.splashImage;
-          target = "/isolinux/background.png";
+          target = "/boot/grub/background.png";
         }
         { source = pkgs.writeText "version" config.system.nixos.label;
           target = "/version.txt";
         }
-      ] ++ optionals canx86BiosBoot [
-        { source = pkgs.substituteAll  {
-            name = "isolinux.cfg";
-            src = pkgs.writeText "isolinux.cfg-in" isolinuxCfg;
-            bootRoot = "/boot";
-          };
-          target = "/isolinux/isolinux.cfg";
+        {
+          source = grubDir;
+          target = "/";
         }
-        { source = "${pkgs.syslinux}/share/syslinux";
-          target = "/isolinux";
-        }
-      ] ++ optionals config.isoImage.makeEfiBootable [
-        { source = efiImg;
-          target = "/boot/efi.img";
-        }
-        { source = "${efiDir}/EFI";
-          target = "/EFI";
-        }
-        { source = (pkgs.writeTextDir "grub/loopback.cfg" "source /EFI/boot/grub.cfg") + "/grub";
-          target = "/boot/grub";
+        {
+          source = pkgs.writeText config.isoImage.volumeID "STUB TO FIND IMAGE";
+          target = "/${config.isoImage.volumeID}";
         }
       ] ++ optionals (config.boot.loader.grub.memtest86.enable && canx86BiosBoot) [
         { source = "${pkgs.memtest86plus}/memtest.bin";
@@ -636,11 +532,11 @@ in
         }
       ] ++ optionals (config.isoImage.grubTheme != null) [
         { source = config.isoImage.grubTheme;
-          target = "/EFI/boot/grub-theme";
+          target = "/boot/grub/grub-theme";
         }
       ] ++ [
         { source = config.isoImage.efiSplashImage;
-          target = "/EFI/boot/efi-background.png";
+          target = "/boot/grub/efi-background.png";
         }
       ];
 
@@ -649,15 +545,14 @@ in
     # Create the ISO image.
     system.build.isoImage = pkgs.callPackage ../../../lib/make-iso9660-image.nix ({
       inherit (config.isoImage) isoName compressImage volumeID contents;
-      bootable = canx86BiosBoot;
-      bootImage = "/isolinux/isolinux.bin";
-      syslinux = if canx86BiosBoot then pkgs.syslinux else null;
+
+      grubDir = grubDir;
+
+      mbrBootable = canx86BiosBoot;
     } // optionalAttrs (config.isoImage.makeUsbBootable && canx86BiosBoot) {
       usbBootable = true;
-      isohybridMbrImage = "${pkgs.syslinux}/share/syslinux/isohdpfx.bin";
     } // optionalAttrs config.isoImage.makeEfiBootable {
       efiBootable = true;
-      efiBootImage = "boot/efi.img";
     });
 
     boot.postBootCommands =
