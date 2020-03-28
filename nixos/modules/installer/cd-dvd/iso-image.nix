@@ -29,7 +29,7 @@ let
       (option: ''
         menuentry '${defaults.name} ${
         # Name appended to menuentry defaults to params if no specific name given.
-        option.name or (if option ? params then "(${option.params})" else "")
+        option.name or (if option ? params then "(${option.class})" else "")
         }' ${if option ? class then " --class ${option.class}" else ""} {
           linux ${defaults.image} \''${isoboot} ${defaults.params} ${
             option.params or ""
@@ -107,13 +107,24 @@ let
     # Menu configuration
     #
 
-    insmod gfxterm
-    insmod png
+    # insmod gfxterm
+    # insmod png
+
+    # TODO: fix this (re-load location where modules get pulled from)
+    insmod /boot/grub/i386-pc/font.mod
+    insmod /boot/grub/i386-pc/gfxterm.mod
+    insmod /boot/grub/i386-pc/bitmap.mod
+    insmod /boot/grub/i386-pc/png.mod
+    insmod /boot/grub/i386-pc/video_colors.mod
+    insmod /boot/grub/i386-pc/trig.mod
+    insmod /boot/grub/i386-pc/bitmap_scale.mod
+    insmod /boot/grub/i386-pc/gfxmenu.mod
+    insmod /boot/grub/i386-pc/test.mod
     set gfxpayload=keep
 
     # Fonts can be loaded?
     # (This font is assumed to always be provided as a fallback by NixOS)
-    if loadfont (hd0)/boot/unicode.pf2; then
+    if loadfont (\$root)/boot/unicode.pf2; then
       # Use graphical term, it can be either with background image or a theme.
       # input is "console", while output is "gfxterm".
       # This enables "serial" input and output only when possible.
@@ -134,11 +145,11 @@ let
     ${ # When there is a theme configured, use it, otherwise use the background image.
     if config.isoImage.grubTheme != null then ''
       # Sets theme.
-      set theme=(hd0)/boot/grub-theme/theme.txt
+      set theme=(\$root)/boot/grub/grub-theme/theme.txt
       # Load theme fonts
-      $(find ${config.isoImage.grubTheme} -iname '*.pf2' -printf "loadfont (hd0)/EFI/boot/grub-theme/%P\n")
+      $(find ${config.isoImage.grubTheme} -iname '*.pf2' -printf "loadfont (\$root)/boot/grub/grub-theme/%P\n")
     '' else ''
-      if background_image (hd0)/boot/efi-background.png; then
+      if background_image (\$root)/boot/background.png; then
         # Black background means transparent background when there
         # is a background image set... This seems undocumented :(
         set color_normal=black/black
@@ -151,12 +162,19 @@ let
     ''}
   '';
 
+  grubCfg = pkgs.writeText "grub.cfg" ''
+    insmod all_video
+    insmod configfile
+    search --set=root --file /${config.isoImage.volumeID}
+    source ($root)/boot/grub/grub.cfg
+  '';
+
   # The EFI boot image.
   # Notes about grub:
   #  * Yes, the grubMenuCfg has to be repeated in all submenus. Otherwise you
   #    will get white-on-black console-like text on sub-menus. *sigh*
   grubDir = pkgs.runCommand "grub-directory" {} ''
-    mkdir -p $out/boot/
+    mkdir -p $out/boot/grub/
 
     cp -p "${config.boot.kernelPackages.kernel}/${config.system.boot.loader.kernelFile}" \
       "${config.system.build.initialRamdisk}/${config.system.boot.loader.initrdFile}" $out/boot/
@@ -174,7 +192,9 @@ let
 
     cp ${grubPkgs.grub2_efi}/share/grub/unicode.pf2 $out/boot/
 
-    cat <<EOF > $out/boot/grub.cfg
+    cat <<EOF > $out/boot/grub/grub.cfg
+
+    insmod all_video
 
     # If you want to use serial for "terminal_*" commands, you need to set one up:
     #   Example manual configuration:
@@ -253,8 +273,6 @@ let
     }
 
     menuentry 'rEFInd' --class refind {
-      # UUID is hard-coded in the derivation.
-      search --set=root --no-floppy --fs-uuid 1234-5678
       chainloader (\$root)/boot/refind_x64.efi
     }
     menuentry 'Firmware Setup' --class settings {
@@ -368,23 +386,13 @@ in
       '';
     };
 
-    isoImage.efiSplashImage = mkOption {
-      default = pkgs.fetchurl {
+    isoImage.splashImage = mkOption {
+      default = pkgs.fetchurl { # TODO: update to resized legacy splash
           url = https://raw.githubusercontent.com/NixOS/nixos-artwork/a9e05d7deb38a8e005a2b52575a3f59a63a4dba0/bootloader/efi-background.png;
           sha256 = "18lfwmp8yq923322nlb9gxrh5qikj1wsk6g5qvdh31c4h5b1538x";
         };
       description = ''
-        The splash image to use in the EFI bootloader.
-      '';
-    };
-
-    isoImage.splashImage = mkOption {
-      default = pkgs.fetchurl {
-          url = https://raw.githubusercontent.com/NixOS/nixos-artwork/a9e05d7deb38a8e005a2b52575a3f59a63a4dba0/bootloader/isolinux/bios-boot.png;
-          sha256 = "1wp822zrhbg4fgfbwkr7cbkr4labx477209agzc0hr6k62fr6rxd";
-        };
-      description = ''
-        The splash image to use in the legacy-boot bootloader.
+        The splash image to use in the bootloader.
       '';
     };
 
@@ -534,10 +542,6 @@ in
         { source = config.isoImage.grubTheme;
           target = "/boot/grub/grub-theme";
         }
-      ] ++ [
-        { source = config.isoImage.efiSplashImage;
-          target = "/boot/grub/efi-background.png";
-        }
       ];
 
     boot.loader.timeout = 10;
@@ -547,6 +551,7 @@ in
       inherit (config.isoImage) isoName compressImage volumeID contents;
 
       grubDir = grubDir;
+      grubCfg = grubCfg;
 
       mbrBootable = canx86BiosBoot;
     } // optionalAttrs (config.isoImage.makeUsbBootable && canx86BiosBoot) {
