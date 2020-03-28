@@ -6,6 +6,8 @@ targets_=($targets)
 objects=($objects)
 symlinks=($symlinks)
 
+# Reference
+# https://willhaley.com/blog/custom-debian-live-environment/
 
 # Remove the initial slash from a path, since genisofs likes it that way.
 stripSlash() {
@@ -31,15 +33,28 @@ stripSlash "$bootImage"; bootImage="$res"
 
 TMP=$(mktemp -d)
 
+mkdir -p append/boot/grub
+mkdir append/EFI
+touch append/boot/grub/device.map
+addPath "/" "$PWD/append"
+
 if test -n "$mbrBootable"; then
   "$grubMbr/bin/grub-mkstandalone" \
       --format=i386-pc \
       --output="$TMP/core.img" \
-      --install-modules="linux normal iso9660 biosdisk memdisk search tar ls" \
+      --install-modules="linux normal iso9660 biosdisk memdisk search tar ls configfile" \
       --modules="linux normal iso9660 biosdisk search" \
       --locales="" \
       --fonts="" \
       "boot/grub/grub.cfg=$grubCfg"
+
+  # TODO: fix this hack to REALLY skip fsprobe
+  "$grubMbr/bin/grub-install" \
+      --target=i386-pc \
+      --boot-directory=$PWD/append/boot \
+      --no-bootsector \
+      --skip-fs-probe \
+      "/dev/null" -v --force || true
 
   cat \
       "$grubMbr/lib/grub/i386-pc/cdboot.img" \
@@ -65,6 +80,16 @@ if test -n "$efiBootable"; then
       --locales="" \
       --fonts="" \
       "boot/grub/grub.cfg=$grubCfg"
+
+  # TODO: fix this hack to REALLY skip fsprobe
+  "$grubEfi/bin/grub-install" \
+      --target=x86_64-efi \
+      --efi-directory=$PWD/append/EFI \
+      --boot-directory=$PWD/append/boot \
+      --no-nvram \
+      --skip-fs-probe \
+      --removable \
+      -v --force || true
 
   (pushd "$TMP" && \
       dd if=/dev/zero of=efiboot.img bs=1M count=10 && \
