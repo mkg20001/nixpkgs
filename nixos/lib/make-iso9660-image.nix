@@ -1,4 +1,4 @@
-{ stdenv, closureInfo, xorriso, mtools, grub2_efi, grub2_full, dosfstools, grubDir
+{ stdenv, closureInfo, xorriso, mtools, grub2_efi, grub2_full, dosfstools, grubDir, grubCfg
 
 , # The file name of the resulting ISO image.
   isoName ? "cd.iso"
@@ -49,9 +49,7 @@ stdenv.mkDerivation {
   inherit
     isoName volumeID
     mbrBootable efiBootable usbBootable
-    grubDir;
-
-  grubCfg = "${grubDir}/boot/grub.cfg";
+    grubDir grubCfg;
 
   # !!! should use XML.
   sources = map (x: x.source) contents;
