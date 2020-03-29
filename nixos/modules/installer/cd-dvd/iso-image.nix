@@ -107,19 +107,8 @@ let
     # Menu configuration
     #
 
-    # insmod gfxterm
-    # insmod png
-
-    # TODO: fix this (re-load location where modules get pulled from)
-    insmod /boot/grub/i386-pc/font.mod
-    insmod /boot/grub/i386-pc/gfxterm.mod
-    insmod /boot/grub/i386-pc/bitmap.mod
-    insmod /boot/grub/i386-pc/png.mod
-    insmod /boot/grub/i386-pc/video_colors.mod
-    insmod /boot/grub/i386-pc/trig.mod
-    insmod /boot/grub/i386-pc/bitmap_scale.mod
-    insmod /boot/grub/i386-pc/gfxmenu.mod
-    insmod /boot/grub/i386-pc/test.mod
+    insmod gfxterm
+    insmod png
     set gfxpayload=keep
 
     # Fonts can be loaded?
@@ -166,6 +155,10 @@ let
     insmod all_video
     insmod configfile
     search --set=root --file /${config.isoImage.volumeID}
+
+    set prefix=(\$root)/boot/grub # see grub dl.c:71
+    export prefix
+
     source ($root)/boot/grub/grub.cfg
   '';
 
