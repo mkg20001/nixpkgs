@@ -152,12 +152,28 @@ let
   '';
 
   grubCfg = pkgs.writeText "grub.cfg" ''
+    # this one fixes a UEFI boot issue (booting in silent mode)
     insmod all_video
     insmod configfile
+    # those are needed if the ISO gets written to a USB
+    insmod part_gpt
+    insmod part_msdos
+
     search --set=root --file /${config.isoImage.volumeID}
 
-    set prefix=(\$root)/boot/grub # see grub dl.c:71
-    export prefix
+    if ! echo; then # if we can't load the echo module, try loading it from the ISO (we're really just testing if we've got all or just a subset of modules)
+      set prefix=($root)/boot/grub # see grub dl.c:71
+      export prefix
+    fi
+
+    # re-try import if anything failed
+
+    # this one fixes a UEFI boot issue (booting in silent mode)
+    insmod all_video
+    insmod configfile
+    # double holds better
+    insmod part_gpt
+    insmod part_msdos
 
     source ($root)/boot/grub/grub.cfg
   '';
