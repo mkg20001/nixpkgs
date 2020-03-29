@@ -55,6 +55,7 @@ let
       storePath = config.boot.loader.grub.storePath;
       bootloaderId = if args.efiBootloaderId == null then "NixOS${efiSysMountPoint'}" else args.efiBootloaderId;
       timeout = if config.boot.loader.timeout == null then -1 else config.boot.loader.timeout;
+      theme = f cfg.theme;
       inherit efiSysMountPoint;
       inherit (args) devices;
       inherit (efi) canTouchEfiVariables;
@@ -349,6 +350,19 @@ in
         '';
       };
 
+      theme = mkOption {
+        type = types.nullOr types.path;
+        example = "<literal>[ pkgs.nixos-grub2-theme ]</literal>";
+        default = null;
+        description = ''
+          Grub theme to be applied
+
+          <note><para>
+          This options has no effect for GRUB 1.
+          </para></note>
+        '';
+      };
+
       splashMode = mkOption {
         type = types.enum [ "normal" "stretch" ];
         default = "stretch";
@@ -618,7 +632,7 @@ in
         in pkgs.writeScript "install-grub.sh" (''
         #!${pkgs.runtimeShell}
         set -e
-        export PERL5LIB=${with pkgs.perlPackages; makePerlPath [ FileSlurp XMLLibXML XMLSAX XMLSAXBase ListCompare ]}
+        export PERL5LIB=${with pkgs.perlPackages; makePerlPath [ FileSlurp FileCopyRecursive XMLLibXML XMLSAX XMLSAXBase ListCompare ]}
         ${optionalString cfg.enableCryptodisk "export GRUB_ENABLE_CRYPTODISK=y"}
       '' + flip concatMapStrings cfg.mirroredBoots (args: ''
         ${pkgs.perl}/bin/perl ${install-grub-pl} ${grubConfig args} $@

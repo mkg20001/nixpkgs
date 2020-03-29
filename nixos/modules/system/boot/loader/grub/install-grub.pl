@@ -6,8 +6,10 @@ use File::Basename;
 use File::Path;
 use File::stat;
 use File::Copy;
+use File::Copy::Recursive qw(rcopy pathrm);
 use File::Slurp;
 use File::Temp;
+use File::Find;
 require List::Compare;
 use POSIX;
 use Cwd;
@@ -72,6 +74,7 @@ my $gfxpayloadBios = get("gfxpayloadBios");
 my $bootloaderId = get("bootloaderId");
 my $forceInstall = get("forceInstall");
 my $font = get("font");
+my $theme = get("theme");
 $ENV{'PATH'} = get("path");
 
 die "unsupported GRUB version\n" if $grubVersion != 1 && $grubVersion != 2;
@@ -311,11 +314,11 @@ else {
         if ($suffix eq ".jpg") {
             $suffix = ".jpeg";
         }
-		if ($backgroundColor) {
-			$conf .= "
-		    background_color '$backgroundColor'
-		    ";
-		}
+	if ($backgroundColor) {
+	    $conf .= "
+	    background_color '$backgroundColor'
+	    ";
+	}
         copy $splashImage, "$bootPath/background$suffix" or die "cannot copy $splashImage to $bootPath\n";
         $conf .= "
             insmod " . substr($suffix, 1) . "
@@ -328,6 +331,28 @@ else {
             fi
         ";
     }
+
+    rmtree("$bootPath/theme") or die "cannot clean up theme folder in $bootPath\n" if -e "$bootPath/theme";
+
+    if ($theme) {
+        # Copy theme
+        rcopy($theme, "$bootPath/theme") or die "cannot copy $theme to $bootPath\n";
+        $conf .= "
+            # Sets theme.
+            set theme=" . ($grubBoot->path eq "/" ? "" : $grubBoot->path) . "/theme/theme.txt
+            export theme
+            # Load theme fonts
+         ";
+
+         find( { wanted => sub { # TODO: recursive glob for *.pf2 in theme, rewrite path from $theme/(.*) to $1
+             my ($filename, $dirs, $suffix) = fileparse($_, qr"\..[^.]*$");
+             if ($suffix eq ".pf2") {
+                 $conf .= "
+                 loadfont " . ($grubBoot->path eq "/" ? "" : $grubBoot->path) . "/theme/$filename.pf2
+                 ";
+             }
+         }, no_chdir => 1 }, $theme );
+     }
 }
 
 $conf .= "$extraConfig\n";
