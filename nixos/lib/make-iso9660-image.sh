@@ -42,7 +42,7 @@ if test -n "$mbrBootable"; then
   "$grubMbr/bin/grub-mkstandalone" \
       --format=i386-pc \
       --output="$TMP/core.img" \
-      --install-modules="linux normal iso9660 biosdisk memdisk search tar ls configfile" \
+      --install-modules="linux normal iso9660 biosdisk memdisk search tar ls configfile part_gpt part_msdos" \
       --modules="linux normal iso9660 biosdisk search" \
       --locales="" \
       --fonts="" \
