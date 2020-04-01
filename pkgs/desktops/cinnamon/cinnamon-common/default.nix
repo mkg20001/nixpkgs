@@ -35,6 +35,7 @@
 , updateScript
 , nemo
 , libnotify
+, accountsservice
 , callPackage
 }:
 
@@ -54,7 +55,7 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     # TODO: review if we really need this all
-    (python3.withPackages (pp: with pp; [ dbus-python setproctitle pygobject3 pycairo xapp pillow pytz tinycss ]))
+    (python3.withPackages (pp: with pp; [ dbus-python setproctitle pygobject3 pycairo xapp pillow pytz tinycss pam pexpect ]))
     atk
     cacert
     cinnamon-desktop
@@ -85,6 +86,7 @@ stdenv.mkDerivation rec {
     timezonemap
     nemo
     libnotify
+    accountsservice
   ];
 
   nativeBuildInputs = [
