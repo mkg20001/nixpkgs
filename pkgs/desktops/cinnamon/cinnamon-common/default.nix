@@ -33,8 +33,14 @@
 , xapps
 , upower
 , updateScript
+, nemo
+, libnotify
+, callPackage
 }:
 
+let
+  timezonemap = callPackage ./timezonemap.nix { };
+in
 stdenv.mkDerivation rec {
   pname = "cinnamon-common";
   version = "4.4.1";
@@ -48,7 +54,7 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     # TODO: review if we really need this all
-    (python3.withPackages (pp: with pp; [ setproctitle pygobject3 pycairo ]))
+    (python3.withPackages (pp: with pp; [ dbus-python setproctitle pygobject3 pycairo xapp pillow pytz tinycss ]))
     atk
     cacert
     cinnamon-desktop
@@ -69,7 +75,6 @@ stdenv.mkDerivation rec {
     polkit
     libxml2
     libgnomekbd
-    gobject-introspection
 
     # bindings
     cairo
@@ -77,9 +82,13 @@ stdenv.mkDerivation rec {
     keybinder3
     upower
     xapps
+    timezonemap
+    nemo
+    libnotify
   ];
 
   nativeBuildInputs = [
+    gobject-introspection
     autoreconfHook
     wrapGAppsHook
     intltool
