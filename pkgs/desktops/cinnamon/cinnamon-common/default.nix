@@ -36,6 +36,8 @@
 , nemo
 , libnotify
 , accountsservice
+, gnome-online-accounts
+, glib-networking
 , callPackage
 }:
 
@@ -58,6 +60,7 @@ stdenv.mkDerivation rec {
     (python3.withPackages (pp: with pp; [ dbus-python setproctitle pygobject3 pycairo xapp pillow pytz tinycss pam pexpect ]))
     atk
     cacert
+    cinnamon-control-center
     cinnamon-desktop
     cinnamon-menus
     cjs
@@ -87,6 +90,10 @@ stdenv.mkDerivation rec {
     nemo
     libnotify
     accountsservice
+
+    # gsi bindings
+    gnome-online-accounts
+    glib-networking # for goa
   ];
 
   nativeBuildInputs = [
@@ -121,6 +128,8 @@ stdenv.mkDerivation rec {
     sed "s|/usr/bin/cinnamon-control-center|${cinnamon-control-center}/bin/cinnamon-control-center|g" -i ./files/usr/bin/cinnamon-settings
     # this one really IS optional
     sed "s|/usr/bin/gnome-control-center|/run/current-system/sw/bin/gnome-control-center|g" -i ./files/usr/bin/cinnamon-settings
+
+    sed "s|\"/usr/lib\"|\"${cinnamon-control-center}/lib\"|g" -i ./files/usr/share/cinnamon/cinnamon-settings/bin/capi.py
 
     # another bunch of optional stuff
     sed "s|/usr/bin|/run/current-system/sw/bin|g" -i ./files/usr/bin/cinnamon-launcher
