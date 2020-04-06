@@ -4635,6 +4635,8 @@ in
 
   libcoap = callPackage ../applications/networking/libcoap {};
 
+  libcroco = callPackage ../development/libraries/libcroco { };
+
   libcryptui = callPackage ../development/libraries/libcryptui { };
 
   libsmi = callPackage ../development/libraries/libsmi { };
