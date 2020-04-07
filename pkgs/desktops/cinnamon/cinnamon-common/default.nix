@@ -39,6 +39,7 @@
 , gnome-online-accounts
 , glib-networking
 , callPackage
+, pciutils
 }:
 
 let
@@ -134,6 +135,7 @@ stdenv.mkDerivation rec {
     # another bunch of optional stuff
     sed "s|/usr/bin|/run/current-system/sw/bin|g" -i ./files/usr/bin/cinnamon-launcher
 
+    sed 's|"lspci"|"${pciutils}/bin/lspci"|g' -i ./files/usr/share/cinnamon/cinnamon-settings/modules/cs_info.py
   '';
 
   passthru = {
