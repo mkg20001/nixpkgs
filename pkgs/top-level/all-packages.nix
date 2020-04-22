@@ -22120,6 +22120,8 @@ julia_15 = callPackage ../development/compilers/julia/1.5.nix {
 
   liferea = callPackage ../applications/networking/newsreaders/liferea { };
 
+  lbry = callPackage ../applications/video/lbry { };
+
   lightworks = callPackage ../applications/video/lightworks {
     portaudio = portaudio2014;
   };
