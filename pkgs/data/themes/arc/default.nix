@@ -1,9 +1,9 @@
 { stdenv, fetchFromGitHub, sassc, autoreconfHook, pkgconfig, gtk3, gnome3
-, gtk-engine-murrine, optipng, inkscape }:
+, gtk-engine-murrine, cinnamon, optipng, inkscape }:
 
 stdenv.mkDerivation rec {
   pname = "arc-theme";
-  version = "20200416";
+  version = "unstable-17042020";
 
   src = fetchFromGitHub {
     owner  = "jnsh";
@@ -34,8 +34,8 @@ stdenv.mkDerivation rec {
   '';
 
   configureFlags = [
-    "--disable-gnome-shell" # 3.36 not supported
-    "--disable-cinnamon" # not equipped to test
+    "--with-cinnamon=${cinnamon.cinnamon-common.version}"
+    "--with-gnome-shell=${gnome3.gnome-shell.version}"
     "--disable-unity"
   ];
 
