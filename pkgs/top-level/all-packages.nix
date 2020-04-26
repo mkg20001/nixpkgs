@@ -12638,6 +12638,8 @@ in
 
   isocodes = callPackage ../development/libraries/iso-codes { };
 
+  iso-flags = callPackage ../data/icons/iso-flags { };
+
   ispc = callPackage ../development/compilers/ispc {
     stdenv = llvmPackages_10.stdenv;
     llvmPackages = llvmPackages_10;
