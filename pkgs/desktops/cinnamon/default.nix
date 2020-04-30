@@ -22,7 +22,6 @@ lib.makeScope pkgs.newScope (self: with self; {
   cinnamon-screensaver = callPackage ./cinnamon-screensaver { };
   cinnamon-session = callPackage ./cinnamon-session { };
   cinnamon-settings-daemon = callPackage ./cinnamon-settings-daemon { };
-  cinnamon-screensaver = callPackage ./cinnamon-screensaver { };
   cjs = callPackage ./cjs { };
   nemo = callPackage ./nemo { };
   mint-themes = callPackage ./mint-themes { };
