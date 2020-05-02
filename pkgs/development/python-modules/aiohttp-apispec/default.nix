@@ -1,18 +1,19 @@
-{ lib, buildPythonPackage, fetchPypi
-, marshmallow, pytest, webtest
+{ lib, buildPythonPackage, fetchPypi, pythonOlder
+, aiohttp, webargs, apispec, jinja2
 }:
 
 buildPythonPackage rec {
-  pname = "webargs";
-  version = "5.5.3";
+  pname = "aiohttp-apispec";
+  version = "2.2.1";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "16pjzc265yx579ijz5scffyfd1vsmi87fdcgnzaj2by6w2i445l7";
+    sha256 = "0hhlmh3mc3xg68znsxyhypb5k12vg59yf72qkyw6ahg8zy3qfz2m";
   };
 
-  buildInputs = [ pytest webtest ];
-  propagatedBuildInputs = [ marshmallow ];
+  disabled = pythonOlder "3.0";
+
+  propagatedBuildInputs = [ aiohttp webargs apispec jinja2 ];
 
   doCheck = false;
 
