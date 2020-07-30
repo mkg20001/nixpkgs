@@ -29,6 +29,14 @@ with lib.maintainers; {
     scope = "Maintain ACME-related packages and modules.";
   };
 
+  cinnamon = {
+    members = [
+      mkg20001
+      worldofpeace
+    ];
+    scope = "Maintain Cinnamon desktop environment and applications made by the LinuxMint team.";
+  };
+
   freedesktop = {
     members = [ jtojnar worldofpeace ];
     scope = "Maintain Freedesktop.org packages for graphical desktop.";
