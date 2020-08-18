@@ -105,6 +105,7 @@ in
       cinnamon-settings-daemon
       gnome3.libgnomekbd
       warp
+      blueberry
 
       # theme
       pkgs.gnome3.adwaita-icon-theme
