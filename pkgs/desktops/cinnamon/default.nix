@@ -14,6 +14,7 @@ lib.makeScope pkgs.newScope (self: with self; {
 
   updateScript = callPackage ./update.nix { };
 
+  blueberry = callPackage ./blueberry { };
   cinnamon-common = callPackage ./cinnamon-common { };
   cinnamon-control-center = callPackage ./cinnamon-control-center { };
   cinnamon-desktop = callPackage ./cinnamon-desktop { };
