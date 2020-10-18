@@ -3,11 +3,11 @@
 
 stdenv.mkDerivation rec {
   pname = "tribler";
-  version = "7.5.0-rc5";
+  version = "7.5.2";
 
   src = fetchurl {
     url = "https://github.com/Tribler/tribler/releases/download/v${version}/Tribler-v${version}.tar.xz";
-    sha256 = "19b11cy3fnza5846lr2s5gxacqav212gs9w2hpz327f4p3p1pzj3";
+    sha256 = "15cvha5myad0vhqwr4xdprc47r9lr6wx4jfvv9c7b2jhcj15cw68";
   };
 
   nativeBuildInputs = [
@@ -41,7 +41,7 @@ stdenv.mkDerivation rec {
     networkx
     pony
     lz4
-    pyqtgraph
+    pyqtgraph5
     pyyaml
     aiohttp
     aiohttp-apispec
