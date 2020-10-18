@@ -6792,7 +6792,13 @@ in {
     withWebKit = true;
   };
 
-  pyqtgraph = callPackage ../development/python-modules/pyqtgraph { };
+  pyqtgraph = callPackage ../development/python-modules/pyqtgraph {
+    pyqt = self.pyqt4;
+  };
+
+  pyqtgraph5 = callPackage ../development/python-modules/pyqtgraph {
+    pyqt = self.pyqt5;
+  };
 
   pyqtwebengine = pkgs.libsForQt5.callPackage ../development/python-modules/pyqtwebengine {
     pythonPackages = self;
@@ -8389,15 +8395,7 @@ in {
 
   sievelib = callPackage ../development/python-modules/sievelib { };
 
-<<<<<<< HEAD
   signedjson = callPackage ../development/python-modules/signedjson { };
-||||||| parent of 0499b8b5e16... Tribler 7.5.0-rc5
-  weasyprint = callPackage ../development/python-modules/weasyprint { };
-=======
-  webargs  = callPackage ../development/python-modules/webargs { };
-
-  weasyprint = callPackage ../development/python-modules/weasyprint { };
->>>>>>> 0499b8b5e16... Tribler 7.5.0-rc5
 
   sigtools = callPackage ../development/python-modules/sigtools { };
 
@@ -9669,6 +9667,8 @@ in {
   wcwidth = callPackage ../development/python-modules/wcwidth { };
 
   weasyprint = callPackage ../development/python-modules/weasyprint { };
+
+  webargs  = callPackage ../development/python-modules/webargs { };
 
   webapp2 = callPackage ../development/python-modules/webapp2 { };
 
