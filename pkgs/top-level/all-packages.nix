@@ -25924,6 +25924,7 @@ with pkgs;
     ubootNanoPCT4
     ubootNovena
     ubootOdroidC2
+    ubootOdroidC4
     ubootOdroidXU3
     ubootOlimexA64Olinuxino
     ubootOrangePiPc
