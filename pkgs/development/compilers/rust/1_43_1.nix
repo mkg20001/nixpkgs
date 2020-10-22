@@ -11,19 +11,20 @@
 , buildPackages
 , newScope, callPackage
 , CoreFoundation, Security
-, llvmPackages_5
+, llvmPackages
 , pkgsBuildTarget, pkgsBuildBuild
+, makeRustPlatform
 } @ args:
 
 import ./default.nix {
-  rustcVersion = "1.43.0";
-  rustcSha256 = "18akhk0wz1my6y9vhardriy2ysc482z0fnjdcgs9gy59kmnarxkm";
+  rustcVersion = "1.43.1";
+  rustcSha256 = "07f478ycscaw1n84qpm18v8wjmgbl4q7dqhdyabdm1y6m2s7gqfd";
 
   # Note: the version MUST be one version prior to the version we're
   # building
-  bootstrapVersion = "1.42.0";
+  bootstrapVersion = "1.43.0";
 
-  # fetch hashes by running `print-hashes.sh 1.43.0`
+  # fetch hashes by running `print-hashes.sh 1.43.1`
   bootstrapHashes = {
 i686-unknown-linux-gnu = "c532385b79fa97144367a7f785f1d8437341099e7b2f065b1ae0b6938ff9b53c";
 x86_64-unknown-linux-gnu = "069f34fa5cef92551724c83c36360df1ac66fe3942bc1d0e4d341ce79611a029";
