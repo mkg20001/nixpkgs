@@ -1697,6 +1697,8 @@ with pkgs;
 
   foxdot = with python3Packages; toPythonApplication foxdot;
 
+  fluffychat = callPackage  ../applications/networking/instant-messengers/fluffychat { };
+
   fxlinuxprintutil = callPackage ../tools/misc/fxlinuxprintutil { };
 
   genann = callPackage ../development/libraries/genann { };
