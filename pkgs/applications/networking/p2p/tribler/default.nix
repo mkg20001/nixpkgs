@@ -45,6 +45,9 @@ stdenv.mkDerivation rec {
     pyyaml
     aiohttp
     aiohttp-apispec
+    pytest-asyncio
+    pytest-timeout
+    asynctest
 
     # there is a BTC feature, but it requires some unclear version of
     # bitcoinlib, so this doesn't work right now.
