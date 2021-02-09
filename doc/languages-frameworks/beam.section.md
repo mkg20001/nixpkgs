@@ -2,15 +2,15 @@
 
 ## Introduction {#beam-introduction}
 
-In this document and related Nix expressions, we use the term, *BEAM*, to describe the environment. BEAM is the name of the Erlang Virtual Machine and, as far as we're concerned, from a packaging perspective, all languages that run on the BEAM are interchangeable. That which varies, like the build system, is transparent to users of any given BEAM package, so we make no distinction.
+In this document and related Nix expressions, we use the term, _BEAM_, to describe the environment. BEAM is the name of the Erlang Virtual Machine and, as far as we're concerned, from a packaging perspective, all languages that run on the BEAM are interchangeable. That which varies, like the build system, is transparent to users of any given BEAM package, so we make no distinction.
 
 ## Structure {#beam-structure}
 
 All BEAM-related expressions are available via the top-level `beam` attribute, which includes:
 
-  - `interpreters`: a set of compilers running on the BEAM, including multiple Erlang/OTP versions (`beam.interpreters.erlangR19`, etc), Elixir (`beam.interpreters.elixir`) and LFE (`beam.interpreters.lfe`).
+- `interpreters`: a set of compilers running on the BEAM, including multiple Erlang/OTP versions (`beam.interpreters.erlangR19`, etc), Elixir (`beam.interpreters.elixir`) and LFE (Lisp-Flavored-Erlang) (`beam.interpreters.lfe`).
 
-  - `packages`: a set of package builders (Mix and rebar3), each compiled with a specific Erlang/OTP version, e.g.  `beam.packages.erlangR19`.
+- `packages`: a set of package builders (Mix and rebar3), each compiled with a specific Erlang/OTP version, e.g. `beam.packages.erlangR19`.
 
 The default Erlang compiler, defined by `beam.interpreters.erlang`, is aliased as `erlang`. The default BEAM package set is defined by `beam.packages.erlang` and aliased at the top level as `beamPackages`.
 
@@ -56,11 +56,56 @@ Mix functions similarly to Rebar3, except we use `buildMix` instead of `buildReb
 
 Alternatively, we can use `buildHex` as a shortcut:
 
+#### buildMix - Elixir Phoenix example
+
+Here is how your default.nix file would look like
+
+```default.nix
+with import <nixpkgs-unstable> { };
+
+let
+  packages = beam.packagesWith beam.interpreters.erlang;
+  name = "union";
+  mixEnv = "prod";
+  version = "0.0.1";
+  src = builtins.fetchGit {
+    url = "ssh://git@github.com/your_id/your_repo";
+    rev = "replace_with_your_commit";
+  };
+  # leave this empty and nix will complain and tell you the right value
+  # to replace this with
+  depsSha256 = "";
+
+  nodeDependencies =
+    (pkgs.callPackage ./assets/default.nix { }).shell.nodeDependencies;
+
+in packages.buildMix {
+  inherit name src version depsSha256;
+  preConfigure = ''
+    export DATABASE_URL=""
+    export SECRET_KEY_BASE=""
+    cd ./assets
+
+    ln -s ${nodeDependencies}/lib/node_modules ./node_modules
+    export PATH="${nodeDependencies}/bin:$PATH"
+
+    webpack --config ./webpack/webpack.prod.js
+    cd ..
+  '';
+}
+```
+
+Setup will require the following steps
+
+- `cd assets` and `node2nix --development` will generate a nix expression containing your frontend dependencies
+- commit and push those changes
+- you can now `nix-build .`
+
 ## How to Develop {#how-to-develop}
 
 ### Creating a Shell {#creating-a-shell}
 
-Usually, we need to create a `shell.nix` file and do our development inside of the environment specified therein. Just install your version of erlang and other interpreter, and then user your normal build tools.  As an example with elixir:
+Usually, we need to create a `shell.nix` file and do our development inside of the environment specified therein. Just install your version of erlang and other interpreter, and then user your normal build tools. As an example with elixir:
 
 ```nix
 { pkgs ? import "<nixpkgs"> {} }:
@@ -79,6 +124,72 @@ mkShell {
 }
 ```
 
-#### Building in a Shell (for Mix Projects) {#building-in-a-shell}
+#### Elixir - Phoenix project
 
-Using a `shell.nix` as described (see <xref linkend="creating-a-shell"/>) should just work.
+Here is an example shell.nix
+
+```shell.nix
+# latest elixir version are only available on unstable
+with import <nixpkgs-unstable> { };
+
+let
+  # define packages to install
+  basePackages = [
+    git
+    # replace with beam.packages.erlang.elixir_1_11 if you need
+    beam.packages.erlang.elixir
+    nodejs-15_x
+    postgresql_13
+    # only used for frontend dependencies
+    # you are free to use yarn2nix as well
+    nodePackages.node2nix
+    # formatting js file
+    nodePackages.prettier
+  ];
+
+  inputs = basePackages ++ lib.optional stdenv.isLinux inotify-tools
+    ++ lib.optionals stdenv.isDarwin
+    (with darwin.apple_sdk.frameworks; [ CoreFoundation CoreServices ]);
+
+  # define shell startup command
+  hooks = ''
+    # this allows mix to work on the local directory
+    mkdir -p $PWD/.nix-mix
+    mkdir -p $PWD/.nix-hex
+    export MIX_HOME=$PWD/.nix-mix
+    export HEX_HOME=$PWD/.nix-mix
+    export PATH=$MIX_HOME/bin:$PATH
+    export PATH=$HEX_HOME/bin:$PATH
+    # TODO: not sure how to make hex available without installing it
+    # afterwards.
+    mix local.hex --if-missing
+    export LANG=en_US.UTF-8
+    export ERL_AFLAGS="-kernel shell_history enabled"
+
+    # postges related
+    # keep all your db data in a folder inside the project
+    export PGDATA="$PWD/db"
+
+    # phoenix related env vars
+    export POOL_SIZE=15
+    export DB_URL="postgresql://postgres:postgres@localhost:5432/db"
+    export PORT=4000
+    export MIX_ENV=dev
+    # add your project env vars here
+    export API_KEY="your_api_key"
+  '';
+
+in mkShell {
+  buildInputs = inputs;
+  shellHook = hooks;
+}
+```
+
+initializing the project will require the following steps
+
+- create the db directory `initdb ./db` (inside your mix project folder)
+- create the postgres user `createuser postgres -ds`
+- create the db `createdb db`
+- start the postgres instance `pg_ctl -l "$PGDATA/server.log" start`
+- add the `/db` folder to your .gitignore
+- you can start your phoenix server and get a shell with `iex -S mix phx.server`
