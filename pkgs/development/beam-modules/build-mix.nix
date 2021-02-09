@@ -1,100 +1,69 @@
-{ stdenv, writeText, elixir, erlang, hex, lib }:
+{ stdenv, lib, elixir, erlang, hex, rebar, rebar3, fetchMixDeps }:
 
-{ name
-, version
-, src
-, setupHook ? null
-, buildInputs ? []
-, beamDeps ? []
-, postPatch ? ""
-, compilePorts ? false
-, installPhase ? null
-, buildPhase ? null
-, configurePhase ? null
-, meta ? {}
-, enableDebugInfo ? false
-, ... }@attrs:
-
-with lib;
+{ name, version, src, nativeBuildInputs ? [ ], meta ? { }
+, enableDebugInfo ? false, depsSha256, mixEnv ? "prod", ... }@attrs:
 
 let
 
-  debugInfoFlag = lib.optionalString (enableDebugInfo || elixir.debugInfo) "--debug-info";
-
-  shell = drv: stdenv.mkDerivation {
-          name = "interactive-shell-${drv.name}";
-          buildInputs = [ drv ];
+  shell = drv:
+    stdenv.mkDerivation {
+      name = "interactive-shell-${drv.name}";
+      buildInputs = [ drv ];
     };
 
-  bootstrapper = ./mix-bootstrap;
+  mixDeps = fetchMixDeps {
+    inherit src name mixEnv version;
+    sha256 = depsSha256;
+  };
 
-  pkg = self: stdenv.mkDerivation ( attrs // {
-    name = "${name}-${version}";
-    inherit version;
+  pkg = self:
+    stdenv.mkDerivation (attrs // {
+      name = "${name}-${version}";
+      inherit version;
 
-    dontStrip = true;
+      dontStrip = true;
 
-    inherit src;
+      inherit src;
 
-    setupHook = if setupHook == null
-    then writeText "setupHook.sh" ''
-       addToSearchPath ERL_LIBS "$1/lib/erlang/lib"
-    ''
-    else setupHook;
+      nativeBuildInputs = nativeBuildInputs ++ [ erlang hex elixir ];
 
-    inherit buildInputs;
-    propagatedBuildInputs = [ hex elixir ] ++ beamDeps;
+      MIX_ENV = mixEnv;
+      MIX_DEBUG = if enableDebugInfo then 1 else 0;
+      HEX_OFFLINE = 1;
+      DEBUG = if enableDebugInfo then 1 else 0; # for Rebar3 compilation
 
-    configurePhase = if configurePhase == null
-    then ''
-      runHook preConfigure
-      ${erlang}/bin/escript ${bootstrapper}
-      runHook postConfigure
-    ''
-    else configurePhase ;
+      postUnpack = ''
+        export HEX_HOME="$TMPDIR/hex"
+        export MIX_HOME="$TMPDIR/mix"
+        export MIX_DEPS_PATH="$TMPDIR/deps"
 
+        # Rebar
+        mix local.rebar rebar "${rebar}/bin/rebar"
+        mix local.rebar rebar3 "${rebar3}/bin/rebar3"
+        export REBAR_GLOBAL_CONFIG_DIR="$TMPDIR/rebar3"
+        export REBAR_CACHE_DIR="$TMPDIR/rebar3.cache"
 
-    buildPhase = if buildPhase == null
-    then ''
+        cp --no-preserve=mode -R "${mixDeps}" "$MIX_DEPS_PATH"
+      '' + (attrs.postUnpack or "");
+
+      configurePhase = attrs.configurePhase or ''
+        runHook preConfigure
+
+        mix deps.loadpaths
+        runHook postConfigure
+      '';
+
+      buildPhase = attrs.buildPhase or ''
         runHook preBuild
-
-        export HEX_OFFLINE=1
-        export HEX_HOME=`pwd`
-        export MIX_ENV=prod
-        export MIX_NO_DEPS=1
-
-        mix compile ${debugInfoFlag} --no-deps-check
-
+        mix do compile --no-deps-check, release --path "$out"
         runHook postBuild
-    ''
-    else buildPhase;
+      '';
 
-    installPhase = if installPhase == null
-    then ''
-        runHook preInstall
+      dontInstall = true;
 
-        MIXENV=prod
-
-        if [ -d "_build/shared" ]; then
-          MIXENV=shared
-        fi
-
-        mkdir -p "$out/lib/erlang/lib/${name}-${version}"
-        for reldir in src ebin priv include; do
-          fd="_build/$MIXENV/lib/${name}/$reldir"
-          [ -d "$fd" ] || continue
-          cp -Hrt "$out/lib/erlang/lib/${name}-${version}" "$fd"
-          success=1
-        done
-
-        runHook postInstall
-    ''
-    else installPhase;
-
-    passthru = {
-      packageName = name;
-      env = shell self;
-      inherit beamDeps;
-    };
-});
-in fix pkg
+      passthru = {
+        packageName = name;
+        env = shell self;
+      };
+    });
+in pkg lib.fix
