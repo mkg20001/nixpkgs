@@ -69,16 +69,17 @@ let
     url = "ssh://git@github.com/your_id/your_repo";
     rev = "replace_with_your_commit";
   };
-  # leave this empty and nix will complain and tell you the right value
-  # to replace this with
 
   nodeDependencies =
     (pkgs.callPackage ./assets/default.nix { }).shell.nodeDependencies;
 
 in packages.buildMix {
+  inherit src;
   name = "your_project";
   version = "0.0.1";
   mixEnv = "prod";
+  # leave this empty and nix will complain and tell you the right value
+  # to replace this with
   depsSha256 = "";
   preConfigure = ''
     export DATABASE_URL=""
