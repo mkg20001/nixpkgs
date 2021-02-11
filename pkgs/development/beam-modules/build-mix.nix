@@ -39,8 +39,8 @@ let
 
         # Rebar
         # the api with `mix local.rebar rebar path` makes a copy of the binary
-        export MIX_REBAR "${rebar}/bin/rebar"
-        export MIX_REBAR3 "${rebar3}/bin/rebar3"
+        export MIX_REBAR="${rebar}/bin/rebar"
+        export MIX_REBAR3="${rebar3}/bin/rebar3"
         export REBAR_GLOBAL_CONFIG_DIR="$TMPDIR/rebar3"
         export REBAR_CACHE_DIR="$TMPDIR/rebar3.cache"
 
