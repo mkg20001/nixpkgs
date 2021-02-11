@@ -65,22 +65,21 @@ with import <nixpkgs-unstable> { };
 
 let
   packages = beam.packagesWith beam.interpreters.erlang;
-  name = "union";
-  mixEnv = "prod";
-  version = "0.0.1";
   src = builtins.fetchGit {
     url = "ssh://git@github.com/your_id/your_repo";
     rev = "replace_with_your_commit";
   };
   # leave this empty and nix will complain and tell you the right value
   # to replace this with
-  depsSha256 = "";
 
   nodeDependencies =
     (pkgs.callPackage ./assets/default.nix { }).shell.nodeDependencies;
 
 in packages.buildMix {
-  inherit name src version depsSha256;
+  name = "your_project";
+  version = "0.0.1";
+  mixEnv = "prod";
+  depsSha256 = "";
   preConfigure = ''
     export DATABASE_URL=""
     export SECRET_KEY_BASE=""
