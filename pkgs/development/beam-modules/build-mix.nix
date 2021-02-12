@@ -1,7 +1,7 @@
 { stdenv, lib, elixir, erlang, hex, rebar, rebar3, fetchMixDeps }:
 
-{ name, version, src, nativeBuildInputs ? [ ], meta ? { }
-, enableDebugInfo ? false, depsSha256, mixEnv ? "prod", ... }@attrs:
+{ name, version, src, depsPreConfigure ? null, nativeBuildInputs ? [ ]
+, meta ? { }, enableDebugInfo ? false, depsSha256, mixEnv ? "prod", ... }@attrs:
 
 let
 
@@ -13,6 +13,7 @@ let
 
   mixDeps = fetchMixDeps {
     inherit src name mixEnv version;
+    preConfigure = depsPreConfigure;
     sha256 = depsSha256;
   };
 

@@ -81,6 +81,11 @@ in packages.buildMix {
   # leave this empty and nix will complain and tell you the right value
   # to replace this with
   depsSha256 = "";
+  depsPreConfigure = ''
+    export DATABASE_URL=""
+    export SECRET_KEY_BASE=""
+  '';
+  inherit src;
   preConfigure = ''
     export DATABASE_URL=""
     export SECRET_KEY_BASE=""
@@ -89,7 +94,7 @@ in packages.buildMix {
     ln -s ${nodeDependencies}/lib/node_modules ./node_modules
     export PATH="${nodeDependencies}/bin:$PATH"
 
-    webpack --config ./webpack/webpack.prod.js
+    webpack --mode production --config ./webpack.config.js
     cd ..
   '';
 }
