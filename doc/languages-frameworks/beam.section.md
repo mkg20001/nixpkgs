@@ -82,7 +82,14 @@ in packages.buildMix {
   # to replace this with
   depsSha256 = "";
   inherit src;
+  depsPreConfigure = ''
+    # if you have build time environment variable add them here
+    export MY_ENV_VAR="my_value";
+  '';
   preConfigure = ''
+    # if you have build time environment variable add them here
+    export MY_ENV_VAR="my_value";
+
     cd ./assets
 
     ln -s ${nodeDependencies}/lib/node_modules ./node_modules
@@ -96,7 +103,8 @@ in packages.buildMix {
 
 Setup will require the following steps
 
-- move your build environment variable dependencies to runtime. For more information about this check [runtime.exs docs](https://hexdocs.pm/mix/Mix.Tasks.Release.html#module-runtime-configuration). On a fresh Phoenix build that would mean that both of the `DATABASE_URL` and `SECRET_KEY` need be moved to `runtime.exs`.
+- Keep in mind that having secrets in the build time environment variables is not recommended. If those are not secrets they can be directly included in the config.
+- move your secrets to runtime envionment variables. For more information about this check [runtime.exs docs](https://hexdocs.pm/mix/Mix.Tasks.Release.html#module-runtime-configuration). On a fresh Phoenix build that would mean that both of the `DATABASE_URL` and `SECRET_KEY` need be moved to `runtime.exs`.
 - `cd assets` and `node2nix --development` will generate a nix expression containing your frontend dependencies
 - commit and push those changes
 - you can now `nix-build .`
