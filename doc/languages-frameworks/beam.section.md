@@ -82,14 +82,11 @@ in packages.buildMix {
   # to replace this with
   depsSha256 = "";
   inherit src;
-  depsPreConfigure = ''
-    # if you have build time environment variable add them here
-    export MY_ENV_VAR="my_value";
-  '';
+  # if you have build time environment variable add them here
+  buildEnvVars = {
+    MY_ENV_VAR="my_value";
+  };
   preConfigure = ''
-    # if you have build time environment variable add them here
-    export MY_ENV_VAR="my_value";
-
     cd ./assets
 
     ln -s ${nodeDependencies}/lib/node_modules ./node_modules
@@ -109,6 +106,61 @@ Setup will require the following steps
 - commit and push those changes
 - you can now `nix-build .`
 - When you need to run the release, you will need to at least supply the environment variable RELEASE_TMP that you have write access to.
+
+#### Example of creating a service for an Elixir - Phoenix project
+
+In order to create a service with your release, you could add a `service.nix`
+in your project with the following
+
+```Nix
+{config, pkgs, lib, ...}:
+
+let
+  release = pkgs.callPackage ./default.nix;
+  release_name = "app";
+  working_directory = "/home/app";
+in
+{
+  systemd.services.${release_name} = {
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" "postgresql.service" ];
+    requires = [ "network-online.target" "postgresql.service" ];
+    description = "my app";
+    serviceConfig = {
+      Type = "exec";
+      DynamicUser = true;
+      WorkingDirectory = working_directory;
+      # Implied by DynamicUser, but just to emphasize due to RELEASE_TMP
+      PrivateTmp = true;
+      ExecStart = ''
+        ${release}/bin/${release_name} start
+      '';
+      ExecStop = ''
+        ${release}/bin/${release_name} stop
+      '';
+      ExecReload = ''
+        ${release}/bin/${release_name} restart
+      '';
+      Restart = "on-failure";
+      RestartSec = 5;
+      StartLimitBurst = 3;
+      StartLimitInterval = 10;
+      environment = {
+        # RELEASE_TMP is used to write the state of the 
+        # VM configuration when the system is running
+        # it needs to be a writable directory
+        # if you don't set it, it will default to /tmp
+        RELEASE_TMP = working_directory;
+        MY_VAR = "my_var";
+      };
+    };
+    # needed for disksup do have sh available
+    path = [ pkgs.bash ];
+  };
+
+  environment.systemPackages = [ release ];
+}
+```
 
 ## How to Develop {#how-to-develop}
 
