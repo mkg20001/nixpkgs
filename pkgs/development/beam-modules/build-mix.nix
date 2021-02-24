@@ -46,6 +46,7 @@ stdenv.mkDerivation (buildEnvVars // {
 
   '' + (attrs.postUnpack or "");
 
+  # TODO enable overriding of preConfigure from the passed attrs
   configurePhase = attrs.configurePhase or ''
     runHook preConfigure
 
@@ -62,4 +63,7 @@ stdenv.mkDerivation (buildEnvVars // {
     wrapProgram $out/bin/${name} \
       --set-default RELEASE_TMP "/tmp"
   '';
+  # TODO figure out how to do a Fixed Output Derivation and add the output hash
+  # This doesn't play well at the moment with Phoenix projects
+  # for example who have frontend dependencies
 })
