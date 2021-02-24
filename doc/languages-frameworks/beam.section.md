@@ -146,7 +146,7 @@ in
       StartLimitBurst = 3;
       StartLimitInterval = 10;
       environment = {
-        # RELEASE_TMP is used to write the state of the 
+        # RELEASE_TMP is used to write the state of the
         # VM configuration when the system is running
         # it needs to be a writable directory
         # if you don't set it, it will default to /tmp
