@@ -1,9 +1,9 @@
 { stdenvNoCC, lib, elixir, hex, rebar, rebar3, cacert, git }:
 
 { name, version, sha256, src, mixEnv ? "prod", debug ? false
-, depsPreConfigure ? null, meta ? { } }:
+, buildEnvVars, meta ? { } }:
 
-stdenvNoCC.mkDerivation ({
+stdenvNoCC.mkDerivation (buildEnvVars // {
   name = "mix-deps-${name}-${version}";
 
   nativeBuildInputs = [ elixir hex cacert git ];
@@ -14,10 +14,7 @@ stdenvNoCC.mkDerivation ({
   MIX_DEBUG = if debug then 1 else 0;
   DEBUG = if debug then 1 else 0; # for rebar3
 
-  preConfigure = depsPreConfigure;
-
   configurePhase = ''
-    runHook preConfigure
     export HEX_HOME="$TEMPDIR/.hex";
     export MIX_HOME="$TEMPDIR/.mix";
     export MIX_DEPS_PATH="$out";
