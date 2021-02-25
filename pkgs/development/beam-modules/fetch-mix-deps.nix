@@ -1,7 +1,14 @@
 { stdenvNoCC, lib, elixir, hex, rebar, rebar3, cacert, git }:
 
-{ name, version, sha256, src, mixEnv ? "prod", debug ? false
-, buildEnvVars, meta ? { } }:
+{ name
+, version
+, sha256
+, src
+, mixEnv ? "prod"
+, debug ? false
+, buildEnvVars ? { }
+, meta ? { }
+}:
 
 stdenvNoCC.mkDerivation (buildEnvVars // {
   name = "mix-deps-${name}-${version}";
