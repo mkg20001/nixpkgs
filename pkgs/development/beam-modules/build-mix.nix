@@ -63,7 +63,11 @@ stdenv.mkDerivation (buildEnvVars // overridable // {
   '';
 
   installPhase = attrs.installPhase or ''
+    runHook preInstall
+
     mix do compile --no-deps-check, release --path "$out"
+
+    runHook postInstall
   '';
 
   postFixup = ''
