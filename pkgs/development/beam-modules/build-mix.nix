@@ -12,14 +12,15 @@
 , ...
 }@attrs:
 let
-
   mixDeps = fetchMixDeps {
     inherit src name mixEnv version buildEnvVars;
     sha256 = depsSha256;
   };
 
+  overridable = builtins.intersectAttrs { preConfigure = ""; postConfigure = ""; } attrs;
+
 in
-stdenv.mkDerivation (buildEnvVars // {
+stdenv.mkDerivation (buildEnvVars // overridable // {
   name = "${name}-${version}";
   inherit version;
 
@@ -53,7 +54,6 @@ stdenv.mkDerivation (buildEnvVars // {
 
   '' + (attrs.postUnpack or "");
 
-  # TODO enable overriding of preConfigure from the passed attrs
   configurePhase = attrs.configurePhase or ''
     runHook preConfigure
 
