@@ -1,17 +1,24 @@
 { stdenv, lib, elixir, erlang, hex, rebar, rebar3, fetchMixDeps, makeWrapper }:
 
-{ name, version, src, nativeBuildInputs ? [ ], meta ? { }
-, buildEnvVars ? { }, enableDebugInfo ? false, depsSha256, mixEnv ? "prod"
-, ... }@attrs:
-
+{ name
+, version
+, src
+, nativeBuildInputs ? [ ]
+, meta ? { }
+, buildEnvVars ? { }
+, enableDebugInfo ? false
+, depsSha256
+, mixEnv ? "prod"
+, ...
+}@attrs:
 let
 
   mixDeps = fetchMixDeps {
-    inherit src name mixEnv version buildEnvVars ;
+    inherit src name mixEnv version buildEnvVars;
     sha256 = depsSha256;
   };
 
-  in
+in
 stdenv.mkDerivation (buildEnvVars // {
   name = "${name}-${version}";
   inherit version;
