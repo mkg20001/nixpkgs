@@ -17,7 +17,7 @@ let
     sha256 = depsSha256;
   };
 
-  overridable = builtins.intersectAttrs { preConfigure = ""; postConfigure = ""; } attrs;
+  overridable = builtins.removeAttrs attrs [ "buildEnvVars" ];
 
 in
 stdenv.mkDerivation (buildEnvVars // overridable // {
