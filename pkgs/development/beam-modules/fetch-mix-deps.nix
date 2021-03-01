@@ -38,6 +38,7 @@ stdenvNoCC.mkDerivation (buildEnvVars // {
 
   installPhase = ''
     mix deps.get --only ${mixEnv}
+    find $out -type d -name ".git" -print0 | xargs -0 -I {} rm -rf "{}"
   '';
 
   outputHashAlgo = "sha256";
