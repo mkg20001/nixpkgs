@@ -1,0 +1,26 @@
+From f2138826cde6613635b6a604ebd2fb1278fd45f8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Maciej=20Kr=C3=BCger?= <mkg20001@gmail.com>
+Date: Mon, 1 Mar 2021 08:57:50 +0100
+Subject: [PATCH] f
+
+---
+ lib/mix/lib/mix/dep.ex | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/lib/mix/lib/mix/dep.ex b/lib/mix/lib/mix/dep.ex
+index b068968..b7ab006 100644
+--- a/lib/mix/lib/mix/dep.ex
++++ b/lib/mix/lib/mix/dep.ex
+@@ -427,8 +427,7 @@ def check_lock(%Mix.Dep{scm: scm, opts: opts} = dep) do
+     if available?(dep) do
+       case scm.lock_status(opts) do
+         :mismatch ->
+-          status = if rev = opts[:lock], do: {:lockmismatch, rev}, else: :nolock
+-          %{dep | status: status}
++          check_manifest(dep, opts[:build])
+ 
+         :outdated ->
+           # Don't include the lock in the dependency if it is outdated
+-- 
+2.30.0
+
