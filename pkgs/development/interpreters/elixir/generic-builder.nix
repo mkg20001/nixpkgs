@@ -25,6 +25,8 @@ in
 
     LANG = "C.UTF-8";
     LC_TYPE = "C.UTF-8";
+    
+    patches = [ ./0001-f.patch ];
 
     setupHook = ./setup-hook.sh;
 
