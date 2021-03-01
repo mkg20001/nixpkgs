@@ -71,8 +71,8 @@ stdenv.mkDerivation (buildEnvVars // overridable // {
   '';
 
   postFixup = ''
-    wrapProgram $out/bin/${name} \
-      --set-default RELEASE_TMP "/tmp"
+    # wrapProgram $out/bin/${name} \
+    #   --set-default RELEASE_TMP "/tmp"
   '';
   # TODO figure out how to do a Fixed Output Derivation and add the output hash
   # This doesn't play well at the moment with Phoenix projects
