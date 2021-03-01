@@ -56,9 +56,9 @@ make_deterministic_repo(){
         .git/refs/remotes/origin/HEAD .git/config
 
     # Remove all remote branches.
-    # git branch -r | while read -r branch; do
-    #     clean_git branch -rD "$branch"
-    # done
+    git branch -r | while read -r branch; do
+        clean_git branch -rD "$branch"
+    done
 
     # Remove tags not reachable from HEAD. If we're exactly on a tag, don't
     # delete it.
