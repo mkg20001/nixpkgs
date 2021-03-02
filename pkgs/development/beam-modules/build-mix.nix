@@ -1,4 +1,4 @@
-{ stdenv, lib, elixir, erlang, hex, rebar, rebar3, fetchMixDeps, makeWrapper }:
+{ stdenv, lib, elixir, erlang, hex, rebar, rebar3, fetchMixDeps, makeWrapper, git }:
 
 { name
 , version
@@ -9,6 +9,8 @@
 , enableDebugInfo ? false
 , depsSha256
 , mixEnv ? "prod"
+, compileFlags ? [ ]
+, defaultEnvVars ? true
 , ...
 }@attrs:
 let
@@ -17,7 +19,7 @@ let
     sha256 = depsSha256;
   };
 
-  overridable = builtins.removeAttrs attrs [ "buildEnvVars" ];
+  overridable = builtins.removeAttrs attrs [ "buildEnvVars" "compileFlags" ];
 
 in
 stdenv.mkDerivation (buildEnvVars // overridable // {
@@ -28,7 +30,7 @@ stdenv.mkDerivation (buildEnvVars // overridable // {
 
   inherit src;
 
-  nativeBuildInputs = nativeBuildInputs ++ [ erlang hex elixir makeWrapper ];
+  nativeBuildInputs = nativeBuildInputs ++ [ erlang hex elixir makeWrapper git ];
 
   MIX_ENV = mixEnv;
   MIX_DEBUG = if enableDebugInfo then 1 else 0;
@@ -62,18 +64,28 @@ stdenv.mkDerivation (buildEnvVars // overridable // {
     runHook postConfigure
   '';
 
+  buildPhase = attrs.buildPhase or ''
+    runHook preBuild
+
+    mix compile --no-deps-check ${lib.concatStringsSep " " compileFlags}
+
+    runHook postBuild
+  '';
+
+
   installPhase = attrs.installPhase or ''
     runHook preInstall
 
-    mix do compile --no-deps-check, release --path "$out"
+    mix release --path "$out"
 
     runHook postInstall
   '';
 
-  postFixup = ''
-    wrapProgram $out/bin/${name} \
-      --set-default RELEASE_TMP "/tmp"
-  '';
+  postFixup =
+    if defaultEnvVars then ''
+      wrapProgram $out/bin/${name} \
+        --set-default RELEASE_TMP "/tmp"
+    '' else "";
   # TODO figure out how to do a Fixed Output Derivation and add the output hash
   # This doesn't play well at the moment with Phoenix projects
   # for example who have frontend dependencies
