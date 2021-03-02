@@ -73,27 +73,54 @@ let
   nodeDependencies =
     (pkgs.callPackage ./assets/default.nix { }).shell.nodeDependencies;
 
-in packages.buildMix {
-  inherit src;
   name = "your_project";
   version = "0.0.1";
+
+  frontEndFiles = stdenvNoCC.mkDerivation {
+    name = "frontend-${name}-${version}";
+
+    nativeBuildInputs = [ nodejs ];
+
+    inherit src;
+
+    buildPhase = ''
+      cp -r ./assets $TEMPDIR
+
+      mkdir -p $TEMPDIR/assets/node_modules/.cache
+      cp -r ${nodeDependencies}/lib/node_modules $TEMPDIR/assets
+      export PATH="${nodeDependencies}/bin:$PATH"
+
+      cd $TEMPDIR/assets
+      webpack --config ./webpack.config.js
+      cd ..
+    '';
+
+    installPhase = ''
+      cp -r ./priv/static $out/
+    '';
+
+    outputHashAlgo = "sha256";
+    outputHashMode = "recursive";
+    # nix will complain and tell you the right value to replace this with
+    outputHash = lib.fakeSha256;
+
+    impureEnvVars = lib.fetchers.proxyImpureEnvVars;
+  };
+
+
+in packages.buildMix {
+  inherit src name version;
   mixEnv = "prod";
-  # leave this empty and nix will complain and tell you the right value
-  # to replace this with
-  depsSha256 = "";
+  # nix will complain and tell you the right value to replace this with
+  depsSha256 = lib.fakeSha256;
   inherit src;
   # if you have build time environment variable add them here
   buildEnvVars = {
     MY_ENV_VAR="my_value";
   };
-  preConfigure = ''
-    cd ./assets
-
-    ln -s ${nodeDependencies}/lib/node_modules ./node_modules
-    export PATH="${nodeDependencies}/bin:$PATH"
-
-    webpack --mode production --config ./webpack.config.js
-    cd ..
+  preInstall = ''
+    mkdir -p ./priv/static
+    cp -r ${frontEndFiles} ./priv/static
   '';
 }
 ```
