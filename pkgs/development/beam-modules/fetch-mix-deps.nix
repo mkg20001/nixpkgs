@@ -24,7 +24,7 @@ stdenvNoCC.mkDerivation (buildEnvVars // {
   configurePhase = ''
     export HEX_HOME="$TEMPDIR/.hex";
     export MIX_HOME="$TEMPDIR/.mix";
-    export MIX_DEPS_PATH="$out";
+    export MIX_DEPS_PATH="$TEMPDIR/deps";
 
     # Rebar
     # the api with `mix local.rebar rebar path` makes a copy of the binary
@@ -38,6 +38,8 @@ stdenvNoCC.mkDerivation (buildEnvVars // {
 
   installPhase = ''
     mix deps.get --only ${mixEnv}
+    find $TEMPDIR/deps -type d -name ".git" -print0 | xargs -0 -I {} rm -rf "{}"
+    cp -r --no-preserve=mode,ownership,timestamps $TEMPDIR/deps $out
   '';
 
   outputHashAlgo = "sha256";
