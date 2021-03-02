@@ -153,6 +153,14 @@ in
     after = [ "network.target" "postgresql.service" ];
     requires = [ "network-online.target" "postgresql.service" ];
     description = "my app";
+    environment = {
+      # RELEASE_TMP is used to write the state of the
+      # VM configuration when the system is running
+      # it needs to be a writable directory
+      # if you don't set it, it will default to /tmp
+      RELEASE_TMP = working_directory;
+      MY_VAR = "my_var";
+    };
     serviceConfig = {
       Type = "exec";
       DynamicUser = true;
@@ -172,14 +180,6 @@ in
       RestartSec = 5;
       StartLimitBurst = 3;
       StartLimitInterval = 10;
-      environment = {
-        # RELEASE_TMP is used to write the state of the
-        # VM configuration when the system is running
-        # it needs to be a writable directory
-        # if you don't set it, it will default to /tmp
-        RELEASE_TMP = working_directory;
-        MY_VAR = "my_var";
-      };
     };
     # needed for disksup do have sh available
     path = [ pkgs.bash ];
