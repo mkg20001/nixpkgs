@@ -59,7 +59,11 @@ stdenv.mkDerivation (buildEnvVars // overridable // {
   configurePhase = attrs.configurePhase or ''
     runHook preConfigure
 
-    mix deps.loadpaths
+    # this is needed for projects that have a specific compile step
+    # the dependency needs to be compiled in order for the task
+    # to be available
+    # Phoenix projects for example will need compile.phoenix
+    mix deps.compile --no-deps-check --skip-umbrella-children
 
     runHook postConfigure
   '';
