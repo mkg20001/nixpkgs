@@ -36,21 +36,21 @@ stdenv.mkDerivation (buildEnvVars // overridable // {
   MIX_DEBUG = if enableDebugInfo then 1 else 0;
   HEX_OFFLINE = 1;
   DEBUG = if enableDebugInfo then 1 else 0; # for Rebar3 compilation
+  # the api with `mix local.rebar rebar path` makes a copy of the binary
+  MIX_REBAR = "${rebar}/bin/rebar";
+  MIX_REBAR3 = "${rebar3}/bin/rebar3";
 
   postUnpack = ''
-    export HEX_HOME="$TMPDIR/hex"
-    export MIX_HOME="$TMPDIR/mix"
+    export HEX_HOME="$TEMPDIR/hex"
+    export MIX_HOME="$TEMPDIR/mix"
     # compilation of the dependencies will require
     # that the dependency path is writable
-    # thus a copy to the TMPDIR is inevitable here
-    export MIX_DEPS_PATH="$TMPDIR/deps"
+    # thus a copy to the TEMPDIR is inevitable here
+    export MIX_DEPS_PATH="$TEMPDIR/deps"
 
     # Rebar
-    # the api with `mix local.rebar rebar path` makes a copy of the binary
-    export MIX_REBAR="${rebar}/bin/rebar"
-    export MIX_REBAR3="${rebar3}/bin/rebar3"
-    export REBAR_GLOBAL_CONFIG_DIR="$TMPDIR/rebar3"
-    export REBAR_CACHE_DIR="$TMPDIR/rebar3.cache"
+    export REBAR_GLOBAL_CONFIG_DIR="$TEMPDIR/rebar3"
+    export REBAR_CACHE_DIR="$TEMPDIR/rebar3.cache"
 
     cp --no-preserve=mode -R "${mixDeps}" "$MIX_DEPS_PATH"
 
