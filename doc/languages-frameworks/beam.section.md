@@ -132,7 +132,7 @@ Setup will require the following steps
 - `cd assets` and `node2nix --development` will generate a nix expression containing your frontend dependencies
 - commit and push those changes
 - you can now `nix-build .`
-- When you need to run the release, you will need to at least supply the environment variable RELEASE_TMP that you have write access to.
+- When you need to run the release, you will need to at least supply the environment variable `RELEASE_TMP` that you have write access to.
 
 #### Example of creating a service for an Elixir - Phoenix project
 
