@@ -129,7 +129,7 @@ Setup will require the following steps
 
 - Keep in mind that having secrets in the build time environment variables is not recommended. If those are not secrets they can be directly included in the config.
 - move your secrets to runtime envionment variables. For more information about this check [runtime.exs docs](https://hexdocs.pm/mix/Mix.Tasks.Release.html#module-runtime-configuration). On a fresh Phoenix build that would mean that both of the `DATABASE_URL` and `SECRET_KEY` need be moved to `runtime.exs`.
-- `cd assets` and `node2nix --development` will generate a nix expression containing your frontend dependencies
+- `cd assets` and `node2nix --development` will generate a Nix expression containing your frontend dependencies
 - commit and push those changes
 - you can now `nix-build .`
 - When you need to run the release, you will need to at least supply the environment variable `RELEASE_TMP` that you have write access to.
