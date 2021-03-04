@@ -58,7 +58,7 @@ Alternatively, we can use `buildHex` as a shortcut:
 
 #### buildMix - Elixir Phoenix example
 
-Here is how your default.nix file would look like
+Here is how your `default.nix` file would look.
 
 ```default.nix
 with import <nixpkgs-unstable> { };
