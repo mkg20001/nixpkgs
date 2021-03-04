@@ -214,7 +214,7 @@ mkShell {
 
 #### Elixir - Phoenix project
 
-Here is an example shell.nix
+Here is an example `shell.nix`.
 
 ```shell.nix
 # latest elixir version are only available on unstable
