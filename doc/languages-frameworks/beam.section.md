@@ -70,11 +70,22 @@ let
     rev = "replace_with_your_commit";
   };
 
-  nodeDependencies =
-    (pkgs.callPackage ./assets/default.nix { }).shell.nodeDependencies;
-
   name = "your_project";
   version = "0.0.1";
+
+  mixEnv = "prod";
+
+  mixDeps = packages.fetchMixDeps {
+    inherit src name mixEnv version;
+    # nix will complain and tell you the right value to replace this with
+    sha256 = lib.fakeSha256;
+    # if you have build time environment variable add them here
+    MY_ENV_VAR="my_value";
+  };
+
+
+  nodeDependencies =
+    (pkgs.callPackage ./assets/default.nix { }).shell.nodeDependencies;
 
   frontEndFiles = stdenvNoCC.mkDerivation {
     name = "frontend-${name}-${version}";
@@ -109,15 +120,11 @@ let
 
 
 in packages.buildMix {
-  inherit src name version;
-  mixEnv = "prod";
+  inherit src name version mixEnv mixDeps;
   # nix will complain and tell you the right value to replace this with
   depsSha256 = lib.fakeSha256;
-  inherit src;
   # if you have build time environment variable add them here
-  buildEnvVars = {
-    MY_ENV_VAR="my_value";
-  };
+  MY_ENV_VAR="my_value";
   preInstall = ''
     mkdir -p ./priv/static
     cp -r ${frontEndFiles} ./priv/static

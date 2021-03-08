@@ -5,24 +5,18 @@
 , src
 , nativeBuildInputs ? [ ]
 , meta ? { }
-, buildEnvVars ? { }
 , enableDebugInfo ? false
-, depsSha256
 , mixEnv ? "prod"
 , compileFlags ? [ ]
 , defaultEnvVars ? true
+, mixDeps ? null
 , ...
 }@attrs:
 let
-  mixDeps = fetchMixDeps {
-    inherit src name mixEnv version buildEnvVars;
-    sha256 = depsSha256;
-  };
-
-  overridable = builtins.removeAttrs attrs [ "buildEnvVars" "compileFlags" ];
+  overridable = builtins.removeAttrs attrs [ "compileFlags" ];
 
 in
-stdenv.mkDerivation (buildEnvVars // overridable // {
+stdenv.mkDerivation (overridable // {
   name = "${name}-${version}";
   inherit version;
 
