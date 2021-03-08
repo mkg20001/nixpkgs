@@ -61,7 +61,7 @@ Alternatively, we can use `buildHex` as a shortcut:
 Here is how your `default.nix` file would look.
 
 ```default.nix
-with import <nixpkgs-unstable> { };
+with import <nixpkgs> { };
 
 let
   packages = beam.packagesWith beam.interpreters.erlang;
@@ -217,8 +217,7 @@ mkShell {
 Here is an example `shell.nix`.
 
 ```shell.nix
-# latest elixir version are only available on unstable
-with import <nixpkgs-unstable> { };
+with import <nixpkgs> { };
 
 let
   # define packages to install
