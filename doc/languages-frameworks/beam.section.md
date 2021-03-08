@@ -83,7 +83,6 @@ let
     MY_ENV_VAR="my_value";
   };
 
-
   nodeDependencies =
     (pkgs.callPackage ./assets/default.nix { }).shell.nodeDependencies;
 
