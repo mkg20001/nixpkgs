@@ -28,6 +28,7 @@
 , bash
 , installShellFiles
 , nixosTests
+, OVMF, qemu_kvm, seabios, gptfdisk
 }:
 
 buildGoModule rec {
@@ -47,6 +48,12 @@ buildGoModule rec {
   postPatch = ''
     substituteInPlace shared/usbid/load.go \
       --replace "/usr/share/misc/usb.ids" "${hwdata}/share/hwdata/usb.ids"
+    # Nuke from orbit.
+    find . -type f -exec sed -i \
+      -e s,/usr/share/OVMF,${OVMF.fd}/FV,g \
+      -e s,/usr/share/qemu,${qemu_kvm}/share/qemu,g \
+      -e s,/usr/share/seabios,${seabios},g \
+      {} +
   '';
 
   excludedPackages = [ "test" "lxd/db/generate" ];
@@ -60,6 +67,7 @@ buildGoModule rec {
     raft-canonical.dev
     sqlite-replication
     udev.dev
+    qemu_kvm
   ];
 
   ldflags = [ "-s" "-w" ];
@@ -86,7 +94,7 @@ buildGoModule rec {
   postInstall = ''
     wrapProgram $out/bin/lxd --prefix PATH : ${lib.makeBinPath (
       [ iptables ]
-      ++ [ acl rsync gnutar xz btrfs-progs gzip dnsmasq squashfsTools iproute2 bash criu attr ]
+      ++ [ acl rsync gnutar xz btrfs-progs gzip dnsmasq squashfsTools iproute2 bash criu attr qemu_kvm gptfdisk ]
       ++ [ (writeShellScriptBin "apparmor_parser" ''
              exec '${apparmor-parser}/bin/apparmor_parser' -I '${apparmor-profiles}/etc/apparmor.d' "$@"
            '') ]
