@@ -7,6 +7,7 @@
 , bash
 , installShellFiles
 , nixosTests
+, OVMF, qemu_kvm, seabios, gptfdisk
 }:
 
 buildGo118Package rec {
@@ -26,6 +27,12 @@ buildGo118Package rec {
   postPatch = ''
     substituteInPlace shared/usbid/load.go \
       --replace "/usr/share/misc/usb.ids" "${hwdata}/share/hwdata/usb.ids"
+    # Nuke from orbit.
+    find . -type f -exec sed -i \
+      -e s,/usr/share/OVMF,${OVMF.fd}/FV,g \
+      -e s,/usr/share/qemu,${qemu_kvm}/share/qemu,g \
+      -e s,/usr/share/seabios,${seabios},g \
+      {} +
   '';
 
   excludedPackages = [ "test" "lxd/db/generate" ];
@@ -40,7 +47,7 @@ buildGo118Package rec {
   postInstall = ''
     wrapProgram $out/bin/lxd --prefix PATH : ${lib.makeBinPath (
       [ iptables ]
-      ++ [ acl rsync gnutar xz btrfs-progs gzip dnsmasq squashfsTools iproute2 bash criu attr ]
+      ++ [ acl rsync gnutar xz btrfs-progs gzip dnsmasq squashfsTools iproute2 bash criu attr qemu_kvm gptfdisk ]
       ++ [ (writeShellScriptBin "apparmor_parser" ''
              exec '${apparmor-parser}/bin/apparmor_parser' -I '${apparmor-profiles}/etc/apparmor.d' "$@"
            '') ]
@@ -55,7 +62,7 @@ buildGo118Package rec {
 
   nativeBuildInputs = [ installShellFiles pkg-config makeWrapper ];
   buildInputs = [ lxc acl libcap dqlite.dev raft-canonical.dev
-                  sqlite-replication udev.dev ];
+                  sqlite-replication udev.dev qemu_kvm ];
 
   meta = with lib; {
     description = "Daemon based on liblxc offering a REST API to manage containers";
