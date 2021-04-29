@@ -1047,6 +1047,13 @@ environment.systemPackages = [
      <programlisting>
 <xref linkend="opt-services.gvfs.package" /> = pkgs.gvfs.override { samba = null; };
      </programlisting>
+   </para>
+  </listitem>
+  <listitem>
+   <para>     
+     LXD support was greatly improved,
+     building LXD images from configurations is now directly possible with just nixpkgs
+     and hydra is now building nixOS LXD images that can be used standalone with full nixos-rebuild support.
     </para>
    </listitem>
   </itemizedlist>
