@@ -27686,6 +27686,8 @@ in
 
   quorum = callPackage ../applications/blockchains/quorum.nix { };
 
+  packetcrypt = callPackage ../applications/blockchains/packetcrypt { };
+
   whirlpool-gui = callPackage ../applications/blockchains/whirlpool-gui { };
 
   ### GAMES
