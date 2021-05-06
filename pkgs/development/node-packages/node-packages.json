@@ -163,6 +163,7 @@
 , "neovim"
 , "netlify-cli"
 , "nijs"
+, "nix-dev"
 , "node-gyp"
 , "node-gyp-build"
 , "node-inspector"
