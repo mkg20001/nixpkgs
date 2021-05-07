@@ -1,7 +1,8 @@
 { lib, stdenv
 , fetchFromGitHub
 , sassc
-, autoreconfHook
+, meson
+, ninja
 , pkg-config
 , gtk3
 , gnome
@@ -13,22 +14,26 @@
 
 stdenv.mkDerivation rec {
   pname = "arc-theme";
-  version = "20210127";
+  version = "20210412";
 
   src = fetchFromGitHub {
     owner = "jnsh";
     repo = pname;
-    rev = version;
-    sha256 = "sha256-P7YZTD5bAWNWepL7qsZZAMf8ujzNbHOj/SLx8Fw3bi4=";
+    rev =  version;
+    sha256 = "BNJirtBtdWsIzQfsJsZzg1zFbJEzZPq1j2qZ+1QjRH8=";
+    fetchSubmodules = false;
   };
 
   nativeBuildInputs = [
-    autoreconfHook
+    meson
+    ninja
     pkg-config
     sassc
     optipng
     inkscape
     gtk3
+    cinnamon.cinnamon-common
+    gnome.gnome-shell
   ];
 
   propagatedUserEnvPkgs = [
@@ -50,7 +55,7 @@ stdenv.mkDerivation rec {
   ];
 
   postInstall = ''
-    install -Dm644 -t $out/share/doc/${pname} AUTHORS *.md
+    install -Dm644 -t $out/share/doc/${pname} $src/AUTHORS $src/*.md
   '';
 
   meta = with lib; {
