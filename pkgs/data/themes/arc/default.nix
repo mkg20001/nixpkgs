@@ -30,6 +30,8 @@ stdenv.mkDerivation rec {
     inkscape
     glib # for glib-compile-resources
     python3
+    cinnamon.cinnamon-common
+    gnome.gnome-shell
   ];
 
   propagatedUserEnvPkgs = [
@@ -57,6 +59,10 @@ stdenv.mkDerivation rec {
     # You will need to patch gdm to make use of this.
     "-Dgnome_shell_gresource=true"
   ];
+
+  postInstall = ''
+    install -Dm644 -t $out/share/doc/${pname} $src/AUTHORS $src/*.md
+  '';
 
   meta = with lib; {
     description = "Flat theme with transparent elements for GTK 3, GTK 2 and Gnome Shell";
