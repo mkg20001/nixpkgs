@@ -21376,6 +21376,7 @@ in
 
   prototool = callPackage ../development/tools/prototool { };
 
+  qemu_5_kvm = lowPrio (qemu_5.override { hostCpuOnly = true; });
   qemu_kvm = lowPrio (qemu.override { hostCpuOnly = true; });
   qemu_full = lowPrio (qemu.override { smbdSupport = true; cephSupport = true; glusterfsSupport = true; });
 
@@ -26226,6 +26227,12 @@ in
   qdirstat = libsForQt5.callPackage ../applications/misc/qdirstat {};
 
   qemu = callPackage ../applications/virtualization/qemu {
+    inherit (darwin.apple_sdk.frameworks) CoreServices Cocoa Hypervisor;
+    inherit (darwin.stubs) rez setfile;
+    python = python3;
+  };
+
+  qemu_5 = callPackage ../applications/virtualization/qemu-5 {
     inherit (darwin.apple_sdk.frameworks) CoreServices Cocoa Hypervisor;
     inherit (darwin.stubs) rez setfile;
     python = python3;
