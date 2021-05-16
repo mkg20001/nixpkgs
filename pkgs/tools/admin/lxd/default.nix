@@ -7,7 +7,7 @@
 , bash
 , installShellFiles
 , nftablesSupport ? false
-, OVMF, qemu_kvm, seabios, gptfdisk
+, OVMF, qemu_5_kvm, seabios, gptfdisk
 }:
 
 let
@@ -34,7 +34,7 @@ buildGoPackage rec {
     # Nuke from orbit.
     find . -type f -exec sed -i \
       -e s,/usr/share/OVMF,${OVMF.fd}/FV,g \
-      -e s,/usr/share/qemu,${qemu_kvm}/share/qemu,g \
+      -e s,/usr/share/qemu,${qemu_5_kvm}/share/qemu,g \
       -e s,/usr/share/seabios,${seabios},g \
       {} +
   '';
@@ -55,7 +55,7 @@ buildGoPackage rec {
 
     wrapProgram $out/bin/lxd --prefix PATH : ${lib.makeBinPath (
       networkPkgs
-      ++ [ acl rsync gnutar xz btrfs-progs gzip dnsmasq squashfsTools iproute2 bash criu qemu_kvm gptfdisk ]
+      ++ [ acl rsync gnutar xz btrfs-progs gzip dnsmasq squashfsTools iproute2 bash criu qemu_5_kvm gptfdisk ]
       ++ [ (writeShellScriptBin "apparmor_parser" ''
              exec '${apparmor-parser}/bin/apparmor_parser' -I '${apparmor-profiles}/etc/apparmor.d' "$@"
            '') ]
@@ -67,7 +67,7 @@ buildGoPackage rec {
 
   nativeBuildInputs = [ installShellFiles pkg-config makeWrapper ];
   buildInputs = [ lxc acl libcap libco-canonical.dev dqlite.dev
-                  raft-canonical.dev sqlite-replication udev.dev qemu_kvm ];
+                  raft-canonical.dev sqlite-replication udev.dev qemu_5_kvm ];
 
   meta = with lib; {
     description = "Daemon based on liblxc offering a REST API to manage containers";
