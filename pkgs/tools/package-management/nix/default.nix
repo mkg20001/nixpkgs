@@ -1,4 +1,4 @@
-{ lib, fetchurl, fetchFromGitHub, fetchpatch, callPackage
+{ lib, fetchurl, fetchgit, fetchFromGitHub, fetchpatch, callPackage
 , storeDir ? "/nix/store"
 , stateDir ? "/nix/var"
 , confDir ? "/etc"
@@ -208,23 +208,18 @@ in rec {
   nixUnstable = lib.lowPrio (callPackage common rec {
     pname = "nix";
     version = "2.4${suffix}";
-    suffix = "pre20210503_6d2553a";
+    suffix = "pre_xer_512ba99165cdef4168b81d0cb4e801dba44c2706";
 
-    src = fetchFromGitHub {
-      owner = "NixOS";
-      repo = "nix";
-      rev = "6d2553ae1496288554e871c530836428f405fd67";
-      sha256 = "sha256-YeSeyOKhBAXHlkzo4mwYr8QIjIP9AgdpJ7YdhqOO2CA=";
+    src = fetchgit { 
+      url = "https://git.mkg20001.io/xeredo/nix-flake.git";
+      rev = "512ba99165cdef4168b81d0cb4e801dba44c2706";
+      sha256 = "1crfkqm31sjx73kw3s3lds3sk25as10lwm2qh5jzbbamwy695h5a";
+      fetchSubmodules = false;
     };
 
     inherit storeDir stateDir confDir boehmgc;
 
-    patches = [
-      (fetchpatch {
-        url = "https://github.com/NixOS/nix/commit/8c7e043de2f673bc355d83f1e873baa93f30be62.patch";
-        sha256 = "sha256-aTcUnZXheewnyCT7yQKnTqQDKS2uDoN9plMQgxJH8Ag=";
-      })
-    ];
+    patches = [ ];
   });
 
 }
