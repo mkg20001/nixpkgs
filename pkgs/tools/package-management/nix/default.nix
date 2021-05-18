@@ -1,4 +1,4 @@
-{ lib, fetchurl, fetchFromGitHub, fetchpatch, callPackage
+{ lib, fetchurl, fetchgit, fetchFromGitHub, fetchpatch, callPackage
 , storeDir ? "/nix/store"
 , stateDir ? "/nix/var"
 , confDir ? "/etc"
@@ -11,7 +11,7 @@ let
 common =
   { lib, stdenv, perl, curl, bzip2, sqlite, openssl ? null, xz
   , bash, coreutils, util-linuxMinimal, gzip, gnutar
-  , pkg-config, boehmgc, libsodium, brotli, boost, editline, nlohmann_json
+  , jemalloc, pkg-config, boehmgc, libsodium, brotli, boost, editline, nlohmann_json
   , autoreconfHook, autoconf-archive, bison, flex
   , jq, libarchive, libcpuid
   , lowdown, mdbook
@@ -62,7 +62,7 @@ common =
           brotli boost editline
         ]
         ++ lib.optionals stdenv.isDarwin [ Security ]
-        ++ lib.optionals is24 [ libarchive gtest lowdown ]
+        ++ lib.optionals is24 [ libarchive gtest lowdown jemalloc ]
         ++ lib.optional (is24 && stdenv.isx86_64) libcpuid
         ++ lib.optional withLibseccomp libseccomp
         ++ lib.optional withAWS
@@ -234,13 +234,12 @@ in rec {
   nixUnstable = lib.lowPrio (callPackage common rec {
     pname = "nix";
     version = "2.4${suffix}";
-    suffix = "pre20210908_${lib.substring 0 7 src.rev}";
+    suffix = "pre_xer_b085c4c12082ec9ec3e2338e2d1c9250b0506f39";
 
-    src = fetchFromGitHub {
-      owner = "NixOS";
-      repo = "nix";
-      rev = "3c56f62093601143838af923195f630d8ffae2d4";
-      sha256 = "sha256-pjdzLOEt8i1NQe4drLpp8+LrRd2MgsISSQEsMebz2kc=";
+    src = fetchgit {
+      url = "https://git.mkg20001.io/xeredo/nix-flake.git";
+      rev = "b085c4c12082ec9ec3e2338e2d1c9250b0506f39";
+      sha256 = "GeN34hIGsVjuXOAzNNwM9loOHhb5S0oeq5PDBn6vasI=";
     };
 
     boehmgc = boehmgc_nixUnstable;
