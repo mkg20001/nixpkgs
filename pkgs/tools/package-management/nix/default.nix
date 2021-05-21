@@ -220,4 +220,6 @@ in rec {
 
   });
 
+  nixFlakes = nixUnstable;
+
 }
