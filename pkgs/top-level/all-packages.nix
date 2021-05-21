@@ -32266,7 +32266,8 @@ with pkgs;
     nixStable
     nix_2_4
     nixUnstable
-    nixFlakes;
+    nixFlakes
+    nixExperimental;
 
   nixStatic = pkgsStatic.nix;
 
