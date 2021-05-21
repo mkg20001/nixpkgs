@@ -222,6 +222,12 @@ in rec {
     patches = [ ];
   });
 
-  nixFlakes = nixUnstable;
+  nixExperimental = nixUnstable.overrideAttrs (prev: {
+    patches = (prev.patches or []) ++ [ ./enable-all-experimental.patch ];
+  });
+
+  nixFlakes = nixUnstable.overrideAttrs (prev: {
+    patches = (prev.patches or []) ++ [ ./enable-flakes.patch ];
+  });
 
 }
