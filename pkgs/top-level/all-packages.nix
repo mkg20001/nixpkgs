@@ -30637,7 +30637,8 @@ in
     nix
     nixStable
     nixUnstable
-    nixFlakes;
+    nixFlakes
+    nixExperimental;
 
   nixStatic = pkgsStatic.nix;
 
