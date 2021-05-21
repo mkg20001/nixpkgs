@@ -272,4 +272,6 @@ in rec {
 
   });
 
+  nixFlakes = nixUnstable;
+
 }
