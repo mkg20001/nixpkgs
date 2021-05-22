@@ -160,8 +160,8 @@ let self = dotnetPackages // overrides; dotnetPackages = with self; {
 
   NUnit3 = fetchNuGet {
     baseName = "NUnit";
-    version = "3.0.1";
-    sha256 = "1g3j3kvg9vrapb1vjgq65nvn1vg7bzm66w7yjnaip1iww1yn1b0p";
+    version = "3.13.2";
+    sha256 = "djMqxXCTX7UIH6XPAI/RNiiqpKKnJdVOInLxmdWTcwE=";
     outputFiles = [ "lib/*" ];
   };
 
@@ -183,9 +183,9 @@ let self = dotnetPackages // overrides; dotnetPackages = with self; {
 
   NUnitConsole = fetchNuGet {
     baseName = "NUnit.Console";
-    version = "3.0.1";
-    sha256 = "154bqwm2n95syv8nwd67qh8qsv0b0h5zap60sk64z3kd3a9ffi5p";
-    outputFiles = [ "tools/*" ];
+    version = "3.12.0";
+    sha256 = "jRZi7kjntjMVt4e7WTH5+MVDNvVLlDCD3dYbCcD8Tps=";
+    outputFiles = [ "lib/*" ];
   };
 
   MaxMindDb = fetchNuGet {
