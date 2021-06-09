@@ -47,6 +47,7 @@ in mkDerivation rec {
       --replace '"libenchant-2.so.2"' '"${enchant2}/lib/libenchant-2.so.2"'
     substituteInPlace Telegram/CMakeLists.txt \
       --replace '"''${TDESKTOP_LAUNCHER_BASENAME}.appdata.xml"' '"''${TDESKTOP_LAUNCHER_BASENAME}.metainfo.xml"'
+    sed "s|#define RTC_DCHECK_IS_ON 1|#define RTC_DCHECK_IS_ON 0|g" -i Telegram/ThirdParty/libtgvoip/webrtc_dsp/rtc_base/checks.h
   '';
 
   # We want to run wrapProgram manually (with additional parameters)
