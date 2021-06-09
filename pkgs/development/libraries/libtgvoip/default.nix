@@ -38,6 +38,10 @@ stdenv.mkDerivation rec {
   buildInputs = [ openssl libopus alsa-lib libpulseaudio ];
   enableParallelBuilding = true;
 
+  postPatch = ''
+    sed "s|#define RTC_DCHECK_IS_ON 1|#define RTC_DCHECK_IS_ON 0|g" -i webrtc_dsp/rtc_base/checks.h
+  '';
+
   meta = {
     description = "VoIP library for Telegram clients";
     license = licenses.unlicense;
