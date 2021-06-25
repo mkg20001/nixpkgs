@@ -1,5 +1,5 @@
 { lib, buildPythonPackage, fetchPypi, pythonOlder
-, aiohttp, webargs, apispec, jinja2
+, aiohttp, webargs, apispec3, jinja2
 }:
 
 buildPythonPackage rec {
@@ -13,7 +13,7 @@ buildPythonPackage rec {
 
   disabled = pythonOlder "3.0";
 
-  propagatedBuildInputs = [ aiohttp webargs apispec jinja2 ];
+  propagatedBuildInputs = [ aiohttp webargs apispec3 jinja2 ];
 
   doCheck = false;
 
