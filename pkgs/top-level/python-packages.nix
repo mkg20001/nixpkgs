@@ -495,6 +495,8 @@ in {
 
   apispec = callPackage ../development/python-modules/apispec { };
 
+  apispec3 = callPackage ../development/python-modules/apispec/3.nix { };
+
   aplpy = callPackage ../development/python-modules/aplpy { };
 
   appdirs = callPackage ../development/python-modules/appdirs { };
@@ -6555,13 +6557,7 @@ in {
     withWebKit = true;
   };
 
-  pyqtgraph = callPackage ../development/python-modules/pyqtgraph {
-    pyqt = self.pyqt4;
-  };
-
-  pyqtgraph5 = callPackage ../development/python-modules/pyqtgraph {
-    pyqt = self.pyqt5;
-  };
+  pyqtgraph = callPackage ../development/python-modules/pyqtgraph { };
 
   pyqtwebengine = pkgs.libsForQt5.callPackage ../development/python-modules/pyqtwebengine {
     pythonPackages = self;
