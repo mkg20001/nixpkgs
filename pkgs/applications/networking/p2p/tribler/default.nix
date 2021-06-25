@@ -41,7 +41,7 @@ stdenv.mkDerivation rec {
     networkx
     pony
     lz4
-    pyqtgraph5
+    pyqtgraph
     pyyaml
     aiohttp
     aiohttp-apispec
@@ -79,10 +79,9 @@ stdenv.mkDerivation rec {
           --prefix LD_LIBRARY_PATH : ${libvlc}/lib
         ''}
 
-    mkdir -p $out/share/applications $out/share/icons $out/share/man/man1
-    cp $out/Tribler/Main/Build/Ubuntu/tribler.desktop $out/share/applications/tribler.desktop
-    cp $out/Tribler/Main/Build/Ubuntu/tribler_big.xpm $out/share/icons/tribler.xpm
-    cp $out/Tribler/Main/Build/Ubuntu/tribler.1 $out/share/man/man1/tribler.1
+    mkdir -p $out/share/applications $out/share/icons
+    cp $out/build/debian/tribler/usr/share/applications/tribler.desktop $out/share/applications/tribler.desktop
+    cp $out/build/debian/tribler/usr/share/pixmaps/tribler_big.xpm $out/share/icons/tribler.xpm
   '';
 
   meta = with lib; {
