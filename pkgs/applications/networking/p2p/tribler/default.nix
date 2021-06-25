@@ -1,13 +1,13 @@
 { stdenv, fetchurl, python3Packages, makeWrapper
-, enablePlayer ? true, libvlc, qt5, lib }:
+, enablePlayer ? true, qt5, lib }:
 
 stdenv.mkDerivation rec {
   pname = "tribler";
-  version = "7.5.2";
+  version = "7.10.0-RC2";
 
   src = fetchurl {
     url = "https://github.com/Tribler/tribler/releases/download/v${version}/Tribler-v${version}.tar.xz";
-    sha256 = "15cvha5myad0vhqwr4xdprc47r9lr6wx4jfvv9c7b2jhcj15cw68";
+    sha256 = "0rvwip3lmicykxpj5n2k7ddwqzspa0ippvvn2ps9bswy49lh5xqg";
   };
 
   nativeBuildInputs = [
@@ -20,7 +20,7 @@ stdenv.mkDerivation rec {
   ];
 
   pythonPath = with python3Packages; [
-    libtorrent-rasterbar
+    libtorrent-rasterbar-1_2_x
     twisted
     netifaces
     pycrypto
@@ -45,23 +45,17 @@ stdenv.mkDerivation rec {
     pyyaml
     aiohttp
     aiohttp-apispec
+    faker
+    sentry-sdk
     pytest-asyncio
     pytest-timeout
     asynctest
+    yappi
 
     # there is a BTC feature, but it requires some unclear version of
     # bitcoinlib, so this doesn't work right now.
     # bitcoinlib
   ];
-
-  postPatch = ''
-    ${lib.optionalString enablePlayer ''
-      substituteInPlace "./src/tribler-gui/tribler_gui/vlc.py" --replace "ctypes.CDLL(p)" "ctypes.CDLL('${libvlc}/lib/libvlc.so')"
-      substituteInPlace "./src/tribler-gui/tribler_gui/widgets/videoplayerpage.py" \
-        --replace "if vlc and vlc.plugin_path" "if vlc" \
-        --replace "os.environ['VLC_PLUGIN_PATH'] = vlc.plugin_path" "os.environ['VLC_PLUGIN_PATH'] = '${libvlc}/lib/vlc/plugins'"
-    ''}
-  '';
 
   installPhase = ''
     mkdir -pv $out
@@ -74,10 +68,7 @@ stdenv.mkDerivation rec {
         --set PYTHONPATH $out/src/tribler-core:$out/src/tribler-common:$out/src/tribler-gui:$program_PYTHONPATH \
         --set NO_AT_BRIDGE 1 \
         --run 'cd $_TRIBLERPATH' \
-        --add-flags "-O $out/src/run_tribler.py" \
-        ${lib.optionalString enablePlayer ''
-          --prefix LD_LIBRARY_PATH : ${libvlc}/lib
-        ''}
+        --add-flags "-O $out/src/run_tribler.py"
 
     mkdir -p $out/share/applications $out/share/icons
     cp $out/build/debian/tribler/usr/share/applications/tribler.desktop $out/share/applications/tribler.desktop
