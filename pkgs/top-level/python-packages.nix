@@ -4100,6 +4100,8 @@ in {
 
   libtorrent-rasterbar = (toPythonModule (pkgs.libtorrent-rasterbar.override { inherit python; })).python;
 
+  libtorrent-rasterbar-1_2_x = (toPythonModule (pkgs.libtorrent-rasterbar-1_2_x.override { inherit python; })).python;
+
   libusb1 = callPackage ../development/python-modules/libusb1 {
     inherit (pkgs) libusb1;
   };
