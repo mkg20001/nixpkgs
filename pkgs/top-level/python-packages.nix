@@ -9481,8 +9481,6 @@ in {
 
   webhelpers = callPackage ../development/python-modules/webhelpers { };
 
-  webargs = callPackage ../development/python-modules/webargs { };
-
   webob = callPackage ../development/python-modules/webob { };
 
   weboob = callPackage ../development/python-modules/weboob { };
