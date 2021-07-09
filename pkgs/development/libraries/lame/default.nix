@@ -30,7 +30,7 @@ stdenv.mkDerivation rec {
     sha256 = "07nsn5sy3a8xbmw1bidxnsj5fj6kg9ai04icmqw40ybkp353dznx";
   };
 
-  outputs = [ "out" "lib" "doc" ]; # a small single header
+  outputs = [ "out" "lib" "doc" "dev" ];
   outputMan = "out";
 
   nativeBuildInputs = [ ]
@@ -54,6 +54,25 @@ stdenv.mkDerivation rec {
     (mkFlag mp3rtpSupport "mp3rtp")
     (if debugSupport then "--enable-debug=alot" else "")
   ];
+
+  # add missing pkgconfig definitions
+  postInstall = ''
+    mkdir -p "$dev/lib/pkgconfig"
+
+    echo 'prefix=${placeholder "lib"}
+    exec_prefix=${placeholder "out"}
+    libdir=${placeholder "lib"}/lib
+    includedir=${placeholder "dev"}/include/lame
+
+    Name: libmp3lame
+    Description: A high quality MPEG Audio Layer III (MP3) encoder
+    Version: 3.1000
+    Libs: -L''${libdir}
+    Cflags: -I''${includedir}
+    ' > "$dev/lib/pkgconfig/libmp3lame.pc"
+
+    cp "$dev/lib/pkgconfig/libmp3lame.pc" "$dev/lib/pkgconfig/lame.pc"
+  '';
 
   preConfigure = ''
     # Prevent a build failure for 3.100 due to using outdated symbol list
