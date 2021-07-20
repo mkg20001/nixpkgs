@@ -41,6 +41,21 @@ stdenv.mkDerivation rec {
   '';
 
   postInstall = ''
+    # add missing pkgconfig definitions
+    mkdir -p "$out/lib/pkgconfig"
+
+    echo 'prefix=${placeholder "out"}
+    exec_prefix=${placeholder "out"}
+    libdir=${placeholder "out"}/lib
+    includedir=${placeholder "out"}/include
+
+    Name: portmidi
+    Description: Platform independent library for MIDI I/O
+    Version: ${version}
+    Libs: -L''${libdir}
+    Cflags: -I''${includedir}
+    ' > "$out/lib/pkgconfig/portmidi.pc"
+
     ln -s libportmidi.so "$out/lib/libporttime.so"
   '';
 
