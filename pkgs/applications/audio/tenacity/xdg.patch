@@ -1,0 +1,184 @@
+From 352fc5c1dcc12943a869e4726659e6fc4927395d Mon Sep 17 00:00:00 2001
+From: Campbell Jones <git@serebit.com>
+Date: Mon, 3 May 2021 14:02:28 -0400
+Subject: [PATCH] Use XDG dirs by default on Linux
+
+---
+ src/AboutDialog.cpp |  5 +++-
+ src/AudacityApp.cpp |  5 +++-
+ src/FileNames.cpp   | 66 ++++++++++++++++++++++++++++++++++++++++++---
+ src/FileNames.h     |  4 +--
+ 4 files changed, 72 insertions(+), 8 deletions(-)
+
+diff --git a/src/AboutDialog.cpp b/src/AboutDialog.cpp
+index 9fc170d5b..82448e1ff 100644
+--- a/src/AboutDialog.cpp
++++ b/src/AboutDialog.cpp
+@@ -630,7 +630,10 @@ void AboutDialog::PopulateInformationPage( ShuttleGui & S )
+ #endif
+ 
+    // Location of settings
+-   AddBuildinfoRow(&informationStr, XO("Settings folder:"), \
++   AddBuildinfoRow(&informationStr, XO("Config folder:"), \
++      FileNames::ConfigDir());
++   // Location of data
++   AddBuildinfoRow(&informationStr, XO("Data folder:"), \
+       FileNames::DataDir());
+ 
+    informationStr << wxT("</table>\n"); // end of build info table
+diff --git a/src/AudacityApp.cpp b/src/AudacityApp.cpp
+index 439871dbb..170a10ab3 100644
+--- a/src/AudacityApp.cpp
++++ b/src/AudacityApp.cpp
+@@ -1090,6 +1090,9 @@ bool AudacityApp::OnInit()
+    // AddHandler takes ownership
+    wxFileSystem::AddHandler(safenew wxZipFSHandler);
+ 
++   // encouraged by wxwidgets
++   wxStandardPaths::Get().SetFileLayout(wxStandardPaths::FileLayout::FileLayout_XDG);
++
+    //
+    // Paths: set search path and temp dir path
+    //
+@@ -1240,7 +1243,7 @@ bool AudacityApp::OnInit()
+ 
+    // Initialize preferences and language
+    {
+-      wxFileName configFileName(FileNames::DataDir(), wxT("audacity.cfg"));
++      wxFileName configFileName(FileNames::ConfigDir(), wxT("audacity.cfg"));
+       auto appName = wxTheApp->GetAppName();
+       InitPreferences( AudacityFileConfig::Create(
+          appName, wxEmptyString,
+diff --git a/src/FileNames.cpp b/src/FileNames.cpp
+index 2e5b861c4..373b6d1d5 100644
+--- a/src/FileNames.cpp
++++ b/src/FileNames.cpp
+@@ -47,6 +47,11 @@ used throughout Audacity into this one place.
+ #include <windows.h>
+ #endif
+ 
++#if defined(__WXGTK__)
++static wxString gOldUnixDataDir;
++#endif
++
++static wxString gConfigDir;
+ static wxString gDataDir;
+ 
+ const FileNames::FileType
+@@ -226,8 +231,48 @@ wxString FileNames::LowerCaseAppNameInPath( const wxString & dirIn){
+    return dir;
+ }
+ 
++FilePath FileNames::ConfigDir()
++{
++#if defined(__WXGTK__)
++   if (gOldUnixDataDir.empty())
++      gOldUnixDataDir = wxFileName::GetHomeDir() + wxT("/.audacity-data");
++#endif
++
++   if (gConfigDir.empty())
++   {
++      wxFileName exePath(PlatformCompatibility::GetExecutablePath());
++#if defined(__WXMAC__)
++      // Path ends for example in "Audacity.app/Contents/MacOSX"
++      // just remove the MacOSX part.
++      exePath.RemoveLastDir();
++#endif
++      wxFileName portablePrefsPath(exePath.GetPath(), wxT("Portable Settings"));
++      if (::wxDirExists(portablePrefsPath.GetFullPath()))
++      {
++         // Use "Portable Settings" folder
++         gConfigDir = portablePrefsPath.GetFullPath();
++#if defined(__WXGTK__)
++      } else if (::wxDirExists(gOldUnixDataDir))
++      {
++         // Use old user data dir folder
++         gConfigDir = gOldUnixDataDir;
++#endif
++      } else {
++         // Use OS-provided user data dir folder
++         wxString configDir(wxStandardPaths::Get().GetUserConfigDir() + wxT("/audacity"));
++         gConfigDir = FileNames::MkDir(configDir);
++      }
++   }
++
++   return gConfigDir;
++}
++
+ FilePath FileNames::DataDir()
+ {
++#if defined(__WXGTK__)
++   if (gOldUnixDataDir.empty())
++      gOldUnixDataDir = wxFileName::GetHomeDir() + wxT("/.audacity-data");
++#endif
+    // LLL:  Wouldn't you know that as of WX 2.6.2, there is a conflict
+    //       between wxStandardPaths and wxConfig under Linux.  The latter
+    //       creates a normal file as "$HOME/.audacity", while the former
+@@ -251,12 +296,25 @@ FilePath FileNames::DataDir()
+       {
+          // Use "Portable Settings" folder
+          gDataDir = portablePrefsPath.GetFullPath();
++#if defined(__WXGTK__)
++      } else if (::wxDirExists(gOldUnixDataDir))
++      {
++         // Use old user data dir folder
++         gDataDir = gOldUnixDataDir;
++      } else
++      {
++         wxString dataDir;
++         // see if XDG_DATA_HOME is defined. if it is, use its value. if it isn't, use the default
++         // XDG-specified value
++         if ( !wxGetEnv(wxS("XDG_DATA_HOME"), &dataDir) || dataDir.empty() )
++            dataDir = wxFileName::GetHomeDir() + wxT("/.local/share");
++
++         dataDir = dataDir + wxT("/audacity");
++#else
+       } else
+       {
+          // Use OS-provided user data dir folder
+          wxString dataDir( LowerCaseAppNameInPath( wxStandardPaths::Get().GetUserDataDir() ));
+-#if defined( __WXGTK__ )
+-         dataDir = dataDir + wxT("-data");
+ #endif
+          gDataDir = FileNames::MkDir(dataDir);
+       }
+@@ -317,12 +375,12 @@ FilePath FileNames::PlugInDir()
+ 
+ FilePath FileNames::PluginRegistry()
+ {
+-   return wxFileName( DataDir(), wxT("pluginregistry.cfg") ).GetFullPath();
++   return wxFileName( ConfigDir(), wxT("pluginregistry.cfg") ).GetFullPath();
+ }
+ 
+ FilePath FileNames::PluginSettings()
+ {
+-   return wxFileName( DataDir(), wxT("pluginsettings.cfg") ).GetFullPath();
++   return wxFileName( ConfigDir(), wxT("pluginsettings.cfg") ).GetFullPath();
+ }
+ 
+ FilePath FileNames::BaseDir()
+diff --git a/src/FileNames.h b/src/FileNames.h
+index 92be64df3..af661f414 100644
+--- a/src/FileNames.h
++++ b/src/FileNames.h
+@@ -75,7 +75,7 @@ namespace FileNames
+       , DynamicLibraries // depends on the operating system
+       , TextFiles // *.txt
+       , XMLFiles; // *.xml, *.XML
+-   
++
+    using FileTypes = std::vector< FileType >;
+ 
+    // Convert fileTypes into a single string as expected by wxWidgets file
+@@ -115,7 +115,7 @@ namespace FileNames
+    /** \brief Audacity user data directory
+     *
+     * Where audacity keeps its settings and other user data squirreled away,
+-    * by default ~/.audacity-data/ on Unix, Application Data/Audacity on
++    * by default ~/.local/share/audacity/ on Unix, Application Data/Audacity on
+     * windows system */
+    AUDACITY_DLL_API FilePath DataDir();
+    AUDACITY_DLL_API FilePath ResourcesDir();
+-- 
+2.32.0
+

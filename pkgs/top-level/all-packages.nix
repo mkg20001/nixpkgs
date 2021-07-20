@@ -22695,6 +22695,8 @@ in
 
   tempora_lgc = callPackage ../data/fonts/tempora-lgc { };
 
+  tenacity = callPackage ../applications/audio/tenacity { wxGTK = wxGTK31-gtk3; };
+
   tenderness = callPackage ../data/fonts/tenderness { };
 
   terminus_font = callPackage ../data/fonts/terminus-font
