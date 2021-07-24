@@ -2,7 +2,7 @@
 , perl, pixman, vde2, alsa-lib, texinfo, flex
 , bison, lzo, snappy, libaio, gnutls, nettle, curl, ninja, meson
 , makeWrapper, autoPatchelfHook
-, attr, libcap, libcap_ng
+, attr, libcap, libcap_ng, libtasn1
 , CoreServices, Cocoa, Hypervisor, rez, setfile
 , numaSupport ? stdenv.isLinux && !stdenv.isAarch32, numactl
 , seccompSupport ? stdenv.isLinux, libseccomp
@@ -40,7 +40,7 @@ let
 in
 
 stdenv.mkDerivation rec {
-  version = "6.0.0";
+  version = "6.1.0-rc0";
   pname = "qemu"
     + lib.optionalString xenSupport "-xen"
     + lib.optionalString hostCpuOnly "-host-cpu-only"
@@ -48,16 +48,16 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url= "https://download.qemu.org/qemu-${version}.tar.xz";
-    sha256 = "1f9hz8rf12jm8baa7kda34yl4hyl0xh0c4ap03krfjx23i3img47";
+    sha256 = "1611s9hxbsnq4mg35g979qj5ay1fzq8bxlzd8s8r6fvppqf7kv7r";
   };
 
-  nativeBuildInputs = [ python python.pkgs.sphinx pkg-config flex bison meson ninja ]
+  nativeBuildInputs = [ python python.pkgs.sphinx python.pkgs.sphinx_rtd_theme pkg-config flex bison meson ninja ]
     ++ optionals gtkSupport [ wrapGAppsHook ]
     ++ optionals stdenv.isLinux [ autoPatchelfHook ];
   buildInputs =
     [ zlib glib perl pixman
       vde2 texinfo makeWrapper lzo snappy
-      gnutls nettle curl
+      gnutls nettle curl libtasn1
     ]
     ++ optionals ncursesSupport [ ncurses ]
     ++ optionals stdenv.isDarwin [ CoreServices Cocoa Hypervisor rez setfile ]
@@ -86,16 +86,6 @@ stdenv.mkDerivation rec {
   patches = [
     ./fix-qemu-ga.patch
     ./9p-ignore-noatime.patch
-    (fetchpatch {
-      name = "CVE-2021-3545.patch";
-      url = "https://gitlab.com/qemu-project/qemu/-/commit/121841b25d72d13f8cad554363138c360f1250ea.patch";
-      sha256 = "13dgfd8dmxcalh2nvb68iv0kyv4xxrvpdqdxf1h3bjr4451glag1";
-    })
-    (fetchpatch {
-      name = "CVE-2021-3546.patch";
-      url = "https://gitlab.com/qemu-project/qemu/-/commit/9f22893adcb02580aee5968f32baa2cd109b3ec2.patch";
-      sha256 = "1vkhm9vl671y4cra60b6704339qk1h5dyyb3dfvmvpsvfyh2pm7n";
-    })
   ] ++ optional nixosTestRunner ./force-uid0-on-9p.patch
     ++ optionals stdenv.hostPlatform.isMusl [
     (fetchpatch {
