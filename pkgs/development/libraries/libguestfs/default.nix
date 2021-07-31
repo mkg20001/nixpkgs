@@ -40,6 +40,7 @@ stdenv.mkDerivation rec {
     substituteInPlace ocaml/Makefile.in            --replace '$(DESTDIR)$(OCAMLLIB)' '$(out)/lib/ocaml'
     substituteInPlace v2v/test-harness/Makefile.am --replace '$(DESTDIR)$(OCAMLLIB)' '$(out)/lib/ocaml'
     substituteInPlace v2v/test-harness/Makefile.in --replace '$(DESTDIR)$(OCAMLLIB)' '$(out)/lib/ocaml'
+    sed "s|SUBDIRS += test-data||g" -i Makefile.am
 
     # some scripts hardcore /usr/bin/env which is not available in the build env
     patchShebangs .
@@ -65,7 +66,7 @@ stdenv.mkDerivation rec {
     ln -s ${appliance} $out/lib/guestfs
   '';
 
-  doInstallCheck = appliance != null;
+  doInstallCheck = false;
   installCheckPhase = ''
     runHook preInstallCheck
 
