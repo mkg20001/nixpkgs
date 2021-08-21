@@ -234,12 +234,12 @@ in rec {
   nixUnstable = lib.lowPrio (callPackage common rec {
     pname = "nix";
     version = "2.4${suffix}";
-    suffix = "pre_xer_xeredo-19.07.2021";
+    suffix = "pre_xer_xeredo-21.08.2021";
 
     src = fetchgit {
       url = "https://git.mkg20001.io/xeredo/nix-flake.git";
-      rev = "e29994d4cbb754c22fce979468ae14cc38cc1c5a";
-      sha256 = "0n33g8n7vdzfzlxwvrzj99420c9whm8viig1s0v21yn4rqfcyal3";
+      rev = "b02f57cac1933725021bf8a32f14782f930ff306";
+      sha256 = "bIF3938JVSL77C3EIpEdnqwzwM9aWoQPMycRwe0B0M0=";
     };
 
     boehmgc = boehmgc_nixUnstable;
