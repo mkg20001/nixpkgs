@@ -33,6 +33,16 @@ stdenv.mkDerivation rec {
     sha256 = "1r94880d4khbjhhfnhaba3y3d4hv2bri82rzfzxn27s5iybpqras";
   };
 
+  /*
+
+    In file included from ../src/plugins/all-tasks-panel/gtd-all-tasks-panel.c:26:
+    ../src/gnome-todo.h:24:10: fatal error: gtd-enum-types.h: No such file or directory
+       24 | #include "gtd-enum-types.h"
+          |          ^~~~~~~~~~~~~~~~~~
+  */
+
+  enableParallelBuild = false;
+
   nativeBuildInputs = [
     meson
     ninja
