@@ -1823,6 +1823,7 @@ in
   bchunk = callPackage ../tools/cd-dvd/bchunk { };
 
   inherit (callPackages ../misc/logging/beats/6.x.nix { })
+    auditbeat6
     filebeat6
     heartbeat6
     metricbeat6
@@ -1830,12 +1831,14 @@ in
     journalbeat6;
 
   inherit (callPackages ../misc/logging/beats/7.x.nix { })
+    auditbeat7
     filebeat7
     heartbeat7
     metricbeat7
     packetbeat7
     journalbeat7;
 
+  auditbeat = auditbeat6;
   filebeat = filebeat6;
   heartbeat = heartbeat6;
   metricbeat = metricbeat6;
