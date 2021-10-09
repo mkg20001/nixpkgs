@@ -1180,6 +1180,7 @@
   ./virtualisation/virtualbox-guest.nix
   ./virtualisation/virtualbox-host.nix
   ./virtualisation/vmware-guest.nix
+  ./virtualisation/waydroid.nix
   ./virtualisation/xen-dom0.nix
   ./virtualisation/xe-guest-utilities.nix
 ]
