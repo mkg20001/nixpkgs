@@ -16,6 +16,9 @@ let
     optionalString (cfg.extraOptions != null) "[mysqld]\n${cfg.extraOptions}"
   );
 
+  # FIXME: this breaks with escaping, strings, etc
+  toMysqlOption = toString;
+
 in
 
 {
@@ -88,6 +91,22 @@ in
 
             !includedir /etc/mysql/conf.d/
           ''';
+        '';
+      };
+
+      setGlobal = mkOption {
+        type = with types; attrsOf (oneOf [ bool int str (listOf str) ]);
+        default = {};
+        description = ''
+          Additional settings that are set by "set global" after fully starting the server.
+        '';
+      };
+
+      postStartCommands = mkOption {
+        type = with types; lines;
+        default = "";
+        description = ''
+          Additional commands that are to be ran on the server after fully starting it.
         '';
       };
 
@@ -341,10 +360,59 @@ in
 
     environment.etc."my.cnf".source = cfg.configFile;
 
+    environment.etc."mysql-post-run-commands.sql".source = let
+      cmds = (map (database: "CREATE DATABASE IF NOT EXISTS `${database}`;") cfg.ensureDatabases)
+        ++ (map (user: concatStringsSep "\n" (mapAttrsToList (database: permission: ''
+          GRANT ${permission} ON ${database} TO '${user.name}'@'localhost';
+        '') user.ensurePermissions)) cfg.ensureUsers)
+        ++ (mapAttrsToList (key: value: "SET GLOBAL \"${key}\" = \"${toMysqlString value}\";") cfg.setGlobal)
+        ++ [ cfg.postStartCommands ] # lines gets auto-concatenated
+      ;
+    in
+      pkgs.writeText "mysql-post-run-commands.sql" (concatStringsSep "\n" cmds); /* pkgs.writeShellScript "my-commands.sh" ''
+      ${optionalString (cfg.ensureDatabases != []) ''
+        (
+        ${concatMapStrings (database: ''
+          echo "CREATE DATABASE IF NOT EXISTS \`${database}\`;"
+        '') cfg.ensureDatabases}
+        ) | ${cfg.package}/bin/mysql -N
+      ''}
+
+      ${concatMapStrings (user:
+        ''
+          ( echo "CREATE USER IF NOT EXISTS '${user.name}'@'localhost' IDENTIFIED WITH ${if isMariaDB then "unix_socket" else "auth_socket"};"
+            ${concatStringsSep "\n" (mapAttrsToList (database: permission: ''
+              echo "GRANT ${permission} ON ${database} TO '${user.name}'@'localhost';"
+            '') user.ensurePermissions)}
+          ) | ${cfg.package}/bin/mysql -N
+        '') cfg.ensureUsers}
+
+      ${concatStringsSep "\n" (attrsToList (key: value:
+        ''
+          echo "SET GLOBAL \"${key}\" = \"${toMysqlString value}\"" | ${mysql}/bin/mysql -N
+        '') cfg.setGlobal)}
+
+      echo ${escapeShellArg cfg.postStartCommands} | ${mysql}/bin/mysql -N
+    ''; */
+
     systemd.tmpfiles.rules = [
       "d '${cfg.dataDir}' 0700 '${cfg.user}' '${cfg.group}' - -"
       "z '${cfg.dataDir}' 0700 '${cfg.user}' '${cfg.group}' - -"
     ];
+
+    /* systemd.services.mysql-commands = {
+      description = "MySQL post setup commands";
+
+      after = [ "mysql.service" ];
+      requires = [ "mysql.service "];
+
+      script = ''
+      '';
+
+      serviceConfig = {
+        Type = "oneshot";
+      };
+    }; */
 
     systemd.services.mysql = let
       hasNotify = isMariaDB;
@@ -354,6 +422,7 @@ in
         after = [ "network.target" ];
         wantedBy = [ "multi-user.target" ];
         restartTriggers = [ cfg.configFile ];
+        # reloadTriggers = [ config.environment.etc."mysql-post-run-commands.sql".source ];
 
         unitConfig.RequiresMountsFor = "${cfg.dataDir}";
 
@@ -471,23 +540,12 @@ in
               rm ${cfg.dataDir}/mysql_init
           fi
 
-          ${optionalString (cfg.ensureDatabases != []) ''
-            (
-            ${concatMapStrings (database: ''
-              echo "CREATE DATABASE IF NOT EXISTS \`${database}\`;"
-            '') cfg.ensureDatabases}
-            ) | ${cfg.package}/bin/mysql -N
-          ''}
-
-          ${concatMapStrings (user:
-            ''
-              ( echo "CREATE USER IF NOT EXISTS '${user.name}'@'localhost' IDENTIFIED WITH ${if isMariaDB then "unix_socket" else "auth_socket"};"
-                ${concatStringsSep "\n" (mapAttrsToList (database: permission: ''
-                  echo "GRANT ${permission} ON ${database} TO '${user.name}'@'localhost';"
-                '') user.ensurePermissions)}
-              ) | ${cfg.package}/bin/mysql -N
-            '') cfg.ensureUsers}
+          cat /etc/mysql-post-run-commands.sql | ${cfg.package}/bin/mysql -N
         '';
+
+        /* reloadScript = ''
+          cat /etc/mysql-post-run-commands.sql | ${cfg.package}/bin/mysql -N
+        ''; */
 
         serviceConfig = {
           Type = if hasNotify then "notify" else "simple";
