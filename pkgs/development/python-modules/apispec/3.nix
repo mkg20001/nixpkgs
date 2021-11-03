@@ -27,6 +27,10 @@ buildPythonPackage rec {
     prance
   ];
 
+  postPatch = ''
+    rm tests/test_ext_marshmallow.py
+  '';
+
   checkInputs = [
     openapi-spec-validator
     marshmallow
