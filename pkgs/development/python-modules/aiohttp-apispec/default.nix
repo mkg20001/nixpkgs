@@ -1,23 +1,32 @@
 { lib, buildPythonPackage, fetchPypi, pythonOlder
-, aiohttp, webargs5, apispec3, jinja2
+, aiohttp, webargs, fetchFromGitHub, callPackage, pytest
 }:
 
+let
+  apispec3 = callPackage ../apispec/3.nix {};
+  jinja2 = callPackage ../jinja2/2.nix {};
+in
 buildPythonPackage rec {
   pname = "aiohttp-apispec";
-  version = "2.2.1";
+  version = "unstable-2021-21-08";
 
-  src = fetchPypi {
-    inherit pname version;
-    sha256 = "0hhlmh3mc3xg68znsxyhypb5k12vg59yf72qkyw6ahg8zy3qfz2m";
+  # unstable so we can use latest webargs
+  src = fetchFromGitHub {
+    owner = "maximdanilchenko";
+    repo = "aiohttp-apispec";
+    rev = "cfa19646394480dda289f6b7af19b7d50f245d81";
+    sha256 = "uEgDRAlMjTa4rvdE3fkORCHIlCLzxPJJ2/m4ZRU3eIQ=";
+    fetchSubmodules = false;
   };
 
-  propagatedBuildInputs = [ aiohttp webargs5 apispec3 jinja2 ];
-
-  # The tests are not included in the archive from pypi
-  doCheck = false;
+  propagatedBuildInputs = [ aiohttp webargs apispec3 jinja2 ];
 
   pythonImportsCheck = [
     "aiohttp_apispec"
+  ];
+
+  checkInputs = [
+    pytest
   ];
 
   meta = with lib; {
