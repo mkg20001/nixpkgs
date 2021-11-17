@@ -350,7 +350,7 @@ rec {
       check = x: isDerivation x || isStorePath x;
       merge = loc: defs:
         let res = mergeOneOption loc defs;
-        in if isDerivation res then res else toDerivation res;
+        in if isDerivation res then res else (builtins.trace "tracing toDerivation usage at ${concatStringsSep "." loc}" (lib.debug.traceSeqN 3 res (toDerivation res)));
     };
 
     shellPackage = package // {
