@@ -30316,8 +30316,8 @@ with pkgs;
 
   methane = callPackage ../games/methane { };
 
-  mindustry = callPackage ../games/mindustry { };
-  mindustry-wayland = callPackage ../games/mindustry { glew = glew-egl; };
+  mindustry = callPackage ../games/mindustry { jdk = adoptopenjdk-hotspot-bin-15; };
+  mindustry-wayland = callPackage ../games/mindustry { jdk = adoptopenjdk-hotspot-bin-15; glew = glew-egl; };
 
   mindustry-server = callPackage ../games/mindustry {
     enableClient = false;
