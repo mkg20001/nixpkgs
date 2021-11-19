@@ -9595,6 +9595,8 @@ with pkgs;
 
   soundkonverter = libsForQt5.soundkonverter;
 
+  soundwireserver = callPackage ../applications/audio/soundwireserver { };
+
   sozu = callPackage ../servers/sozu { };
 
   sparsehash = callPackage ../development/libraries/sparsehash { };
