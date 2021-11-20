@@ -5843,6 +5843,8 @@ in {
 
   python-glanceclient = callPackage ../development/python-modules/python-glanceclient { };
 
+  python-google-nest = callPackage ../development/python-modules/python-google-nest { };
+
   python-heatclient = callPackage ../development/python-modules/python-heatclient { };
 
   python-ipmi = callPackage ../development/python-modules/python-ipmi { };
