@@ -2703,6 +2703,8 @@ in {
 
   fido2 = callPackage ../development/python-modules/fido2 { };
 
+  fields = callPackage ../development/python-modules/fields { };
+
   filebrowser_safe = callPackage ../development/python-modules/filebrowser_safe { };
 
   filebytes = callPackage ../development/python-modules/filebytes { };
