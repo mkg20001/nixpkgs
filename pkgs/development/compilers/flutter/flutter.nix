@@ -118,6 +118,8 @@ let
         unzip
         which
         xz
+        # HACK: this shouldn't be here
+        epoxy
 
         # flutter test requires this lib
         libGLU
