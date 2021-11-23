@@ -32603,6 +32603,8 @@ with pkgs;
 
   utsushi = callPackage ../misc/drivers/utsushi { };
 
+  utsushi-networkscan = callPackage ../misc/drivers/utsushi/networkscan.nix { };
+
   idsk = callPackage ../tools/filesystems/idsk { };
 
   colima = callPackage ../applications/virtualization/colima {};
