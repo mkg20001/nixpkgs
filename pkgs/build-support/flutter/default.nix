@@ -6,7 +6,14 @@
 , pkg-config
 , wrapGAppsHook
 , autoPatchelfHook
-, mount
+, util-linux
+, libselinux
+, libsepol
+, libthai
+, libdatrie
+, libxkbcommon
+, xorg
+, dbus
 , gtk3
 , glib
 , pcre
@@ -22,6 +29,10 @@ this needs to be fixed:
 Perhaps you should add the directory containing `mount.pc'⡿
 to the PKG_CONFIG_PATH environment variable               ⢿
 Package 'mount', required by 'gio-2.0', not found         ⣻
+
+[        ] Perhaps you should add the directory containing `atspi-2.pc'
+[        ] to the PKG_CONFIG_PATH environment variable
+[        ] Package 'atspi-2', required by 'atk-bridge-2.0', not found
 
 */
 
@@ -105,8 +116,6 @@ let
     wrapGAppsHook
     # flutter likes dynamic linking
     autoPatchelfHook
-    mount
-    epoxy.dev
   ];
 
   buildInputs = [
@@ -114,6 +123,15 @@ let
     gtk3
     glib
     pcre
+    util-linux
+    # also required by cmake, not sure if really needed
+    libselinux
+    libsepol
+    libthai
+    libdatrie
+    xorg.libXdmcp
+    libxkbcommon
+    dbus
     # directly required by build
     epoxy
   ];
@@ -174,12 +192,9 @@ let
 
     # remove stuff like /build/source/packages/ubuntu_desktop_installer/linux/flutter/ephemeral
     for f in $(find $out/app/lib -type f); do
-      echo pr $f
       if patchelf --print-rpath $f | grep /build; then
         newrp=$(patchelf --print-rpath $f | sed -r "s|/build.*ephemeral:||g")
-        echo "newrp=$newrp"
         patchelf --set-rpath "$newrp" "$f"
-        patchelf --print-rpath $f
       fi
     done
 
