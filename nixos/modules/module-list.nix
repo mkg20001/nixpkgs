@@ -132,6 +132,7 @@
   ./programs/captive-browser.nix
   ./programs/ccache.nix
   ./programs/cdemu.nix
+  ./programs/cfs-zen-tweaks.nix
   ./programs/chromium.nix
   ./programs/clickshare.nix
   ./programs/cnping.nix
