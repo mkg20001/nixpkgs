@@ -23,6 +23,7 @@
 , xorg
 , libexecinfo
 , pango
+, elogind
 }:
 
 stdenv.mkDerivation rec {
@@ -53,6 +54,7 @@ stdenv.mkDerivation rec {
     xorg.libXcomposite
 
     systemd
+    elogind
 
     xorg.libXtst
     xorg.libXrender
