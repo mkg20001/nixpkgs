@@ -12,6 +12,9 @@
 , libthai
 , libdatrie
 , libxkbcommon
+, at-spi2-core
+, libsecret
+, jsoncpp
 , xorg
 , dbus
 , gtk3
@@ -20,6 +23,9 @@
 , epoxy
 , stdenvNoCC
 , cacert
+, git
+, dart
+, pkgs
 }:
 
 /*
@@ -39,8 +45,19 @@ Package 'mount', required by 'gio-2.0', not found         ⣻
 args:
 let
   placeholder = "##FLUTTER_SRC_ROOT_PLACEHOLDER_MARKER##";
-  fetchAttrs = [ "src" "sourceRoot" "setSourceRoot" "unpackPhase" ];
+  fetchAttrs = [ "src" "sourceRoot" "setSourceRoot" "unpackPhase" "patches" ];
   getAttrsOrNull = names: attrs: lib.genAttrs names (name: if attrs ? ${name} then attrs.${name} else null);
+  flutterDeps = with pkgs; [
+    # flutter deps
+    flutter.unwrapped
+    bash
+    curl
+    flutter.dart
+    git
+    unzip
+    which
+    xz
+  ];
   bla =
 (self: clang10Stdenv.mkDerivation (lib.recursiveUpdate args {
   # FIXME: unstable hash, fod contains store references (that's why base64) - but I want to make it work first
@@ -50,15 +67,13 @@ let
   deps = stdenvNoCC.mkDerivation (lib.recursiveUpdate (getAttrsOrNull fetchAttrs args) {
     name = "${self.name}-deps.tar.gz";
 
-    nativeBuildInputs = [
-      flutter
-      # flutter.unwrapped git
-      # nukeReferences
-    ];
+    nativeBuildInputs = flutterDeps;
 
     installPhase = ''
       TMP=$(mktemp -d)
       export HOME="$TMP"
+      export PUB_CACHE=''${PUB_CACHE:-"$HOME/.pub-cache"}
+      export ANDROID_EMULATOR_USE_SYSTEM_LIBS=1
 
       flutter config --no-analytics >/dev/null 2>/dev/null # mute first-run
       flutter config --enable-linux-desktop
@@ -107,9 +122,8 @@ let
 
   });
 
-  nativeBuildInputs = [
-    # flutter.unwrapped
-    flutter
+  nativeBuildInputs = with pkgs; flutterDeps ++ [
+    # flutter dev tools
     cmake
     ninja
     pkg-config
@@ -124,24 +138,34 @@ let
     glib
     pcre
     util-linux
-    # also required by cmake, not sure if really needed
+    # also required by cmake, not sure if really needed or dep of all packages
     libselinux
     libsepol
     libthai
     libdatrie
     xorg.libXdmcp
+    xorg.libXtst
     libxkbcommon
     dbus
+    at-spi2-core
+    libsecret
+    jsoncpp
+    # build deps
+    xorg.libX11
     # directly required by build
     epoxy
   ];
 
   # TODO: do we need this?
   NIX_LDFLAGS = "-rpath ${lib.makeLibraryPath self.buildInputs}";
+  NIX_CFLAGS_COMPILE = "-I${xorg.libX11}/include";
   LD_LIBRARY_PATH = lib.makeLibraryPath self.buildInputs;
 
   configurePhase = ''
     runHook preConfigure
+
+    cp pubspec.yaml bla
+    cat pubspec.yaml
 
     # we get this from $depsFolder, but we might need it again once deps are fetched properly
     # flutter config --no-analytics >/dev/null 2>/dev/null # mute first-run
@@ -156,12 +180,16 @@ let
     if [ -e pubspec.lock ]; then
       diff -u pubspec.lock $depsFolder/pubspec.lock
     else
-      cp "$depsFolder/pubspec.lock" .
+      cp -v "$depsFolder/pubspec.lock" .
     fi
     diff -u pubspec.yaml $depsFolder/pubspec.yaml
     mv -v $(find $depsFolder/f -type f) .
     export HOME=$depsFolder
+    export PUB_CACHE=''${PUB_CACHE:-"$HOME/.pub-cache"}
+    export ANDROID_EMULATOR_USE_SYSTEM_LIBS=1
     # mv "$depsFolder/.pub-cache" "$HOME"
+
+    autoPatchelf -- "$depsFolder"
 
     runHook postConfigure
   '';
@@ -169,7 +197,11 @@ let
   buildPhase = ''
     runHook preBuild
 
-    flutter packages get --offline
+    cat pubspec.yaml bla
+    cp bla pubspec.yaml
+    pwd
+
+    flutter packages get --offline -v
     flutter build linux --release -v ${/*optionalStrings (target != null) (escapeShellArgs [ "-t" target ])*/""}
 
     runHook postBuild
