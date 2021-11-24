@@ -22018,6 +22018,8 @@ with pkgs;
 
   firmware-manager = callPackage ../os-specific/linux/firmware/firmware-manager { };
 
+  firmware-updater = callPackage ../os-specific/linux/firmware/firmware-updater { };
+
   fwts = callPackage ../os-specific/linux/fwts { };
 
   gobi_loader = callPackage ../os-specific/linux/gobi_loader { };
