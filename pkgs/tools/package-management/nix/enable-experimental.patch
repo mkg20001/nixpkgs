@@ -1,0 +1,26 @@
+From d9d29576f678897577ebb04f3b3a8520a0974d50 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Maciej=20Kr=C3=BCger?= <mkg20001@gmail.com>
+Date: Wed, 26 Jan 2022 15:50:43 +0100
+Subject: [PATCH 4/4] enable experimental
+
+---
+ src/libstore/globals.cc | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/libstore/globals.cc b/src/libstore/globals.cc
+index b7f55cae7..388f798c8 100644
+--- a/src/libstore/globals.cc
++++ b/src/libstore/globals.cc
+@@ -174,8 +174,7 @@ bool Settings::isExperimentalFeatureEnabled(const ExperimentalFeature & feature)
+ 
+ void Settings::requireExperimentalFeature(const ExperimentalFeature & feature)
+ {
+-    if (!isExperimentalFeatureEnabled(feature))
+-        throw MissingExperimentalFeature(feature);
++    return;
+ }
+ 
+ bool Settings::isWSL1()
+-- 
+2.38.1
+
