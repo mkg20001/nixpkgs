@@ -1,0 +1,25 @@
+From 6b457aa7b28d77435eb68b13e924e3553eb52d98 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Maciej=20Kr=C3=BCger?= <mkg20001@gmail.com>
+Date: Wed, 26 Jan 2022 15:47:52 +0100
+Subject: [PATCH 3/4] enable flakes
+
+---
+ src/libstore/globals.hh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libstore/globals.hh b/src/libstore/globals.hh
+index ca72ad31e..88d3df862 100644
+--- a/src/libstore/globals.hh
++++ b/src/libstore/globals.hh
+@@ -964,7 +964,7 @@ public:
+           are loaded as plugins (non-recursively).
+         )"};
+ 
+-    Setting<std::set<ExperimentalFeature>> experimentalFeatures{this, {}, "experimental-features",
++    Setting<std::set<ExperimentalFeature>> experimentalFeatures{this, {Xp::Flakes, Xp::NixCommand}, "experimental-features",
+         "Experimental Nix features to enable."};
+ 
+     bool isExperimentalFeatureEnabled(const ExperimentalFeature &);
+-- 
+2.38.1
+
