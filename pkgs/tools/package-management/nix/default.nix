@@ -8,6 +8,7 @@
 , fetchpatch
 , fetchpatch2
 , Security
+, fetchgit
 
 , storeDir ? "/nix/store"
 , stateDir ? "/nix/var"
@@ -112,7 +113,7 @@ let
     hash = "sha256-s1ybRFCjQaSGj7LKu0Z5g7UiHqdJGeD+iPoQL0vaiS0=";
   };
 
-in lib.makeExtensible (self: ({
+in lib.makeExtensible (self: (rec {
   nix_2_3 = (common rec {
     version = "2.3.16";
     src = fetchurl {
@@ -206,6 +207,19 @@ in lib.makeExtensible (self: ({
   stable = self.nix_2_18;
 
   unstable = self.nix_2_18;
+
+  xeredoNix = {
+    stable = nix_2_16.overrideAttrs(prev: {
+      patches = [
+        ./0001-feat-use-effectiveUrl-in-tarball-flake-locked.patch
+        ./0002-libfetchers-git-fetch-submodules-by-default.patch
+        ./0003-enable-flakes-command.patch
+        ./fix-test.patch
+      ] ++ (prev.patches or []);
+    });
+  };
+
+  nixFlakes = builtins.trace "Use pkgs.xeredoNix.stable" xeredoNix.stable;
 } // lib.optionalAttrs config.allowAliases {
   nix_2_4 = throw "nixVersions.nix_2_4 has been removed";
 
