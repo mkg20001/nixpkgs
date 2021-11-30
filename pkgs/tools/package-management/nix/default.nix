@@ -8,6 +8,7 @@
 , fetchpatch2
 , runCommand
 , Security
+, fetchgit
 
 , storeDir ? "/nix/store"
 , stateDir ? "/nix/var"
@@ -150,7 +151,7 @@ let
     }
     pkg;
 
-in lib.makeExtensible (self: ({
+in lib.makeExtensible (self: (rec {
   nix_2_3 = (common {
     version = "2.3.17";
     hash = "sha256-EK0pgHDekJFqr0oMj+8ANIjq96WPjICe2s0m4xkUdH4=";
@@ -262,6 +263,18 @@ in lib.makeExtensible (self: ({
   stable = addFallbackPathsCheck self.nix_2_18;
 
   unstable = self.nix_2_19;
+
+  xeredoNix = {
+    stable = nix_2_18.overrideAttrs(prev: {
+      patches = [
+        ./0001-libfetchers-git-fetch-submodules-by-default.patch
+        ./0002-enable-flakes-command.patch
+        ./0003-disable-flaky-test.patch
+      ] ++ (prev.patches or []);
+    });
+  };
+
+  nixFlakes = builtins.trace "Use pkgs.xeredoNix.stable" xeredoNix.stable;
 } // lib.optionalAttrs config.allowAliases {
   nix_2_4 = throw "nixVersions.nix_2_4 has been removed";
 
