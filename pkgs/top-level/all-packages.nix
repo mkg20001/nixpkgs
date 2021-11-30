@@ -32849,7 +32849,9 @@ with pkgs;
     nix_2_3
     nix_2_4
     nix_2_5
-    nixUnstable;
+    nixUnstable
+    nixFlakes
+    xeredoNix;
 
   nixStatic = pkgsStatic.nix;
 
