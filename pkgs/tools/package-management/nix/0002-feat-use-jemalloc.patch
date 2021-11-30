@@ -1,0 +1,66 @@
+From ec75e6f3da25c48942ad3fa560219d442df38cbd Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Maciej=20Kr=C3=BCger?= <mkg20001@gmail.com>
+Date: Sat, 5 Jun 2021 23:59:21 +0200
+Subject: [PATCH 2/3] feat: use jemalloc
+
+---
+ configure.ac               |  4 ++++
+ flake.nix                  |  1 +
+ src/libexpr/eval-inline.hh | 10 +++++-----
+ 3 files changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index c35065704..de77d4a99 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -194,6 +194,10 @@ PKG_CHECK_MODULES([SODIUM], [libsodium], [CXXFLAGS="$SODIUM_CFLAGS $CXXFLAGS"])
+ # Look for libbrotli{enc,dec}.
+ PKG_CHECK_MODULES([LIBBROTLI], [libbrotlienc libbrotlidec], [CXXFLAGS="$LIBBROTLI_CFLAGS $CXXFLAGS"])
+ 
++# jemalloc
++PKG_CHECK_MODULES([JEMALLOC], [jemalloc], [CXXFLAGS="$JEMALLOC_CFLAGS $CXXFLAGS"])
++LDFLAGS="-ljemalloc $LDFLAGS"
++
+ # Look for libcpuid.
+ have_libcpuid=
+ if test "$machine_name" = "x86_64"; then
+diff --git a/flake.nix b/flake.nix
+index b7494c86a..f9e8f5e46 100644
+--- a/flake.nix
++++ b/flake.nix
+@@ -114,6 +114,7 @@
+             boost
+             lowdown-nix
+             gtest
++            jemalloc
+           ]
+           ++ lib.optionals stdenv.isLinux [libseccomp]
+           ++ lib.optional (stdenv.isLinux || stdenv.isDarwin) libsodium
+diff --git a/src/libexpr/eval-inline.hh b/src/libexpr/eval-inline.hh
+index 655408cd3..6305022f1 100644
+--- a/src/libexpr/eval-inline.hh
++++ b/src/libexpr/eval-inline.hh
+@@ -82,15 +82,15 @@ inline void EvalState::forceList(Value & v, const Pos & pos)
+         throwTypeError(pos, "value is %1% while a list was expected", v);
+ }
+ 
++#include<jemalloc/jemalloc.h>
++
+ /* Note: Various places expect the allocated memory to be zeroed. */
+ inline void * allocBytes(size_t n)
+ {
+     void * p;
+-#if HAVE_BOEHMGC
+-    p = GC_MALLOC(n);
+-#else
+-    p = calloc(n, 1);
+-#endif
++
++    p = mallocx(n, MALLOCX_ZERO);
++
+     if (!p) throw std::bad_alloc();
+     return p;
+ }
+-- 
+2.34.1
+
