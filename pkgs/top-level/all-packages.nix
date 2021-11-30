@@ -40171,6 +40171,10 @@ with pkgs;
 
   nix = nixVersions.stable;
 
+  inherit (nixVersions)
+    nixFlakes
+    xeredoNix;
+
   nixStatic = pkgsStatic.nix;
 
   inherit (callPackages ../applications/networking/cluster/nixops { })
