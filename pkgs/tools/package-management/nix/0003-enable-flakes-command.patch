@@ -1,0 +1,31 @@
+From 7149dada4be9dcbd8a3b8080faec2777b653295c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Maciej=20Kr=C3=BCger?= <mkg20001@gmail.com>
+Date: Thu, 6 Jul 2023 17:45:38 +0200
+Subject: [PATCH 3/3] enable flakes&command
+
+---
+ src/libutil/config.cc | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/libutil/config.cc b/src/libutil/config.cc
+index 085a884dc..9cada8466 100644
+--- a/src/libutil/config.cc
++++ b/src/libutil/config.cc
+@@ -475,10 +475,13 @@ ExperimentalFeatureSettings experimentalFeatureSettings;
+ 
+ static GlobalConfig::Register rSettings(&experimentalFeatureSettings);
+ 
++static std::set<ExperimentalFeature> DefaultEnabled = {Xp::Flakes, Xp::NixCommand};
++
+ bool ExperimentalFeatureSettings::isEnabled(const ExperimentalFeature & feature) const
+ {
+     auto & f = experimentalFeatures.get();
+-    return std::find(f.begin(), f.end(), feature) != f.end();
++    return std::find(f.begin(), f.end(), feature) != f.end()
++        || std::find(DefaultEnabled.begin(), DefaultEnabled.end(), feature) != DefaultEnabled.end();
+ }
+ 
+ void ExperimentalFeatureSettings::require(const ExperimentalFeature & feature) const
+-- 
+2.40.1
+
