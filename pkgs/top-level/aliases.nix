@@ -992,7 +992,6 @@ mapAliases ({
   nilfs_utils = throw "'nilfs_utils' has been renamed to/replaced by 'nilfs-utils'"; # Converted to throw 2022-02-22
   nix-direnv-flakes = nix-direnv;
   nix-review = nixpkgs-review; # Added 2019-12-22
-  nixFlakes = nixVersions.stable; # Added 2021-05-21
   nixStable = nixVersions.stable; # Added 2022-01-24
   nixUnstable = nixVersions.unstable; # Added 2022-01-26
   nix_2_3 = nixVersions.nix_2_3;
