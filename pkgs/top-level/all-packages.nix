@@ -40258,6 +40258,10 @@ with pkgs;
 
   nix = nixVersions.stable;
 
+  inherit (nixVersions)
+    nixFlakes
+    xeredoNix;
+
   nixStatic = pkgsStatic.nix;
 
   nixops_unstable = callPackage ../applications/networking/cluster/nixops { };
