@@ -1,0 +1,82 @@
+From ca58b57836852e5b30ed80229cc9a370e5b0ced8 Mon Sep 17 00:00:00 2001
+From: Timothy DeHerrera <tim.deh@pm.me>
+Date: Thu, 17 Jun 2021 12:00:26 -0600
+Subject: [PATCH 3/3] libfetchers/git: fetch submodules by default
+
+---
+ src/libexpr/primops/fetchTree.cc |  2 +-
+ src/libfetchers/git.cc           |  2 +-
+ tests/fetchGitSubmodules.sh      | 12 ++++++------
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/src/libexpr/primops/fetchTree.cc b/src/libexpr/primops/fetchTree.cc
+index f570f19ae..2bfaabd6f 100644
+--- a/src/libexpr/primops/fetchTree.cc
++++ b/src/libexpr/primops/fetchTree.cc
+@@ -36,7 +36,7 @@ void emitTreeAttrs(
+ 
+     if (input.getType() == "git")
+         mkBool(*state.allocAttr(v, state.symbols.create("submodules")),
+-            fetchers::maybeGetBoolAttr(input.attrs, "submodules").value_or(false));
++            fetchers::maybeGetBoolAttr(input.attrs, "submodules").value_or(true));
+ 
+     if (!forceDirty) {
+ 
+diff --git a/src/libfetchers/git.cc b/src/libfetchers/git.cc
+index 8468d2afc..129089060 100644
+--- a/src/libfetchers/git.cc
++++ b/src/libfetchers/git.cc
+@@ -179,7 +179,7 @@ struct GitInputScheme : InputScheme
+         std::string name = input.getName();
+ 
+         bool shallow = maybeGetBoolAttr(input.attrs, "shallow").value_or(false);
+-        bool submodules = maybeGetBoolAttr(input.attrs, "submodules").value_or(false);
++        bool submodules = maybeGetBoolAttr(input.attrs, "submodules").value_or(true);
+         bool allRefs = maybeGetBoolAttr(input.attrs, "allRefs").value_or(false);
+ 
+         std::string cacheType = "git";
+diff --git a/tests/fetchGitSubmodules.sh b/tests/fetchGitSubmodules.sh
+index 5f104355f..03d46088e 100644
+--- a/tests/fetchGitSubmodules.sh
++++ b/tests/fetchGitSubmodules.sh
+@@ -42,8 +42,8 @@ r1=$(nix eval --raw --expr "(builtins.fetchGit { url = file://$rootRepo; rev = \
+ r2=$(nix eval --raw --expr "(builtins.fetchGit { url = file://$rootRepo; rev = \"$rev\"; submodules = false; }).outPath")
+ r3=$(nix eval --raw --expr "(builtins.fetchGit { url = file://$rootRepo; rev = \"$rev\"; submodules = true; }).outPath")
+ 
+-[[ $r1 == $r2 ]]
+-[[ $r2 != $r3 ]]
++[[ $r1 == $r3 ]]
++[[ $r2 != $r1 ]]
+ 
+ r4=$(nix eval --raw --expr "(builtins.fetchGit { url = file://$rootRepo; ref = \"master\"; rev = \"$rev\"; }).outPath")
+ r5=$(nix eval --raw --expr "(builtins.fetchGit { url = file://$rootRepo; ref = \"master\"; rev = \"$rev\"; submodules = false; }).outPath")
+@@ -52,13 +52,13 @@ r7=$(nix eval --raw --expr "(builtins.fetchGit { url = $rootRepo; ref = \"master
+ r8=$(nix eval --raw --expr "(builtins.fetchGit { url = $rootRepo; rev = \"$rev\"; submodules = true; }).outPath")
+ 
+ [[ $r1 == $r4 ]]
+-[[ $r4 == $r5 ]]
++[[ $r4 == $r6 ]]
+ [[ $r3 == $r6 ]]
+ [[ $r6 == $r7 ]]
+ [[ $r7 == $r8 ]]
+ 
+ have_submodules=$(nix eval --expr "(builtins.fetchGit { url = $rootRepo; rev = \"$rev\"; }).submodules")
+-[[ $have_submodules == false ]]
++[[ $have_submodules == true ]]
+ 
+ have_submodules=$(nix eval --expr "(builtins.fetchGit { url = $rootRepo; rev = \"$rev\"; submodules = false; }).submodules")
+ [[ $have_submodules == false ]]
+@@ -66,8 +66,8 @@ have_submodules=$(nix eval --expr "(builtins.fetchGit { url = $rootRepo; rev = \
+ have_submodules=$(nix eval --expr "(builtins.fetchGit { url = $rootRepo; rev = \"$rev\"; submodules = true; }).submodules")
+ [[ $have_submodules == true ]]
+ 
+-pathWithoutSubmodules=$(nix eval --raw --expr "(builtins.fetchGit { url = file://$rootRepo; rev = \"$rev\"; }).outPath")
+-pathWithSubmodules=$(nix eval --raw --expr "(builtins.fetchGit { url = file://$rootRepo; rev = \"$rev\"; submodules = true; }).outPath")
++pathWithoutSubmodules=$(nix eval --raw --expr "(builtins.fetchGit { url = file://$rootRepo; rev = \"$rev\"; submodules = false; }).outPath")
++pathWithSubmodules=$(nix eval --raw --expr "(builtins.fetchGit { url = file://$rootRepo; rev = \"$rev\"; }).outPath")
+ pathWithSubmodulesAgain=$(nix eval --raw --expr "(builtins.fetchGit { url = file://$rootRepo; rev = \"$rev\"; submodules = true; }).outPath")
+ pathWithSubmodulesAgainWithRef=$(nix eval --raw --expr "(builtins.fetchGit { url = file://$rootRepo; ref = \"master\"; rev = \"$rev\"; submodules = true; }).outPath")
+ 
+-- 
+2.33.1
+
