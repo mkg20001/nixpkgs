@@ -49,6 +49,7 @@ in
 , sqlite
 , util-linuxMinimal
 , xz
+, jemalloc
 
 , enableDocumentation ? !atLeast24 || (
     (stdenv.hostPlatform == stdenv.buildPlatform) &&
@@ -111,6 +112,7 @@ self = stdenv.mkDerivation {
     openssl
     sqlite
     xz
+    jemalloc
   ] ++ lib.optionals stdenv.isDarwin [
     Security
   ] ++ lib.optionals atLeast24 [
