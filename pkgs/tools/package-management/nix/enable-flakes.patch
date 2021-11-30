@@ -1,0 +1,14 @@
+diff --git a/src/libstore/globals.hh b/src/libstore/globals.hh
+index f65893b10..605af4e01 100644
+--- a/src/libstore/globals.hh
++++ b/src/libstore/globals.hh
+@@ -929,7 +929,8 @@ public:
+           value.
+           )"};
+
+-    Setting<std::set<ExperimentalFeature>> experimentalFeatures{this, {}, "experimental-features",
++    Setting<std::set<ExperimentalFeature>> experimentalFeatures{
++      this, {Xp::Flakes, Xp::NixCommand}, "experimental-features",
+         "Experimental Nix features to enable."};
+
+     bool isExperimentalFeatureEnabled(const ExperimentalFeature &);
