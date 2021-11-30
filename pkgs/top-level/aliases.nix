@@ -670,7 +670,6 @@ mapAliases ({
   nilfs_utils = nilfs-utils; # added 2018-04-25
   nix-direnv-flakes = nix-direnv;
   nix-review = nixpkgs-review; # added 2019-12-22
-  nixFlakes = nixVersions.stable; # added 2021-05-21
   nixStable = nixVersions.stable; # added 2022-01-24
   nixUnstable = nixVersions.unstable; # added 2022-01-26
   nix_2_3 = nixVersions.nix_2_3;
