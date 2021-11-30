@@ -1,0 +1,66 @@
+From caa79d7c810af362b26c3cf22aa8ec40a2cb8596 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Maciej=20Kr=C3=BCger?= <mkg20001@gmail.com>
+Date: Sat, 5 Jun 2021 23:59:21 +0200
+Subject: [PATCH 2/3] feat: use jemalloc
+
+---
+ configure.ac               |  4 ++++
+ flake.nix                  |  1 +
+ src/libexpr/eval-inline.hh | 10 +++++-----
+ 3 files changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 65478ecc5..3304c382b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -194,6 +194,10 @@ PKG_CHECK_MODULES([SODIUM], [libsodium], [CXXFLAGS="$SODIUM_CFLAGS $CXXFLAGS"])
+ # Look for libbrotli{enc,dec}.
+ PKG_CHECK_MODULES([LIBBROTLI], [libbrotlienc libbrotlidec], [CXXFLAGS="$LIBBROTLI_CFLAGS $CXXFLAGS"])
+ 
++# jemalloc
++PKG_CHECK_MODULES([JEMALLOC], [jemalloc], [CXXFLAGS="$JEMALLOC_CFLAGS $CXXFLAGS"])
++LDFLAGS="-ljemalloc $LDFLAGS"
++
+ # Look for libcpuid.
+ if test "$machine_name" = "x86_64"; then
+   PKG_CHECK_MODULES([LIBCPUID], [libcpuid], [CXXFLAGS="$LIBCPUID_CFLAGS $CXXFLAGS"])
+diff --git a/flake.nix b/flake.nix
+index a834448ce..30d7e0f4d 100644
+--- a/flake.nix
++++ b/flake.nix
+@@ -91,6 +91,7 @@
+             boost
+             lowdown-nix
+             gmock
++            jemalloc
+           ]
+           ++ lib.optionals stdenv.isLinux [libseccomp]
+           ++ lib.optional (stdenv.isLinux || stdenv.isDarwin) libsodium
+diff --git a/src/libexpr/eval-inline.hh b/src/libexpr/eval-inline.hh
+index 655408cd3..6305022f1 100644
+--- a/src/libexpr/eval-inline.hh
++++ b/src/libexpr/eval-inline.hh
+@@ -82,15 +82,15 @@ inline void EvalState::forceList(Value & v, const Pos & pos)
+         throwTypeError(pos, "value is %1% while a list was expected", v);
+ }
+ 
++#include<jemalloc/jemalloc.h>
++
+ /* Note: Various places expect the allocated memory to be zeroed. */
+ inline void * allocBytes(size_t n)
+ {
+     void * p;
+-#if HAVE_BOEHMGC
+-    p = GC_MALLOC(n);
+-#else
+-    p = calloc(n, 1);
+-#endif
++
++    p = mallocx(n, MALLOCX_ZERO);
++
+     if (!p) throw std::bad_alloc();
+     return p;
+ }
+-- 
+2.33.1
+
