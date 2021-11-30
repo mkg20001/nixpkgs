@@ -1,0 +1,14 @@
+diff --git a/src/libstore/globals.cc b/src/libstore/globals.cc
+index 81ca9cc0f..7d5a9b2c8 100644
+--- a/src/libstore/globals.cc
++++ b/src/libstore/globals.cc
+@@ -168,8 +168,7 @@ bool Settings::isExperimentalFeatureEnabled(const ExperimentalFeature & feature)
+
+ void Settings::requireExperimentalFeature(const ExperimentalFeature & feature)
+ {
+-    if (!isExperimentalFeatureEnabled(feature))
+-        throw MissingExperimentalFeature(feature);
++    return;
+ }
+
+ bool Settings::isWSL1()
