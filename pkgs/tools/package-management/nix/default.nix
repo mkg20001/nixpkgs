@@ -1,4 +1,4 @@
-{ lib, fetchurl, fetchFromGitHub, fetchpatch, callPackage
+{ lib, fetchurl, fetchgit, fetchFromGitHub, fetchpatch, callPackage
 , storeDir ? "/nix/store"
 , stateDir ? "/nix/var"
 , confDir ? "/etc"
@@ -11,7 +11,7 @@ let
 common =
   { lib, stdenv, perl, curl, bzip2, sqlite, openssl ? null, xz
   , bash, coreutils, util-linuxMinimal, gzip, gnutar
-  , pkg-config, boehmgc, libsodium, brotli, boost, editline, nlohmann_json
+  , jemalloc, pkg-config, boehmgc, libsodium, brotli, boost, editline, nlohmann_json
   , autoreconfHook, autoconf-archive, bison, flex
   , jq, libarchive, libcpuid
   , lowdown, mdbook
@@ -64,7 +64,7 @@ common =
           brotli boost editline
         ]
         ++ lib.optionals stdenv.isDarwin [ Security ]
-        ++ lib.optionals is24 [ libarchive gtest lowdown ]
+        ++ lib.optionals is24 [ libarchive gtest lowdown jemalloc ]
         ++ lib.optional (is24 && stdenv.isx86_64) libcpuid
         ++ lib.optional withLibseccomp libseccomp
         ++ lib.optional withAWS
@@ -299,5 +299,34 @@ in rec {
     inherit storeDir stateDir confDir;
 
   });
+
+  xeredoNix = {
+    stable = nix_2_4.overrideAttrs(prev: {
+      patches = (prev.patches or []) ++ [
+        ./0001-feat-use-effectiveUrl-in-tarball-flake-locked.patch
+        ./0002-feat-use-jemalloc.patch
+        ./0003-libfetchers-git-fetch-submodules-by-default.patch
+        ./enable-flakes.patch
+      ];
+    });
+
+    experimentalVanillaUnstable = nixUnstable.overrideAttrs (prev: {
+      patches = (prev.patches or []) ++ [ ./enable-all-experimental.patch ];
+    });
+
+    flakesVanillaUnstable = nixUnstable.overrideAttrs (prev: {
+      patches = (prev.patches or []) ++ [ ./enable-flakes.patch ];
+    });
+
+    experimentalVanillaStable = nixStable.overrideAttrs (prev: {
+      patches = (prev.patches or []) ++ [ ./enable-all-experimental.patch ];
+    });
+
+    flakesVanillaStable = nixStable.overrideAttrs (prev: {
+      patches = (prev.patches or []) ++ [ ./enable-flakes.patch ];
+    });
+  };
+
+  nixFlakes = builtins.trace "Use pkgs.xeredoNix.stable" xeredoNix.stable;
 
 }
