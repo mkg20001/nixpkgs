@@ -37,7 +37,7 @@ let
         boehmgc = boehmgc-nix;
         aws-sdk-cpp = aws-sdk-cpp-nix;
       };
-in lib.makeExtensible (self: {
+in lib.makeExtensible (self: rec {
   nix_2_3 = (common rec {
     version = "2.3.16";
     src = fetchurl {
@@ -98,4 +98,33 @@ in lib.makeExtensible (self: {
   stable = self.nix_2_11;
 
   unstable = self.stable;
+
+  xeredoNix = {
+    stable = nix_2_6.overrideAttrs(prev: {
+      patches = (prev.patches or []) ++ [
+        ./0001-feat-use-effectiveUrl-in-tarball-flake-locked.patch
+        # ./0002-feat-use-jemalloc.patch
+        ./0003-libfetchers-git-fetch-submodules-by-default.patch
+        ./enable-flakes.patch
+      ];
+    });
+
+    experimentalVanillaUnstable = unstable.overrideAttrs (prev: {
+      patches = (prev.patches or []) ++ [ ./enable-all-experimental.patch ];
+    });
+
+    flakesVanillaUnstable = unstable.overrideAttrs (prev: {
+      patches = (prev.patches or []) ++ [ ./enable-flakes.patch ];
+    });
+
+    experimentalVanillaStable = stable.overrideAttrs (prev: {
+      patches = (prev.patches or []) ++ [ ./enable-all-experimental.patch ];
+    });
+
+    flakesVanillaStable = stable.overrideAttrs (prev: {
+      patches = (prev.patches or []) ++ [ ./enable-flakes.patch ];
+    });
+  };
+
+  nixFlakes = builtins.trace "Use pkgs.xeredoNix.stable" xeredoNix.stable;
 })
