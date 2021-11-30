@@ -7,6 +7,7 @@
 , fetchpatch
 , fetchpatch2
 , Security
+, fetchgit
 
 , storeDir ? "/nix/store"
 , stateDir ? "/nix/var"
@@ -60,7 +61,7 @@ let
     sha256 = "sha256-s1ybRFCjQaSGj7LKu0Z5g7UiHqdJGeD+iPoQL0vaiS0=";
   };
 
-in lib.makeExtensible (self: {
+in lib.makeExtensible (self: rec {
   nix_2_3 = (common rec {
     version = "2.3.16";
     src = fetchurl {
@@ -129,4 +130,55 @@ in lib.makeExtensible (self: {
   stable = self.nix_2_13;
 
   unstable = self.nix_2_14;
+
+  xeredoNix = {
+    nixUnstable = lib.lowPrio (common rec {
+      version = "2.12";
+      suffix = "xeredo-2.12-11.12.2022";
+
+      src = fetchgit {
+        url = "https://git.xeredo.it/xeredo/nix-flake.git";
+        rev = "d9d29576f678897577ebb04f3b3a8520a0974d50";
+        hash = "sha256-V/3EVM+8WAOBNTGGwk9h0mdMYuJTMDyR7wn+vf01h9A=";
+      };
+
+      patches = [
+        ./patches/flaky-tests.patch
+      ];
+    });
+
+    unstableExperimental = xeredoNix.nixUnstable.overrideAttrs (prev: {
+      patches = (prev.patches or []) ++ [ ./enable-all-experimental.patch ];
+    });
+
+    unstableFlakes = xeredoNix.nixUnstable.overrideAttrs (prev: {
+      patches = (prev.patches or []) ++ [ ./enable-flakes.patch ];
+    });
+
+    stable = nix_2_12.overrideAttrs(prev: {
+      patches = (prev.patches or []) ++ [
+        ./0001-feat-use-effectiveUrl-in-tarball-flake-locked.patch
+        ./0002-libfetchers-git-fetch-submodules-by-default.patch
+        ./enable-flakes.patch
+      ];
+    });
+
+    experimentalVanillaUnstable = unstable.overrideAttrs (prev: {
+      patches = (prev.patches or []) ++ [ ./enable-all-experimental.patch ];
+    });
+
+    flakesVanillaUnstable = unstable.overrideAttrs (prev: {
+      patches = (prev.patches or []) ++ [ ./enable-flakes.patch ];
+    });
+
+    experimentalVanillaStable = stable.overrideAttrs (prev: {
+      patches = (prev.patches or []) ++ [ ./enable-all-experimental.patch ];
+    });
+
+    flakesVanillaStable = stable.overrideAttrs (prev: {
+      patches = (prev.patches or []) ++ [ ./enable-flakes.patch ];
+    });
+  };
+
+  nixFlakes = builtins.trace "Use pkgs.xeredoNix.stable" xeredoNix.stable;
 })
