@@ -30361,6 +30361,8 @@ with pkgs;
 
   harmonist = callPackage ../games/harmonist { };
 
+  harmonoid = callPackage ../applications/audio/harmonoid { };
+
   hawkthorne = callPackage ../games/hawkthorne { love = love_0_9; };
 
   hedgewars = libsForQt514.callPackage ../games/hedgewars {
