@@ -701,7 +701,7 @@ with pkgs;
       makeSetupHook { deps = [ dieHook ]; } script;
   in
     lib.makeOverridable f {
-      cc = stdenv.cc.cc;
+      cc = stdenv.cc;
       sanitizers = [ "undefined" "address" ];
     };
 
