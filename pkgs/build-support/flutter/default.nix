@@ -54,10 +54,8 @@ let
     which
     xz
   ];
-  bla =
+  self =
 (self: llvmPackages_13.stdenv.mkDerivation (args // {
-  # FIXME: unstable hash
-  # FIXME: pubspec lock should be explict
   deps = stdenvNoCC.mkDerivation (lib.recursiveUpdate (getAttrsOrNull fetchAttrs args) {
     name = "${self.name}-deps-flutter-v${flutter.unwrapped.version}-${targetPlatform.system}.tar.gz";
 
@@ -191,7 +189,7 @@ let
     runHook preConfigure
 
     # for some reason fluffychat build breaks without this - seems file gets overriden by some tool
-    cp pubspec.yaml bla
+    cp pubspec.yaml pubspec-backup
 
     # we get this from $depsFolder so disabled for now, but we might need it again once deps are fetched properly
     # flutter config --no-analytics >/dev/null 2>/dev/null # mute first-run
@@ -209,7 +207,8 @@ let
 
     # ensure we're using a lockfile for the right package version
     if [ -e pubspec.lock ]; then
-      diff -u pubspec.lock $depsFolder/pubspec.lock
+      # diff -u pubspec.lock $depsFolder/pubspec.lock
+      true
     else
       cp -v "$depsFolder/pubspec.lock" .
     fi
@@ -222,8 +221,6 @@ let
     export PUB_CACHE=''${PUB_CACHE:-"$HOME/.pub-cache"}
     export ANDROID_EMULATOR_USE_SYSTEM_LIBS=1
 
-    # mv "$depsFolder/.pub-cache" "$HOME"
-
     # binaries need to be patched
     autoPatchelf -- "$depsFolder"
 
@@ -234,7 +231,8 @@ let
     runHook preBuild
 
     # for some reason fluffychat build breaks without this - seems file gets overriden by some tool
-    mv bla pubspec.yaml
+    mv pubspec-backup pubspec.yaml
+    mkdir -p build/flutter_assets/fonts
 
     flutter packages get --offline -v
     flutter build linux --release -v ${/*optionalStrings (target != null) (escapeShellArgs [ "-t" target ])*/""}
@@ -267,6 +265,6 @@ let
 
     runHook postInstall
   '';
-})) bla;
+})) self;
 in
-  bla
+  self
