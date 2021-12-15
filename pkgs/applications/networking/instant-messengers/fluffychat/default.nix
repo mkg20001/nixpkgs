@@ -6,16 +6,15 @@
 
 flutter.mkFlutterApp rec {
   pname = "fluffychat";
-  # 42.3 is latest
-  version = "0.41.2";
+  version = "1.0.1";
 
-  vendorHash = "sha256-ccBECZoPaPahPlteAMvLCeWS6Cuzx/XgXjvxWAybJHE=";
+  vendorHash = "sha256-wYwYN0xi86x6fcFSVCgpj6ndeOBc1uMSLm+ViqspvSg=";
 
   src = fetchFromGitLab {
     owner = "famedly";
     repo = "fluffychat";
     rev = "v${version}";
-    hash = "sha256-3eAManOo+kzg16difcTRwWIFDU2hkxZDnLl7jr0b40M=";
+    hash = "sha256-KXQUmplkY16qsFlGN5cYSEKs95iUwHwe2SMcfADMarI=";
   };
 
   buildInputs = [
