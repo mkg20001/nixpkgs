@@ -93,7 +93,7 @@ let
         {} +
 
       remove_line_matching() {
-        sed "s|.*$2.*||g" -r -i "$1"
+        replace_line_matching "$1" "$2" ""
       }
 
       replace_line_matching() {
