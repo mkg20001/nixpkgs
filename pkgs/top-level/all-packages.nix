@@ -705,7 +705,7 @@ with pkgs;
   in
     lib.makeOverridable f {
       cc = stdenv.cc;
-      sanitizers = [ "undefined" "address" ];
+      sanitizers = [ ];
     };
 
   makeModulesClosure = { kernel, firmware, rootModules, allowMissing ? false }:
