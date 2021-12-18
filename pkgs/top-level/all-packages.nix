@@ -10994,6 +10994,8 @@ with pkgs;
 
   chase = callPackage ../tools/system/chase { };
 
+  wingpanel-indicator-ayatana = callPackage ../desktops/pantheon/third-party/wingpanel-indicator-ayatana { };
+
   wimlib = callPackage ../tools/archivers/wimlib { };
 
   wipe = callPackage ../tools/security/wipe { };
