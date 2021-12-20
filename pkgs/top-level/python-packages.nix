@@ -3088,6 +3088,8 @@ in {
 
   gehomesdk = callPackage ../development/python-modules/gehomesdk { };
 
+  gekitchen = callPackage ../development/python-modules/gekitchen { };
+
   gemfileparser = callPackage ../development/python-modules/gemfileparser { };
 
   genanki = callPackage ../development/python-modules/genanki { };
