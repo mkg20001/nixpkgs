@@ -188,9 +188,7 @@ let
   NIX_CFLAGS_COMPILE = "-I${xorg.libX11}/include";
   LD_LIBRARY_PATH = lib.makeLibraryPath self.buildInputs;
 
-  configurePhase = ''
-    runHook preConfigure
-
+  flutterConfigurePhase = ''
     # for some reason fluffychat build breaks without this - seems file gets overriden by some tool
     cp pubspec.yaml pubspec-backup
 
@@ -227,20 +225,25 @@ let
 
     # binaries need to be patched
     autoPatchelf -- "$depsFolder"
-
-    runHook postConfigure
   '';
 
-  buildPhase = ''
-    runHook preBuild
+  preConfigurePhases = [ "flutterConfigurePhase" ];
 
+  # avoid cmake phase
+  configurePhase = "true";
+
+  flutterBuildPhase = ''
     # for some reason fluffychat build breaks without this - seems file gets overriden by some tool
     mv pubspec-backup pubspec.yaml
     mkdir -p build/flutter_assets/fonts
 
     flutter packages get --offline -v
     flutter build linux --release -v
+  '';
 
+  buildPhase = ''
+    runHook preBuild
+    runHook flutterBuildPhase
     runHook postBuild
   '';
 
