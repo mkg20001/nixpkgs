@@ -8,7 +8,7 @@ flutter.mkFlutterApp rec {
   pname = "fluffychat";
   version = "1.2.0";
 
-  vendorHash = "sha256-T5JYUAj8q3xDnwN1jwV9DzBNAO9/683m3RUXp0zuYKE=";
+  vendorHash = "sha256-slQeCECItZirEVf3agB8mqhTg6/JLsErFV2yDj4M3k0=";
 
   src = fetchFromGitLab {
     owner = "famedly";
@@ -20,6 +20,20 @@ flutter.mkFlutterApp rec {
   buildInputs = [
     olm
   ];
+
+  flutterExtraFetchCommands = ''
+    M=$(echo $TMP/.pub-cache/hosted/pub.dartlang.org/matrix-*)
+    sed "s|/usr/lib/x86_64-linux-gnu/libolm.so.3|${olm}/lib/libolm.so.3|g" -i $M/scripts/prepare.sh
+    sed "s|if which flutter >/dev/null; then|exit; if which flutter >/dev/null; then|g" -i $M/scripts/prepare.sh
+
+    # debug
+    # cat $M/scripts/prepare.sh
+
+    pushd $M
+    chmod +x ./scripts/*.sh
+    ./scripts/prepare.sh
+    popd
+  '';
 
   meta = with lib; {
     description = "Chat with your friends (matrix client)";
