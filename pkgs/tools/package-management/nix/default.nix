@@ -46,11 +46,24 @@ in lib.makeExtensible (self: rec {
     };
   }).override { boehmgc = boehmgc-nix_2_3; };
 
-  nix_2_4 = throw "nixVersions.nix_2_4 has been removed";
+  nix_2_4 = common {
+    version = "2.4";
+    sha256 = "sha256-op48CCDgLHK0qV1Batz4Ln5FqBiRjlE6qHTiZgt3b6k=";
+    # https://github.com/NixOS/nix/pull/5537
+    patches = [ ./patches/install-nlohmann_json-headers.patch ];
+  };
 
-  nix_2_5 = throw "nixVersions.nix_2_5 has been removed";
+  nix_2_5 = common {
+    version = "2.5.1";
+    sha256 = "sha256-GOsiqy9EaTwDn2PLZ4eFj1VkXcBUbqrqHehRE9GuGdU=";
+    # https://github.com/NixOS/nix/pull/5536
+    patches = [ ./patches/install-nlohmann_json-headers.patch ];
+  };
 
-  nix_2_6 = throw "nixVersions.nix_2_6 has been removed";
+  nix_2_6 = common {
+    version = "2.6.1";
+    sha256 = "sha256-E9iQ7f+9Z6xFcUvvfksTEfn8LsDfzmwrcRBC//5B3V0=";
+  };
 
   nix_2_7 = common {
     version = "2.7.0";
