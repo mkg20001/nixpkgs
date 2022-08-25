@@ -1,5 +1,6 @@
 { stdenv, fetchgit, flex, bison, python3, autoconf, automake, gnulib, libtool
 , gettext, ncurses, libusb-compat-0_1, freetype, qemu, lvm2, unifont, pkg-config
+, fetchpatch
 , fuse # only needed for grub-mount
 , zfs ? null
 , efiSupport ? false
