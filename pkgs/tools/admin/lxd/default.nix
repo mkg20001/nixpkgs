@@ -16,22 +16,28 @@
 , squashfsTools
 , iproute2
 , iptables
+, firewall ? iptables
 , libcap
 , dqlite
 , raft-canonical
 , sqlite
 , udev
-, writeShellScriptBin
-, apparmor-profiles
 , apparmor-parser
 , criu
 , bash
 , installShellFiles
+, linkFarm
+, qemu_kvm
+, qemu-utils
+, OVMFFull
+, useQemu ? true
+, util-linux
+, gptfdisk
 , nixosTests
 }:
 
-buildGoModule rec {
-  pname = "lxd";
+let
+
   version = "5.10";
 
   src = fetchurl {
@@ -41,6 +47,48 @@ buildGoModule rec {
     ];
     hash = "sha256-sYJkPr/tE22xJEjKX7fMjOLQ9zBDm52UjqbVLrm39zU=";
   };
+
+  binPath = [
+    acl
+    attr
+    bash
+    btrfs-progs
+    criu
+    dnsmasq
+    gnutar
+    gzip
+    iproute2
+    firewall
+    rsync
+    squashfsTools
+    xz
+    util-linux
+    gptfdisk
+    apparmor-parser
+  ] ++ lib.optionals useQemu [ qemu-utils qemu_kvm ];
+
+  firmware = linkFarm "lxd-firmware" [
+    {
+      name = "share/OVMF/OVMF_CODE.fd";
+      path = "${OVMFFull.fd}/FV/OVMF_CODE.fd";
+    }
+    {
+      name = "share/OVMF/OVMF_VARS.fd";
+      path = "${OVMFFull.fd}/FV/OVMF_VARS.fd";
+    }
+    {
+      name = "share/OVMF/OVMF_VARS.ms.fd";
+      path = "${OVMFFull.fd}/FV/OVMF_VARS.fd";
+    }
+  ];
+
+  LXD_OVMF_PATH = "${firmware}/share/OVMF";
+
+in
+
+buildGoModule rec {
+  pname = "lxd";
+  inherit src version;
 
   vendorSha256 = null;
 
@@ -70,41 +118,39 @@ buildGoModule rec {
     export CGO_LDFLAGS_ALLOW="(-Wl,-wrap,pthread_create)|(-Wl,-z,now)"
   '';
 
-  preCheck =
-    let skippedTests = [
+  preCheck = let
+    skippedTests = [
       "TestValidateConfig"
       "TestConvertNetworkConfig"
       "TestConvertStorageConfig"
       "TestSnapshotCommon"
       "TestContainerTestSuite"
-    ]; in
-    ''
-      # Disable tests requiring local operations
-      buildFlagsArray+=("-run" "[^(${builtins.concatStringsSep "|" skippedTests})]")
-    '';
+    ];
+  in ''
+    # Disable tests requiring local operations
+    buildFlagsArray+=("-run" "[^(${
+      builtins.concatStringsSep "|" skippedTests
+    })]")
+  '';
 
   postInstall = ''
-    wrapProgram $out/bin/lxd --prefix PATH : ${lib.makeBinPath (
-      [ iptables ]
-      ++ [ acl rsync gnutar xz btrfs-progs gzip dnsmasq squashfsTools iproute2 bash criu attr ]
-      ++ [ (writeShellScriptBin "apparmor_parser" ''
-             exec '${apparmor-parser}/bin/apparmor_parser' -I '${apparmor-profiles}/etc/apparmor.d' "$@"
-           '') ]
-      )
+    wrapProgram $out/bin/lxd --prefix PATH : ${lib.makeBinPath binPath} ${
+      lib.optionalString useQemu " --set LXD_OVMF_PATH ${LXD_OVMF_PATH}"
     }
 
     installShellCompletion --bash --name lxd ./scripts/bash/lxd-client
   '';
 
-  passthru.tests.lxd = nixosTests.lxd;
-  passthru.tests.lxd-nftables = nixosTests.lxd-nftables;
+  passthru.tests = {
+    inherit (nixosTests) lxd lxd-nftables lxd-qemu;
+  };
 
   meta = with lib; {
     description = "Daemon based on liblxc offering a REST API to manage containers";
     homepage = "https://linuxcontainers.org/lxd/";
     changelog = "https://github.com/lxc/lxd/releases/tag/lxd-${version}";
     license = licenses.asl20;
-    maintainers = with maintainers; [ marsam adamcstephens ];
+    maintainers = with maintainers; [ marsam adamcstephens ifd3f mkg20001 ];
     platforms = platforms.linux;
   };
 }

@@ -32,6 +32,8 @@ in {
         '';
       };
 
+      enableQemu = mkEnableOption (lib.mdDoc "Enable qemu support.");
+
       package = mkOption {
         type = types.package;
         default = pkgs.lxd;
@@ -39,6 +41,7 @@ in {
         description = lib.mdDoc ''
           The LXD package to use.
         '';
+        apply = p: p.override({ firewall = config.networking.firewall.package; useQemu = config.virtualisation.lxd.enableQemu; });
       };
 
       lxcPackage = mkOption {
@@ -91,6 +94,8 @@ in {
   ###### implementation
   config = mkIf cfg.enable {
     environment.systemPackages = [ cfg.package ];
+
+    virtualisation.lxd.enableQemu = mkDefault true;
 
     # Note: the following options are also declared in virtualisation.lxc, but
     # the latter can't be simply enabled to reuse the formers, because it
@@ -185,6 +190,7 @@ in {
     };
 
     boot.kernelModules = [ "veth" "xt_comment" "xt_CHECKSUM" "xt_MASQUERADE" ]
-      ++ optionals (!config.networking.nftables.enable) [ "iptable_mangle" ];
+      ++ optionals (!config.networking.nftables.enable) [ "iptable_mangle" ]
+      ++ optionals (cfg.enableQemu) [ "vhost_vsock" ];
   };
 }
