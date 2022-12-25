@@ -83,6 +83,7 @@ in
       '';
     };
 
+    networking.nftables.flushRuleset = mkEnableOption (lib.mdDoc "Flush the entire ruleset on each reload.");
     networking.nftables.ruleset = mkOption {
       type = types.lines;
       default = "";
@@ -209,6 +210,7 @@ in
     boot.blacklistedKernelModules = [ "ip_tables" ];
     environment.systemPackages = [ pkgs.nftables ];
     networking.networkmanager.firewallBackend = mkDefault "nftables";
+    networking.nftables.flushRuleset = mkDefault (versionOlder config.system.stateVersion "23.05");
     systemd.services.nftables = {
       description = "nftables firewall";
       before = [ "network-pre.target" ];
@@ -219,6 +221,7 @@ in
         enabledTables = filterAttrs (_: table: table.enable) cfg.tables;
         rulesScript = pkgs.writeScript "nftables-rules" ''
           #! ${pkgs.nftables}/bin/nft -f
+          ${optionalString cfg.flushRuleset "flush ruleset"}
           ${concatStringsSep "\n" (mapAttrsToList (_: table: ''
             table ${table.family} ${table.name}
             delete table ${table.family} ${table.name}
