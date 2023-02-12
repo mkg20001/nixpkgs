@@ -369,9 +369,10 @@ in {
   logrotate = handleTest ./logrotate.nix {};
   loki = handleTest ./loki.nix {};
   lvm2 = handleTest ./lvm2 {};
-  lxd = handleTest ./lxd.nix {};
-  lxd-qemu = handleTest ./lxd-qemu.nix {};
-  lxd-nftables = handleTest ./lxd-nftables.nix {};
+  lxd = handleTest ./lxd.nix { };
+  lxd-nftables = handleTest ./lxd.nix { nftables = true; };
+  lxd-apparmor = handleTest ./lxd.nix { apparmor = true; };
+  lxd-no-qemu = handleTest ./lxd.nix { qemu = false; };
   lxd-image-server = handleTest ./lxd-image-server.nix {};
   #logstash = handleTest ./logstash.nix {};
   lorri = handleTest ./lorri/default.nix {};

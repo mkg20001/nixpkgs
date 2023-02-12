@@ -142,7 +142,7 @@ buildGoModule rec {
   '';
 
   passthru.tests = {
-    inherit (nixosTests) lxd lxd-nftables lxd-qemu;
+    inherit (nixosTests) lxd lxd-nftables lxd-apparmor lxd-no-qemu;
   };
 
   meta = with lib; {

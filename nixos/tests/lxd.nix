@@ -1,4 +1,6 @@
-import ./make-test-python.nix ({ pkgs, lib, ... } :
+import ./make-test-python.nix ({ pkgs, lib, qemu ? true, nftables ? false, apparmor ? false, ... } :
+
+with lib;
 
 let
   lxd-image = import ../release.nix {
@@ -15,10 +17,10 @@ let
   lxd-image-rootfs = lxd-image.lxdImage.${pkgs.stdenv.hostPlatform.system};
 
 in {
-  name = "lxd-qemu";
+  name = "lxd${optionalString nftables "-nftables"}${optionalString apparmor "-apparmor"}${optionalString (!qemu) "-no-qemu"}";
 
   meta = with pkgs.lib.maintainers; {
-    maintainers = [ patryk27 ifd3f ];
+    maintainers = [ patryk27 ifd3f mkg20001 ];
   };
 
   nodes.machine = { lib, ... }: {
@@ -34,7 +36,13 @@ in {
 
       lxc.lxcfs.enable = true;
       lxd.enable = true;
-      lxd.package = pkgs.lxd.override { useQemu = false; };
+      lxd.enableQemu = qemu;
+    };
+
+    security.apparmor.enable = apparmor;
+    networking = optionalAttrs nftables {
+      nftables.enable = true;
+      firewall.trustedInterfaces = [ "lxdbr0" ];
     };
   };
 
@@ -53,9 +61,29 @@ in {
         "cat ${./common/lxd/config.yaml} | lxd init --preseed"
     )
 
+    ${optionalString nftables ''
+    machine.wait_for_unit("network.target")
+
+    with subtest("When nftables is enabled, lxd doesn't depend on iptables anymore"):
+        machine.succeed("lsmod | grep nf_tables")
+        machine.fail("lsmod | grep ip_tables")
+    ''}
+
     machine.succeed(
         "lxc image import ${lxd-image-metadata}/*/*.tar.xz ${lxd-image-rootfs}/*/*.tar.xz --alias nixos"
     )
+
+    ${optionalString qemu ''
+    machine.succeed(
+        "lxc image import ${./lxd-qemu.qcow2} ${./meta-lxd-qemu.tar.xz} --alias nixos"
+    )
+
+    with subtest("Qemu container works"):
+        machine.succeed("lxd launch nixos vm --vm")
+        machine.sleep(5)
+        machine.succeed("echo true | lxc exec vm /bin/bash -")
+        machine.succeed("lxc delete -f vm")
+    ''}
 
     with subtest("Container can be managed"):
         machine.succeed("lxc launch nixos container")

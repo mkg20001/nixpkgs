@@ -342,6 +342,38 @@ in rec {
 
   );
 
+  # An image that can be imported into lxd and used for qemu container creation
+  lxdQemuImage = forMatchingSystems [ "x86_64-linux" "aarch64-linux" ] (system:
+
+    with import ./.. { inherit system; };
+
+    hydraJob ((import lib/eval-config.nix {
+      inherit system;
+      modules =
+        [ configuration
+          versionModule
+          ./maintainers/scripts/lxd/lxd-image.nix
+        ];
+    }).config.system.build.tarball)
+
+  );
+
+  # Metadata for the lxd qemu image
+  lxdQemuMeta = forMatchingSystems [ "x86_64-linux" "aarch64-linux" ] (system:
+
+    with import ./.. { inherit system; };
+
+    hydraJob ((import lib/eval-config.nix {
+      inherit system;
+      modules =
+        [ configuration
+          versionModule
+          ./maintainers/scripts/lxd/lxd-image.nix
+        ];
+    }).config.system.build.metadata)
+
+  );
+
   # Ensure that all packages used by the minimal NixOS config end up in the channel.
   dummy = forAllSystems (system: pkgs.runCommand "dummy"
     { toplevel = (import lib/eval-config.nix {
