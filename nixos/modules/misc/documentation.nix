@@ -171,7 +171,7 @@ in
 
       enable = mkOption {
         type = types.bool;
-        default = true;
+        default = false;
         description = lib.mdDoc ''
           Whether to install documentation of packages from
           {option}`environment.systemPackages` into the generated system path.
