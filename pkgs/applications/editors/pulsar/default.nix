@@ -19,24 +19,44 @@
 }:
 
 let
+  owner = "pulsar-edit";
+  pname = "Pulsar";
+  version = "1.103.0";
+
+  sourcesPath = {
+    x86_64-linux = {
+      tarname = "Linux.${pname}-${version}.tar.gz";
+      hash = "sha256-O+mekV2h3mxRPYpIrpoPHQyRDuXgl+En8n8u2yBG8TQ=";
+    };
+    aarch64-linux = {
+      tarname = "ARM.Linux.${pname}-${version}-arm64.tar.gz";
+      hash = "sha256-gajIHUJrjCogcJjJVSKz85/x9inuS9rEMYlLqcolUqg=";
+    };
+  }.${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
+
   additionalLibs = lib.makeLibraryPath [
     xorg.libxshmfence
     libxkbcommon
     xorg.libxkbfile
   ];
   newLibpath = "${atomEnv.libPath}:${additionalLibs}";
+
+  # Hunspell for x86_64-linux
   buildLocalePath = path: "searchPaths.push('${path}');";
   localeDerivations = builtins.map (lang: hunspellDicts.${lang}) languages;
   localePatchs = lib.concatMapStringsSep "" buildLocalePath localeDerivations;
-  owner = "pulsar-edit";
+
+  # Hunspell for aarch64-linux
+  hunspellDirs = builtins.map (lang: "${hunspellDicts.${lang}}/share/hunspell") languages;
+  hunspellTargetDirs = "$out/opt/Pulsar/resources/app.asar.unpacked/node_modules/spellchecker/vendor/hunspell_dictionaries";
+  hunspellCopyCommands = lib.concatMapStringsSep "\n" (lang: "cp -r ${lang}/* ${hunspellTargetDirs};") hunspellDirs;
 in
 stdenv.mkDerivation rec {
-  pname = "pulsar";
-  version = "1.103.0";
+  inherit pname version;
 
-  src = fetchzip {
-    url = "https://github.com/${owner}/${pname}/releases/download/v1.103.0/Linux.${pname}-${version}.tar.gz";
-    hash = "sha256-O+mekV2h3mxRPYpIrpoPHQyRDuXgl+En8n8u2yBG8TQ=";
+  src = with sourcesPath; fetchzip {
+    url = "https://github.com/${owner}/${pname}/releases/download/v${version}/${tarname}";
+    inherit hash;
   };
 
   nativeBuildInputs = [
@@ -67,7 +87,7 @@ stdenv.mkDerivation rec {
       # needed for gio executable to be able to delete files
       --prefix "PATH" : "${lib.makeBinPath [ glib ]}"
     )
-  '' + lib.optionalString useHunspell ''
+  '' + lib.optionalString (useHunspell && stdenv.hostPlatform.system == "x86_64-linux") ''
     opt=$out/opt/Pulsar
     # We need to patch the already existing app.asar.unpacked, and add python3
     # to resources/app.asar.unpacked/node_modules/tree-sitter-bash/build/node_gyp_bins/python3
@@ -84,6 +104,9 @@ stdenv.mkDerivation rec {
     # Rebuild app.asar and clean up
     asar pack ./app $opt/resources/app.asar
     rm -rf ./app
+  '' + lib.optionalString (useHunspell && stdenv.hostPlatform.system == "aarch64-linux") ''
+    # On aarch64, we must inject our dictionnaries
+    ${hunspellCopyCommands}
   '';
 
   postFixup = ''
@@ -103,13 +126,14 @@ stdenv.mkDerivation rec {
     patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" \
       $opt/resources/app.asar.unpacked/node_modules/symbols-view/vendor/ctags-linux
 
+  '' + lib.optionalString (stdenv.hostPlatform.system == "x86_64-linux") ''
     # Replace the bundled git with the one from nixpkgs
     dugite=$opt/resources/app.asar.unpacked/node_modules/dugite
     rm -f $dugite/git/bin/git
     ln -s ${git}/bin/git $dugite/git/bin/git
     rm -f $dugite/git/libexec/git-core/git
     ln -s ${git}/bin/git $dugite/git/libexec/git-core/git
-
+  '' + ''
     # Patch the bundled node executables
     find $opt -name "*.node" -exec patchelf --set-rpath "${newLibpath}:$opt" {} \;
 
@@ -137,7 +161,7 @@ stdenv.mkDerivation rec {
     icon = "pulsar";
     comment = meta.description;
     genericName = "Text Editor";
-    categories = [ "Development" "TextEditor" ];
+    categories = [ "Development" "TextEditor" "Utility" ];
     mimeTypes = [ "text/plain" ];
   };
 
@@ -150,8 +174,7 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/pulsar-edit/pulsar";
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     license = licenses.mit;
-    platforms = platforms.x86_64;
-    broken = stdenv.hostPlatform.system != "x86_64-linux";
+    platforms = platforms.x86_64 ++ platforms.aarch64;
     maintainers = with maintainers; [ colamaroro ];
   };
 }
