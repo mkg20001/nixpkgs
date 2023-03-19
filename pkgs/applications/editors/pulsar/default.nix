@@ -2,7 +2,7 @@
 , stdenv
 , git
 , runtimeShell
-, fetchurl
+, fetchzip
 , wrapGAppsHook
 , glib
 , gtk3
@@ -28,14 +28,15 @@ let
   buildLocalePath = path: "searchPaths.push('${path}');";
   localeDerivations = builtins.map (lang: hunspellDicts.${lang}) languages;
   localePatchs = lib.concatMapStringsSep "" buildLocalePath localeDerivations;
+  owner = "pulsar-edit";
 in
 stdenv.mkDerivation rec {
   pname = "pulsar";
   version = "1.103.0";
 
-  src = fetchurl {
-    url = "https://github.com/pulsar-edit/pulsar/releases/download/v${version}/Linux.pulsar_${version}_amd64.deb ";
-    sha256 = "16k3j9rw0mshv2gfhwrccpn2d2704whw640qjgzwkal0lwjpx49x";
+  src = fetchzip {
+    url = "https://github.com/${owner}/${pname}/releases/download/v1.103.0/Linux.${pname}-${version}.tar.gz";
+    hash = "sha256-O+mekV2h3mxRPYpIrpoPHQyRDuXgl+En8n8u2yBG8TQ=";
   };
 
   nativeBuildInputs = [
@@ -52,15 +53,11 @@ stdenv.mkDerivation rec {
   dontBuild = true;
   dontConfigure = true;
 
-  unpackPhase = ''
-    ar p $src data.tar.xz | tar xJ ./usr/ ./opt/
-  '';
-
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out
-    mv opt usr $out
+    mkdir -p $out/opt/Pulsar
+    mv * $out/opt/Pulsar
 
     runHook postInstall
   '';
