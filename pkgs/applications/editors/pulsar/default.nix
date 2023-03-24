@@ -13,13 +13,12 @@
 , hunspellDicts
 , useHunspell ? true
 , languages ? [ "en_US" ]
-, nodePackages # We need ASAR to unpack the app.asar file and patch paths
-, python3 # Cursed patch to allow asar unpacking, as the builtin in the unpacked asar isn't there
 , makeDesktopItem
+, copyDesktopItems
+, makeWrapper
 }:
 
 let
-  owner = "pulsar-edit";
   pname = "Pulsar";
   version = "1.103.0";
 
@@ -41,33 +40,44 @@ let
   ];
   newLibpath = "${atomEnv.libPath}:${additionalLibs}";
 
-  # Hunspell for x86_64-linux
-  buildLocalePath = path: "searchPaths.push('${path}');";
-  localeDerivations = builtins.map (lang: hunspellDicts.${lang}) languages;
-  localePatchs = lib.concatMapStringsSep "" buildLocalePath localeDerivations;
-
-  # Hunspell for aarch64-linux
+  # Hunspell
   hunspellDirs = builtins.map (lang: "${hunspellDicts.${lang}}/share/hunspell") languages;
   hunspellTargetDirs = "$out/opt/Pulsar/resources/app.asar.unpacked/node_modules/spellchecker/vendor/hunspell_dictionaries";
   hunspellCopyCommands = lib.concatMapStringsSep "\n" (lang: "cp -r ${lang}/* ${hunspellTargetDirs};") hunspellDirs;
+
+  desktopItem = makeDesktopItem {
+    name = "Pulsar";
+    desktopName = "Pulsar";
+    exec = "pulsar";
+    icon = "pulsar";
+    comment = "A Community-led Hyper-Hackable Text Editor";
+    genericName = "Text Editor";
+    categories = [ "Development" "TextEditor" "Utility" ];
+    mimeTypes = [ "text/plain" ];
+  };
 in
 stdenv.mkDerivation rec {
   inherit pname version;
 
   src = with sourcesPath; fetchzip {
-    url = "https://github.com/${owner}/${pname}/releases/download/v${version}/${tarname}";
+    url = "https://github.com/pulsar-edit/pulsar/releases/download/v${version}/${tarname}";
     inherit hash;
   };
 
+  patches = [
+    ./001-patch-wrapper.patch
+  ];
+
+  patchFlags = [ ];
+
   nativeBuildInputs = [
-    wrapGAppsHook # Fix error: GLib-GIO-ERROR **: No GSettings schemas are installed on the system
-  ] ++ lib.optional useHunspell [
-    nodePackages.asar # We need ASAR to unpack the app.asar file and patch paths
+    wrapGAppsHook
+    copyDesktopItems
   ];
 
   buildInputs = [
-    gtk3 # Fix error: GLib-GIO-ERROR **: Settings schema 'org.gtk.Settings.FileChooser' is not installed
-    xorg.libxkbfile # Fix error on electron: libxkbfile.so.1: cannot open shared object file: No such file or directory
+    gtk3
+    xorg.libxkbfile
   ];
 
   dontBuild = true;
@@ -87,25 +97,8 @@ stdenv.mkDerivation rec {
       # needed for gio executable to be able to delete files
       --prefix "PATH" : "${lib.makeBinPath [ glib ]}"
     )
-  '' + lib.optionalString (useHunspell && stdenv.hostPlatform.system == "x86_64-linux") ''
-    opt=$out/opt/Pulsar
-    # We need to patch the already existing app.asar.unpacked, and add python3
-    # to resources/app.asar.unpacked/node_modules/tree-sitter-bash/build/node_gyp_bins/python3
-    rm $opt/resources/app.asar.unpacked/node_modules/tree-sitter-bash/build/node_gyp_bins/python3
-    ln -s ${python3}/bin/python3 $opt/resources/app.asar.unpacked/node_modules/tree-sitter-bash/build/node_gyp_bins/python3
-
-    # We need to extract the app.asar file
-    asar extract $opt/resources/app.asar ./app
-
-    # Remove lines 114 to 116 (inclusive) and replace with ''${localePaths}
-    sed -i '114,116d' ./app/node_modules/spell-check/lib/locale-checker.js
-    echo 'sed -i "114i ${localePatchs}" ./app/node_modules/spell-check/lib/locale-checker.js'
-    sed -i "114i ${localePatchs}" ./app/node_modules/spell-check/lib/locale-checker.js
-    # Rebuild app.asar and clean up
-    asar pack ./app $opt/resources/app.asar
-    rm -rf ./app
-  '' + lib.optionalString (useHunspell && stdenv.hostPlatform.system == "aarch64-linux") ''
-    # On aarch64, we must inject our dictionnaries
+  '' + lib.optionalString useHunspell ''
+    # On all platforms, we must inject our dictionnaries
     ${hunspellCopyCommands}
   '';
 
@@ -137,33 +130,19 @@ stdenv.mkDerivation rec {
     # Patch the bundled node executables
     find $opt -name "*.node" -exec patchelf --set-rpath "${newLibpath}:$opt" {} \;
 
-    # Create a wrapper script for the executable
+    # We have patched the original wrapper, but now it needs the "PULSAR_PATH" env var
     mkdir -p $out/bin
-    cat > $out/bin/${pname} <<EOF
-    #!${runtimeShell}
-    nohup $opt/pulsar --no-sandbox "\$@" > /dev/null 2>&1 &
-    EOF
-    chmod +x $out/bin/${pname}
+    wrapProgram $opt/resources/pulsar.sh \
+      --prefix "PULSAR_PATH" : "$opt/pulsar"
+    ln -s $opt/resources/pulsar.sh $out/bin/pulsar
 
-    # Place the desktop icons and file
+    # Copy the icons
     mkdir -p $out/share/icons/hicolor/scalable/apps $out/share/icons/hicolor/1024x1024/apps
     cp $opt/resources/pulsar.svg $out/share/icons/hicolor/scalable/apps/pulsar.svg
     cp $opt/resources/pulsar.png $out/share/icons/hicolor/1024x1024/apps/pulsar.png
-
-    mkdir -p $out/share/applications
-    ln -s ${desktopFile}/share/applications/* $out/share/applications
   '';
 
-  desktopFile = makeDesktopItem {
-    name = "Pulsar";
-    desktopName = "Pulsar";
-    exec = pname;
-    icon = "pulsar";
-    comment = meta.description;
-    genericName = "Text Editor";
-    categories = [ "Development" "TextEditor" "Utility" ];
-    mimeTypes = [ "text/plain" ];
-  };
+  desktopItems = [ desktopItem ];
 
   meta = with lib; {
     description = "A Community-led Hyper-Hackable Text Editor";
@@ -174,7 +153,7 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/pulsar-edit/pulsar";
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     license = licenses.mit;
-    platforms = platforms.x86_64 ++ platforms.aarch64;
+    platforms = platforms.linux;
     maintainers = with maintainers; [ colamaroro ];
   };
 }
