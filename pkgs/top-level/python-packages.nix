@@ -6734,6 +6734,8 @@ self: super: with self; {
 
   mwparserfromhell = callPackage ../development/python-modules/mwparserfromhell { };
 
+  mwtypes = callPackage ../development/python-modules/mwtypes { };
+
   mxnet = callPackage ../development/python-modules/mxnet { };
 
   myfitnesspal = callPackage ../development/python-modules/myfitnesspal { };
