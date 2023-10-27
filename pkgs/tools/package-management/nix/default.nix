@@ -209,12 +209,11 @@ in lib.makeExtensible (self: (rec {
   unstable = self.nix_2_18;
 
   xeredoNix = {
-    stable = nix_2_16.overrideAttrs(prev: {
+    stable = nix_2_18.overrideAttrs(prev: {
       patches = [
-        ./0001-feat-use-effectiveUrl-in-tarball-flake-locked.patch
-        ./0002-libfetchers-git-fetch-submodules-by-default.patch
-        ./0003-enable-flakes-command.patch
-        ./fix-test.patch
+        ./0001-libfetchers-git-fetch-submodules-by-default.patch
+        ./0002-enable-flakes-command.patch
+        ./0003-disable-flaky-test.patch
       ] ++ (prev.patches or []);
     });
   };
