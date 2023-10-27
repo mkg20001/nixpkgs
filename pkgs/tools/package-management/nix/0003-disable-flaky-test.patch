@@ -1,7 +1,7 @@
-From 651fc2aed9db82b4c267aadd22c5de2b28d3972c Mon Sep 17 00:00:00 2001
+From dde00a72debaec5d210b2fc0bd08e716fe4c9013 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Maciej=20Kr=C3=BCger?= <mkg20001@gmail.com>
 Date: Thu, 6 Jul 2023 18:38:51 +0200
-Subject: [PATCH] disable flaky test
+Subject: [PATCH 3/3] disable flaky test
 
 ---
  tests/experimental-features.sh | 86 ----------------------------------
@@ -102,17 +102,17 @@ index 607bf0a8e..000000000
 -    expect 1 nix --experimental-features '' "$arg" --help 1>/dev/null
 -done
 diff --git a/tests/local.mk b/tests/local.mk
-index 9e340e2e2..8092855aa 100644
+index 4edf31303..9ecca1864 100644
 --- a/tests/local.mk
 +++ b/tests/local.mk
-@@ -19,7 +19,6 @@ nix_tests = \
-   remote-store.sh \
+@@ -20,7 +20,6 @@ nix_tests = \
    legacy-ssh-store.sh \
    lang.sh \
+   lang-test-infra.sh \
 -  experimental-features.sh \
    fetchMercurial.sh \
    gc-auto.sh \
    user-envs.sh \
 -- 
-2.40.1
+2.42.0
 
