@@ -42,6 +42,7 @@ stdenv.mkDerivation rec {
 
   postPatch = ''
     patchShebangs meson/install-file.py
+    sed "s|cinnamon_versions = ['3.8', '4.0', '4.2', '4.4', '4.6', '4.8', '5.0', '5.2', '5.4']|cinnamon_versions = ['3.8', '4.0', '4.2', '4.4', '4.6', '4.8', '5.0', '5.2', '5.4', '6.0']|g" -i common/cinnamon/meson.build
   '';
 
   preBuild = ''
@@ -55,7 +56,7 @@ stdenv.mkDerivation rec {
   mesonFlags = [
     # "-Dthemes=cinnamon,gnome-shell,gtk2,gtk3,plank,xfwm,metacity"
     # "-Dvariants=light,darker,dark,lighter"
-    "-Dcinnamon_version=${cinnamon.cinnamon-common.version}"
+    "-Dcinnamon_version=6.0.0"
     "-Dgnome_shell_version=${gnome.gnome-shell.version}"
     # You will need to patch gdm to make use of this.
     "-Dgnome_shell_gresource=true"
