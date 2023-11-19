@@ -62,6 +62,7 @@ stdenv.mkDerivation rec {
     (replaceVars ./fix-paths.patch {
       inherit zenity;
     })
+    ./keymap.patch
   ];
 
   nativeBuildInputs = [
