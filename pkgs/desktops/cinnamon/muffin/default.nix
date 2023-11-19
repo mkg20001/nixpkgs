@@ -31,11 +31,13 @@
 , udev
 , wrapGAppsHook
 , xorgserver
+, xwayland
+, libxcvt
 }:
 
 stdenv.mkDerivation rec {
   pname = "muffin";
-  version = "5.8.1";
+  version = "6.0.0";
 
   outputs = [ "out" "dev" "man" ];
 
@@ -43,7 +45,7 @@ stdenv.mkDerivation rec {
     owner = "linuxmint";
     repo = pname;
     rev = version;
-    hash = "sha256-9YE+pHXJb21CcAflL9swNyhQY3ZCkLlZbnmUwTNdyfA=";
+    hash = "sha256-17B2C3SW9smTgLBBGJc9LwFpXoP9WidZEGgI2hbJTH8=";
   };
 
   patches = [
@@ -73,6 +75,7 @@ stdenv.mkDerivation rec {
     gtk3
     libcanberra
     libdrm
+    libxcvt
     libgnomekbd
     libgudev
     libinput
@@ -82,6 +85,7 @@ stdenv.mkDerivation rec {
     libxkbcommon
     pipewire
     udev
+    xwayland
   ];
 
   propagatedBuildInputs = [
