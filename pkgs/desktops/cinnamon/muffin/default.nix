@@ -19,6 +19,7 @@
 , libinput
 , libstartup_notification
 , libwacom
+, libxcvt
 , libXdamage
 , libxkbcommon
 , libXtst
@@ -31,11 +32,12 @@
 , udev
 , wrapGAppsHook
 , xorgserver
+, xwayland
 }:
 
 stdenv.mkDerivation rec {
   pname = "muffin";
-  version = "5.8.1";
+  version = "6.0.0";
 
   outputs = [ "out" "dev" "man" ];
 
@@ -43,7 +45,7 @@ stdenv.mkDerivation rec {
     owner = "linuxmint";
     repo = pname;
     rev = version;
-    hash = "sha256-9YE+pHXJb21CcAflL9swNyhQY3ZCkLlZbnmUwTNdyfA=";
+    hash = "sha256-17B2C3SW9smTgLBBGJc9LwFpXoP9WidZEGgI2hbJTH8=";
   };
 
   patches = [
@@ -78,10 +80,12 @@ stdenv.mkDerivation rec {
     libinput
     libstartup_notification
     libwacom
+    libxcvt
     libXdamage
     libxkbcommon
     pipewire
     udev
+    xwayland
   ];
 
   propagatedBuildInputs = [
