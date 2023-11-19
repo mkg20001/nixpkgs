@@ -14,17 +14,18 @@
 , xorg
 , wrapGAppsHook
 , glib
+, systemd
 }:
 
 stdenv.mkDerivation rec {
   pname = "cinnamon-desktop";
-  version = "5.8.0";
+  version = "6.0.0";
 
   src = fetchFromGitHub {
     owner = "linuxmint";
     repo = pname;
     rev = version;
-    hash = "sha256-rYTWtdYfMow3cIPhJdcmhyaIIU7fgVecWigbsCW0Piw=";
+    hash = "sha256-Ay9JyPBsE345dBwQHChkaGuoXiB2nPyvCNhWWphL8kY=";
   };
 
   outputs = [ "out" "dev" ];
@@ -41,6 +42,7 @@ stdenv.mkDerivation rec {
     xorg.libxkbfile
     xorg.libXext
     xorg.libXrandr
+    systemd
   ];
 
   nativeBuildInputs = [
