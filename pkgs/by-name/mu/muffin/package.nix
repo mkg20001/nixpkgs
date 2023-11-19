@@ -59,6 +59,7 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   patches = [
+    ./keymap.patch
     (replaceVars ./fix-paths.patch {
       inherit zenity;
     })
