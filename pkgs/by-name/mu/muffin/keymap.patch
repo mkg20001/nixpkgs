@@ -1,0 +1,25 @@
+From 640684b66b416574bf0ec9a6d5701e4da1f408f1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Maciej=20Kr=C3=BCger?= <mkg20001@gmail.com>
+Date: Sun, 19 Nov 2023 20:44:55 +0100
+Subject: [PATCH] keymap
+
+---
+ src/backends/native/meta-keymap-native.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/backends/native/meta-keymap-native.c b/src/backends/native/meta-keymap-native.c
+index 622cfd35..125624f3 100644
+--- a/src/backends/native/meta-keymap-native.c
++++ b/src/backends/native/meta-keymap-native.c
+@@ -24,7 +24,7 @@
+ #include "backends/native/meta-keymap-native.h"
+ #include "backends/native/meta-seat-native.h"
+ 
+-static const char *option_xkb_layout = "us";
++static const char *option_xkb_layout = "de";
+ static const char *option_xkb_variant = "";
+ static const char *option_xkb_options = "";
+ 
+-- 
+2.42.0
+
