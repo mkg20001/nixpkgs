@@ -9,7 +9,6 @@
 , cjs
 , evolution-data-server
 , fetchFromGitHub
-, fetchpatch
 , gdk-pixbuf
 , gettext
 , libgnomekbd
@@ -20,7 +19,6 @@
 , intltool
 , json-glib
 , callPackage
-, libsoup
 , libstartup_notification
 , libXtst
 , libXdamage
@@ -73,25 +71,18 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "cinnamon-common";
-  version = "5.8.4";
+  version = "unstable-2023-11-19";
 
   src = fetchFromGitHub {
     owner = "linuxmint";
     repo = "cinnamon";
-    rev = version;
-    hash = "sha256-34kOSDIU56cSZ4j0FadVfr9HLQytnK4ys88DFF7LTiM=";
+    rev = "fc69a484f56a07386fe07f3b1c05c5ded1bb126b";
+    hash = "sha256-OzZpkYOmrp8yWZsOjltQLXD6ZAExLx3zwOqPSkDNdng=";
   };
 
   patches = [
     ./use-sane-install-dir.patch
     ./libdir.patch
-
-    # Backport pillow 10.0.0 support.
-    # https://github.com/linuxmint/cinnamon/issues/11746
-    (fetchpatch {
-      url = "https://github.com/linuxmint/cinnamon/commit/fce9aad1ebb290802dc550e8dae6344dddf9dec1.patch";
-      hash = "sha256-flt7CblfXlLieAVNeC8TBnv1TX0Zca1obPWusBMnIxE=";
-    })
   ];
 
   buildInputs = [
@@ -108,7 +99,6 @@ stdenv.mkDerivation rec {
     gsound
     gtk3
     json-glib
-    libsoup # referenced in js/ui/environment.js
     libstartup_notification
     libXtst
     libXdamage
@@ -201,7 +191,7 @@ stdenv.mkDerivation rec {
   '';
 
   passthru = {
-    providedSessions = [ "cinnamon" "cinnamon2d" ];
+    providedSessions = [ "cinnamon" "cinnamon2d" "cinnamon-wayland" ];
   };
 
   meta = with lib; {
