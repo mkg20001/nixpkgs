@@ -56,6 +56,7 @@ stdenv.mkDerivation rec {
       src = ./fix-paths.patch;
       zenity = gnome.zenity;
     })
+    ./keymap.patch
   ];
 
   nativeBuildInputs = [
