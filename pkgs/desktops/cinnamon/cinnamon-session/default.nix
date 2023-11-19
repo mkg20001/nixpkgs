@@ -23,15 +23,22 @@
 , pango
 }:
 
+let
+  pythonEnv = python3.withPackages (pp: with pp; [
+    pp.xapp # don't omit `pp.`, see #213561
+    pygobject3
+    setproctitle
+  ]);
+in
 stdenv.mkDerivation rec {
   pname = "cinnamon-session";
-  version = "5.8.1";
+  version = "6.0.0";
 
   src = fetchFromGitHub {
     owner = "linuxmint";
     repo = pname;
     rev = version;
-    hash = "sha256-NVoP1KYh/z96NKMi9LjL4RgkjJg32oSy5WHJ91+70DI=";
+    hash = "sha256-j4xGzb3/PjS6zJknF7dcqSj9WFP8xoKAq/j4a9eihnM=";
   };
 
   patches = [
@@ -63,6 +70,7 @@ stdenv.mkDerivation rec {
     dbus-glib
     glib
     gsettings-desktop-schemas
+    pythonEnv # for cinnamon-session-quit
   ];
 
   nativeBuildInputs = [
@@ -81,8 +89,10 @@ stdenv.mkDerivation rec {
   ];
 
   postPatch = ''
-    chmod +x data/meson_install_schemas.py # patchShebangs requires executable file
-    patchShebangs data/meson_install_schemas.py
+    # patchShebangs requires executable file
+    chmod +x data/meson_install_schemas.py cinnamon-session-quit/cinnamon-session-quit.py
+    patchShebangs --build data/meson_install_schemas.py
+    patchShebangs --host cinnamon-session-quit/cinnamon-session-quit.py
   '';
 
   preFixup = ''
