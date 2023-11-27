@@ -12,11 +12,11 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "tribler";
-  version = "7.11.0";
+  version = "7.13.0";
 
   src = fetchurl {
-    url = "https://github.com/Tribler/tribler/releases/download/v${version}/Tribler-v${version}.tar.xz";
-    sha256 = "0ffh8chb47iaar8872gvalgm84fjzyxph16nixsxknnprqdxyrkx";
+    url = "https://github.com/Tribler/tribler/releases/download/v${version}/Tribler-${version}.tar.xz";
+    hash = "sha256-j9+Kq6dOqiJCTY3vuRWGnciuwACU7L0pl73l6nkDLN4=";
   };
 
   nativeBuildInputs = [
@@ -33,36 +33,46 @@ stdenv.mkDerivation rec {
   ] ++ (with python3.pkgs; [
     aiohttp
     aiohttp-apispec
-    asynctest
+    anyio
     chardet
-    cherrypy
     configobj
     cryptography
     decorator
     faker
-    feedparser
     libnacl
     lz4
-    m2crypto
+    marshmallow
     netifaces
     networkx
-    pillow
     pony
     psutil
     pyasn1
-    pycrypto
-    pyqt5
-    pyqtgraph
-    pytest-asyncio
-    pytest-timeout
+    pydantic
+    pyopenssl
     pyyaml
-    requests
     sentry-sdk
     service-identity
-    twisted
     yappi
-    pydantic
-    anyio
+    yarl
+    bitarray
+    (pyipv8.overrideAttrs (p: rec {
+      version = "2.10.0";
+      src = fetchPypi {
+        inherit (p) pname;
+        inherit version;
+        hash = "sha256-yxiXBxBiPokequm+vjsHIoG9kQnRnbsOx3mYOd8nmiU=";
+      };
+    }))
+    libtorrent
+    file-read-backwards
+    brotli
+    human-readable
+
+    pillow
+    pyqt5
+    #pyqt5-sip
+    pyqtgraph
+    pyqtwebengine
   ]);
 
   installPhase = ''
