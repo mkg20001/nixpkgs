@@ -10337,6 +10337,8 @@ self: super: with self; {
 
   pyipp = callPackage ../development/python-modules/pyipp { };
 
+  pyipv8 = callPackage ../development/python-modules/pyipv8 { };
+
   pyiqvia = callPackage ../development/python-modules/pyiqvia { };
 
   pyisbn = callPackage ../development/python-modules/pyisbn { };
