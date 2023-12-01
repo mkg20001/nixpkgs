@@ -9137,8 +9137,6 @@ with pkgs;
     llvmPackages = llvmPackages_16;
   };
 
-  harec = callPackage ../development/compilers/harec { };
-
   hareThirdParty = recurseIntoAttrs (callPackage ./hare-third-party.nix { });
 
   ham = pkgs.perlPackages.ham;
