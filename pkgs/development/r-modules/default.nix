@@ -977,6 +977,13 @@ let
       preConfigure = "patchShebangs configure";
     });
 
+    gbm = old.gbm.overrideAttrs(attrs: {
+      postInstall = ''
+        mkdir -p $out/include
+        cp src/*.h $out/include
+      '';
+    });
+
     RcppParallel = old.RcppParallel.overrideAttrs (attrs: {
       preConfigure = "patchShebangs configure";
     });
