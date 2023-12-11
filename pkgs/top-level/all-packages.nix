@@ -40936,6 +40936,11 @@ with pkgs;
 
   qMasterPassword = qt6Packages.callPackage ../applications/misc/qMasterPassword { };
 
+  qMasterPassword-wayland = qt6Packages.callPackage ../applications/misc/qMasterPassword {
+    x11Support = false;
+    waylandSupport = true;
+  };
+
   qmake2cmake = python3Packages.callPackage ../tools/misc/qmake2cmake { };
 
   qtrvsim = libsForQt5.callPackage ../applications/science/computer-architecture/qtrvsim { };
