@@ -1,4 +1,4 @@
-{ lib, buildGoModule, fetchFromGitHub, nixosTests }:
+{ lib, buildGoModule, fetchFromGitHub, nixosTests, fetchurl }:
 
 buildGoModule rec {
   pname = "yggdrasil";
@@ -12,6 +12,13 @@ buildGoModule rec {
   };
 
   vendorHash = "sha256-Ar0mWVFgLP1eYeKalaazZLKaLMXoe2bOGYkruzaKW88=";
+
+  patches = [
+    (fetchurl {
+      url = "https://github.com/yggdrasil-network/yggdrasil-go/pull/1052.patch";
+      hash = "sha256-aEd0St56ASinSmQsGpD62q56iy5BIWbY2pVpT4C1CG4=";
+    })
+  ];
 
   subPackages = [ "cmd/genkeys" "cmd/yggdrasil" "cmd/yggdrasilctl" ];
 
