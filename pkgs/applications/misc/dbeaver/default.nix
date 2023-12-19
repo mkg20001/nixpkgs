@@ -37,7 +37,7 @@ mavenJdk17.buildMavenPackage rec {
   };
 
   # mvnHash = lib.fakeHash;
-  mvnHash = "sha256-uK2bbcWvSEEFrnofLpjACTQcW3DL4FNaMLCF7aVKXiI=";
+  mvnHash = "sha256-9KUkv1naVMcPwkxKOCf/KRwQlLAeTB+CkDIxIvga2/w=";
   mvnParameters = "-P desktop,all-platforms";
 
   nativeBuildInputs = [
