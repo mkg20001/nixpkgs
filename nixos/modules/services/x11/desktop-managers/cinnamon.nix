@@ -80,7 +80,8 @@ in
         };
       };
       services.xserver.displayManager.sessionCommands = ''
-        if test "$XDG_CURRENT_DESKTOP" = "Cinnamon"; then
+        # Have to take care of cinnamon2d and cinnamon-wayland.
+        if test "''${XDG_SESSION_DESKTOP:0:8}" = "cinnamon"; then
             true
             ${concatMapStrings (p: ''
               if [ -d "${p}/share/gsettings-schemas/${p.name}" ]; then
