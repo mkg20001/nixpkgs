@@ -63,6 +63,7 @@ buildPythonPackage (finalAttrs: {
     export QT_QPA_PLATFORM=offscreen
     export DYLD_FRAMEWORK_PATH=/System/Library/Frameworks
     export FONTCONFIG_FILE=${fontsConf}
+    export HOME=$(mktemp -d)
   '';
 
   enabledTestPaths = [
