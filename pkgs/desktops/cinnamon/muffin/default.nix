@@ -57,6 +57,7 @@ stdenv.mkDerivation rec {
       zenity = gnome.zenity;
     })
     ./keymap.patch
+    ./segfault-alt-tab.patch
   ];
 
   nativeBuildInputs = [
