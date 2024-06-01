@@ -5478,6 +5478,8 @@ self: super: with self; {
 
   hikari = callPackage ../development/python-modules/hikari { };
 
+  hikari-crescent = callPackage ../development/python-modules/hikari-crescent { };
+
   hikari-lightbulb = callPackage ../development/python-modules/hikari-lightbulb { };
 
   hikvision = callPackage ../development/python-modules/hikvision { };
