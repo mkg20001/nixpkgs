@@ -32863,10 +32863,6 @@ with pkgs;
 
   polyphone = libsForQt5.callPackage ../applications/audio/polyphone { };
 
-  portfolio = callPackage ../applications/office/portfolio {
-    jre = openjdk17;
-  };
-
   psi-notify = callPackage ../applications/misc/psi-notify { };
 
   ptex = callPackage ../development/libraries/ptex { };
