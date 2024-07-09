@@ -30878,7 +30878,7 @@ with pkgs;
 
   freerdpUnstable = freerdp;
 
-  friture = callPackage ../applications/audio/friture {
+  friture = callPackage ../by-name/fr/friture/package.nix {
     python3Packages = python311Packages;
   };
 
