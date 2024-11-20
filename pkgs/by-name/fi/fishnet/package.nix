@@ -3,6 +3,8 @@
   rustPlatform,
   fetchFromGitHub,
   fetchurl,
+  testers,
+  fishnet,
 }:
 
 let
@@ -38,6 +40,10 @@ rustPlatform.buildRustPackage rec {
   '';
 
   cargoHash = "sha256-HuVEg8uJ1WbXzYaXCPBobmxhbhk+X8D/xFcM2wE8Lh0=";
+
+  passthru.tests.version = testers.testVersion {
+    package = fishnet;
+  };
 
   meta = with lib; {
     description = "Distributed Stockfish analysis for lichess.org";
