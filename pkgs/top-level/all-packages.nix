@@ -5939,7 +5939,7 @@ with pkgs;
   };
 
   codon = callPackage ../development/compilers/codon {
-    inherit (llvmPackages_14) lld stdenv;
+    inherit (llvmPackages) lld stdenv;
   };
 
   colmap = libsForQt5.callPackage ../applications/science/misc/colmap { inherit (config) cudaSupport; };
