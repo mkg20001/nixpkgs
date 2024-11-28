@@ -1,4 +1,5 @@
 { fetchFromGitHub
+, fetchpatch
 , glib
 , gobject-introspection
 , meson
@@ -7,7 +8,7 @@
 , lib
 , stdenv
 , wrapGAppsHook3
-, libxml2
+, libxmlb
 , gtk3
 , gvfs
 , cinnamon-desktop
@@ -19,23 +20,39 @@
 , shared-mime-info
 , cinnamon-translations
 , libgsf
+, python3
 }:
 
+let
+  # For action-layout-editor.
+  pythonEnv = python3.withPackages (pp: with pp; [
+    pycairo
+    pygobject3
+    python-xapp
+  ]);
+in
 stdenv.mkDerivation rec {
   pname = "nemo";
-  version = "6.2.8";
+  version = "6.4.0";
 
   src = fetchFromGitHub {
     owner = "linuxmint";
     repo = pname;
     rev = version;
-    hash = "sha256-1GJLsUlptwXcZUWIOztskV0nHA9BnPmnVeTgUwJ+QDQ=";
+    hash = "sha256-hlCIwuy6t6eGImHxEbcg4ky9rBXHAgiX9hzoYZ9nW9A=";
   };
 
   patches = [
     # Load extensions from NEMO_EXTENSION_DIR environment variable
     # https://github.com/NixOS/nixpkgs/issues/78327
     ./load-extensions-from-env.patch
+
+    # Remove unused libxml2 headers
+    # https://github.com/linuxmint/nemo/pull/3490
+    (fetchpatch {
+      url = "https://github.com/linuxmint/nemo/commit/9ad22e14b510f76ff6ab3c05dd49ed4cd94fbd5c.patch";
+      hash = "sha256-ib1VK0bkzKbpTO6/vaA463iWxC4ieg9nQvVYhHhN1sw=";
+    })
   ];
 
   outputs = [ "out" "dev" ];
@@ -44,7 +61,8 @@ stdenv.mkDerivation rec {
     glib
     gtk3
     cinnamon-desktop
-    libxml2
+    libxmlb # action-layout-editor
+    pythonEnv
     xapp
     libexif
     exempi
