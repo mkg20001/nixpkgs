@@ -3,6 +3,7 @@
 , gobject-introspection
 , gtk3
 , intltool
+, isocodes
 , meson
 , ninja
 , pkg-config
@@ -19,13 +20,13 @@
 
 stdenv.mkDerivation rec {
   pname = "cinnamon-desktop";
-  version = "6.2.0";
+  version = "6.4.0";
 
   src = fetchFromGitHub {
     owner = "linuxmint";
     repo = pname;
     rev = version;
-    hash = "sha256-9uewZh0GHQAenTcZpLchgFXSt3vOhxLbaepsJIkjTdI=";
+    hash = "sha256-QlBQTZIcmnMX+0ESLqdGXOgmYzE6WPJUTXq+wZVAq8Y=";
   };
 
   outputs = [ "out" "dev" ];
@@ -38,6 +39,7 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     gdk-pixbuf
+    isocodes
     systemd
     xkeyboard_config
     xorg.libxkbfile
