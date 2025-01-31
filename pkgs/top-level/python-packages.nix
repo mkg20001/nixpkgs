@@ -14522,6 +14522,8 @@ self: super: with self; {
 
   sbom2dot = callPackage ../development/python-modules/sbom2dot { };
 
+  sbom4files = callPackage ../development/python-modules/sbom4files { };
+
   scalene = callPackage ../development/python-modules/scalene { };
 
   scales = callPackage ../development/python-modules/scales { };
