@@ -441,6 +441,7 @@ in
   fenics = handleTest ./fenics.nix { };
   ferm = handleTest ./ferm.nix { };
   ferretdb = handleTest ./ferretdb.nix { };
+  fiche = handleTest ./fiche.nix { };
   fider = runTest ./fider.nix;
   filesender = handleTest ./filesender.nix { };
   filesystems-overlayfs = runTest ./filesystems-overlayfs.nix;
