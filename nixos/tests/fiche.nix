@@ -18,6 +18,7 @@ import ./make-test-python.nix (
           services.nginx = {
             enable = true;
           };
+          environment.systemPackages = [ pkgs.wget ];
         };
     };
 
@@ -29,7 +30,12 @@ import ./make-test-python.nix (
           main.wait_for_open_port(9999)
 
       with subtest("ensure we can submit things"):
-          main.succeed("echo hi | nc localhost 9999")
+          main.succeed("echo hi | nc localhost 9999 > url")
+          main.succeed("grep 'http://localhost/[a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9]' url")
+      
+      with subtest("ensure we can fetch things"):
+          main.succeed("wget $(cat url) -O out")
+          main.succeed("grep hi out")
     '';
   }
 )

@@ -60,7 +60,7 @@ in
       after = [ "network.target" ];
 
       serviceConfig = {
-        ExecStart = "${pkgs.fiche}/bin/fiche -L :: " +
+        ExecStart = "${pkgs.fiche}/bin/fiche " +
           "-o ${cfg.outputDirectory} " +
           "${optionalString (cfg.domain != null) "-d ${cfg.domain}"} " +
           "-p ${toString cfg.port} " +
@@ -82,9 +82,20 @@ in
       firewall.allowedTCPPorts = [ cfg.port ];
     };
 
+    systemd.services.nginx = mkIf (cfg.nginx) {
+      serviceConfig = {
+        SupplementaryGroups = [ "fiche" ];
+#        ReadWritePaths = cfg.outputDirectory;
+      };
+    };
+
     services.nginx = mkIf (cfg.nginx) {
       virtualHosts.${cfg.domain} = {
-        locations."/".alias = cfg.outputDirectory;
+        locations."/" = {
+          alias = "${cfg.outputDirectory}/";
+          index = "index.txt";
+          # tryFiles = "$uri $uri/index.txt =404";
+        };
       };
     };
   };
