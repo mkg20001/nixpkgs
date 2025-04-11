@@ -15501,6 +15501,8 @@ self: super: with self; {
     inherit (pkgs.darwin.apple_sdk.frameworks) Accelerate;
   };
 
+  scspell = callPackage ../development/python-modules/scspell { };
+
   sdds = callPackage ../development/python-modules/sdds { };
 
   sdjson = callPackage ../development/python-modules/sdjson { };
