@@ -15416,6 +15416,8 @@ self: super: with self; {
     inherit (pkgs) libpcap; # Avoid confusion with python package of the same name
   };
 
+  scenedetect = callPackage ../development/python-modules/scenedetect { };
+
   schedule = callPackage ../development/python-modules/schedule { };
 
   schema = callPackage ../development/python-modules/schema { };
