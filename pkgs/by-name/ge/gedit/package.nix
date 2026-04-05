@@ -20,6 +20,7 @@
   docbook-xsl-nons,
   ninja,
   gitUpdater,
+  python3,
   gspell,
   itstool,
   desktop-file-utils,
@@ -49,6 +50,9 @@ stdenv.mkDerivation (finalAttrs: {
     # We patch gobject-introspection and meson to store absolute paths to libraries in typelibs
     # but that requires the install_dir is an absolute path.
     ./correct-gir-lib-path.patch
+
+    # Re-enable python3 plugin loader, removed upstream in gedit 49.0.
+    ./enable-python3-loader.patch
   ];
 
   nativeBuildInputs = [
@@ -77,10 +81,16 @@ stdenv.mkDerivation (finalAttrs: {
     libgedit-gtksourceview
     libgedit-tepl
     libpeas
+    python3
+    python3.pkgs.pygobject3
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     gtk-mac-integration
   ];
+
+  preFixup = ''
+    gappsWrapperArgs+=(--prefix GI_TYPELIB_PATH : "$out/lib/gedit/girepository-1.0")
+  '';
 
   # Reliably fails to generate gedit-file-browser-enum-types.h in time
   enableParallelBuilding = false;
