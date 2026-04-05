@@ -1,0 +1,13 @@
+diff --git a/gedit/gedit-plugins-engine.c b/gedit/gedit-plugins-engine.c
+index 1111111..2222222 100644
+--- a/gedit/gedit-plugins-engine.c
++++ b/gedit/gedit-plugins-engine.c
+@@ -38,6 +38,8 @@ static GeditPluginsEngine *default_engine = NULL;
+ static void
+ gedit_plugins_engine_init (GeditPluginsEngine *engine)
+ {
++	peas_engine_enable_loader (PEAS_ENGINE (engine), "python3");
++
+ 	peas_engine_add_search_path (PEAS_ENGINE (engine),
+ 				     gedit_dirs_get_user_plugins_dir (),
+ 				     NULL);
