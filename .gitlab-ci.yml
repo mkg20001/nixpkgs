@@ -1,0 +1,32 @@
+build_x86_64-linux:
+  timeout: 10h
+  tags:
+  - nix
+  script:
+    - bash build.sh
+    - bash xzar-install.sh
+    - bash xzar.sh
+  stage: build
+  artifacts:
+    paths:
+      - nixpkgs.tar.xz
+  environment: production_linux
+  resource_group: production_linux
+
+build_aarch64-darwin:
+  timeout: 10h
+  tags:
+  - macos
+  script:
+    - 'nix profile install nixpkgs#gnutar'
+    - 'nix profile install nixpkgs#coreutils'
+    - bash build.sh
+    - bash xzar-install.sh
+    - bash xzar.sh
+  stage: build
+  artifacts:
+    paths:
+      - nixpkgs.tar.xz
+  environment: production_mac
+  resource_group: production_mac
+
