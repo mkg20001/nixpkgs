@@ -24,6 +24,10 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-xBH0OMrAQ3eVqBczzJnbaxbBLo2mRc6cCZBb5w4SkhI=";
   };
 
+  patches = [
+    ./plan-ai.patch
+  ];
+
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     inherit pnpm;
