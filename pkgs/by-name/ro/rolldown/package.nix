@@ -6,9 +6,9 @@
   pnpmConfigHook,
   pnpm_10,
   nodejs_22,
-  rustPlatform,
-  cargo,
-  rustc,
+  # rolldown 1.0.0 requires Rust 1.95 (oxc_transformer uses stabilized-in-1.95
+  # `if let` guards); the nixpkgs default is still 1.94, so pull 1.95 explicitly.
+  rustPackages_1_95,
   cmake,
   version ? "1.0.0",
 }:
@@ -24,7 +24,7 @@ stdenv.mkDerivation (finalAttrs: {
     tag = "v${finalAttrs.version}";
     hash = "sha256-EbxZe2JBj69F6bpPn4X7BTRE/dTb/mUIvvqw7oqhAe8=";
   };
-  cargoDeps = rustPlatform.fetchCargoVendor {
+  cargoDeps = rustPackages_1_95.rustPlatform.fetchCargoVendor {
     pname = "rolldown";
     version = finalAttrs.version;
     src = finalAttrs.src;
@@ -46,9 +46,9 @@ stdenv.mkDerivation (finalAttrs: {
     pnpmConfigHook
     pnpm_10
     nodejs_22
-    rustPlatform.cargoSetupHook
-    cargo
-    rustc
+    rustPackages_1_95.rustPlatform.cargoSetupHook
+    rustPackages_1_95.cargo
+    rustPackages_1_95.rustc
     cmake
   ];
 
