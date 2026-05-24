@@ -1,0 +1,108 @@
+--- a/tools/lazy_deps.py	2026-05-20 19:42:19.037142186 +0200
++++ b/tools/lazy_deps.py	2026-05-20 19:43:34.992209842 +0200
+@@ -55,6 +55,7 @@
+ import os
+ import re
+ import shutil
++import site
+ import subprocess
+ import sys
+ from dataclasses import dataclass
+@@ -336,6 +337,64 @@
+         return False
+ 
+ 
++def _in_nix_store() -> bool:
++    """True when the running Python lives in the read-only Nix store."""
++    return sys.executable.startswith("/nix/store/")
++
++
++def _overlay_venv_dir() -> Path:
++    """Return ``$HERMES_HOME/venv`` (typically ``~/.hermes/venv``)."""
++    try:
++        from hermes_constants import get_hermes_home
++        return get_hermes_home() / "venv"
++    except Exception:
++        return Path.home() / ".hermes" / "venv"
++
++
++_overlay_venv_activated = False
++
++
++def _activate_overlay_venv() -> None:
++    """Add the overlay venv's site-packages to ``sys.path`` (idempotent).
++
++    Called once per process so packages installed into the mutable overlay
++    venv are discoverable by ``importlib.metadata`` and plain ``import``.
++    """
++    global _overlay_venv_activated
++    if _overlay_venv_activated:
++        return
++    _overlay_venv_activated = True
++    venv = _overlay_venv_dir()
++    if not venv.is_dir():
++        return
++    lib_dir = venv / "lib"
++    if not lib_dir.is_dir():
++        return
++    for pydir in sorted(lib_dir.iterdir()):
++        sp = pydir / "site-packages"
++        if sp.is_dir():
++            site.addsitedir(str(sp))
++            break
++
++
++def _ensure_overlay_venv() -> Path:
++    """Create the overlay venv if it doesn't exist yet.  Returns venv path."""
++    venv = _overlay_venv_dir()
++    if not (venv / "pyvenv.cfg").exists():
++        logger.info("Creating overlay venv at %s", venv)
++        venv.parent.mkdir(parents=True, exist_ok=True)
++        subprocess.run(
++            [sys.executable, "-m", "venv", "--without-pip", str(venv)],
++            capture_output=True, text=True, timeout=60,
++        )
++    return venv
++
++
++# Activate eagerly so _is_satisfied() sees overlay packages on first call.
++if _in_nix_store():
++    _activate_overlay_venv()
++
++
+ def _venv_pip_install(specs: tuple[str, ...], *, timeout: int = 300) -> _InstallResult:
+     """Install ``specs`` into the active venv using uv → pip → ensurepip ladder.
+ 
+@@ -345,7 +404,12 @@
+     if not specs:
+         return _InstallResult(True, "", "")
+ 
+-    venv_root = Path(sys.executable).parent.parent
++    # When running from a read-only Nix store, redirect installs to the
++    # mutable overlay venv at $HERMES_HOME/venv.
++    if _in_nix_store():
++        venv_root = _ensure_overlay_venv()
++    else:
++        venv_root = Path(sys.executable).parent.parent
+     uv_env = {**os.environ, "VIRTUAL_ENV": str(venv_root)}
+ 
+     # Tier 1: uv (preferred — fast, doesn't need pip in the venv)
+@@ -357,11 +421,18 @@
+                 capture_output=True, text=True, timeout=timeout, env=uv_env,
+             )
+             if r.returncode == 0:
++                _activate_overlay_venv()  # make new packages importable
+                 return _InstallResult(True, r.stdout or "", r.stderr or "")
+             logger.debug("uv pip install failed: %s", r.stderr)
+         except (subprocess.TimeoutExpired, FileNotFoundError) as e:
+             logger.debug("uv invocation failed: %s", e)
+ 
++    # For Nix overlay venv: the sealed venv has no pip and ensurepip would
++    # target the wrong prefix.  uv is the only viable installer.
++    if _in_nix_store():
++        return _InstallResult(False, "",
++                              "uv not available — cannot install into Nix overlay venv without uv on PATH")
++
+     # Tier 2: python -m pip (with ensurepip bootstrap if needed)
+     pip_cmd = [sys.executable, "-m", "pip"]
+     try:
