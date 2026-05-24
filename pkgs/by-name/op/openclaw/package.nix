@@ -11,10 +11,12 @@
   versionCheckHook,
   rolldown,
   installShellFiles,
+  mac-mgmt-systemctl-shim,
   version ? "2026.6.5",
 }:
 let
   pnpm = pnpm_11.override { nodejs-slim = nodejs-slim_22; };
+  systemctlShim = mac-mgmt-systemctl-shim.override { serviceName = "openclaw"; };
 in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "openclaw";
@@ -90,7 +92,12 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
     makeWrapper ${lib.getExe nodejs-slim_22} $out/bin/openclaw \
       --add-flags "$libdir/dist/index.js" \
-      --set NODE_PATH "$libdir/node_modules"
+      --set NODE_PATH "$libdir/node_modules" \
+      --prefix PATH : ${
+        lib.makeBinPath (
+          lib.optional stdenvNoCC.hostPlatform.isLinux systemctlShim ++ [ nodejs-slim_22 ]
+        )
+      }
     ln -s $out/bin/openclaw $out/bin/moltbot
     ln -s $out/bin/openclaw $out/bin/clawdbot
 
@@ -113,6 +120,11 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   doInstallCheck = true;
 
   passthru.updateScript = ./update.sh;
+
+  patches = [
+    ./skills-in-store.patch
+    ./remove-update-available-dialog.patch
+  ];
 
   meta = {
     description = "Self-hosted, open-source AI assistant/agent";
