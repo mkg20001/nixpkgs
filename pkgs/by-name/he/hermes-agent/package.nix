@@ -36,12 +36,16 @@ let
   #    of trying to pip-install into the read-only Nix store venv.
   # 2. hermes-agent.nix — add uv to runtimeDeps so the overlay venv installer
   #    has a working package manager on PATH.
+  # 3. codex-recover-null-output-pr-32963 — upstream PR #32963 (merged post-tag):
+  #    recover Codex Responses streams when chatgpt.com returns
+  #    response.completed.output = null instead of crashing the session.
   src = pkgs.applyPatches {
     name = "hermes-agent-patched-${tag}";
     src = upstreamSrc;
     patches = [
       ./nix-venv-lazy-deps.patch
       ./nix-add-uv-runtime.patch
+      ./codex-recover-null-output-pr-32963.patch
     ];
   };
 
