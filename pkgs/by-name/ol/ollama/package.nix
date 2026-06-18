@@ -115,8 +115,8 @@ let
   llamaCppSrc = fetchFromGitHub {
     owner = "ggml-org";
     repo = "llama.cpp";
-    tag = "b9509";
-    hash = "sha256-bO1ucb/+vidj/EYzNCssotjte9NlVLdjC794jToNNeM=";
+    tag = "b9672";
+    hash = "sha256-/0qfu4QT1CFt1zBmaMvWGiOiRLqHp2ovhdpiirmvMOU=";
   };
 
   wrapperOptions = [
@@ -152,7 +152,7 @@ let
 in
 goBuild (finalAttrs: {
   pname = "ollama";
-  version = "0.30.7";
+  version = "0.30.10";
 
   patches = [
     ./ollama-no-openclaw-daemon.patch
@@ -162,7 +162,7 @@ goBuild (finalAttrs: {
     owner = "ollama";
     repo = "ollama";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-pS6Wd//g+Q1Oqw32+mr2h5ag7C2HNwf/8ZVrTKOvdWE=";
+    hash = "sha256-a4aovPjkZh42fJYTGMQX8xVT7jCA9RDhrWvD6tyf+0g=";
   };
 
   vendorHash = "sha256-lZdGzGb9xRjTm1Rm7/wHjqM490gLznLEndmb4mNbCX0=";
