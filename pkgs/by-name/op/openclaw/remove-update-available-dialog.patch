@@ -2,7 +2,7 @@ diff --git a/ui/src/ui/app-render.ts b/ui/src/ui/app-render.ts
 index e99624ab96..43989c6660 100644
 --- a/ui/src/ui/app-render.ts
 +++ b/ui/src/ui/app-render.ts
-@@ -1595,33 +1595,7 @@ export function renderApp(state: AppViewState) {
+@@ -2436,33 +2436,7 @@ export function renderApp(state: AppViewState) {
                ${state.updateStatusBanner.text}
              </div>`
            : nothing}
@@ -34,6 +34,6 @@ index e99624ab96..43989c6660 100644
 -            </div>`
 -          : nothing}
 +        ${nothing}
-         ${state.tab === "config"
+         ${state.tab === "config" || isChat
            ? nothing
            : html`<section

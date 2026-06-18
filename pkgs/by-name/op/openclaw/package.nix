@@ -12,7 +12,7 @@
   rolldown,
   installShellFiles,
   mac-mgmt-systemctl-shim,
-  version ? "2026.6.5",
+  version ? "2026.6.8",
 }:
 let
   pnpm = pnpm_11.override { nodejs-slim = nodejs-slim_22; };
@@ -26,10 +26,10 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     owner = "openclaw";
     repo = "openclaw";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-hiYbIhE13XMFIeB0zmb6AHlfw8le6vpJgCqN81YWGsE=";
+    hash = "sha256-tzzVjf6ZmemoBvI1rJvEn8x+rvpwBGQLnj4RjWlOKDY=";
   };
 
-  pnpmDepsHash = "sha256-7RQJAVWqhauG8JrF8AD1VU1IJRM+SH05aHAfmFaXraU=";
+  pnpmDepsHash = "sha256-pOzW/bmauRdGjAd34GBBr4PKxyWYC1R6on2MLxZcblk=";
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
