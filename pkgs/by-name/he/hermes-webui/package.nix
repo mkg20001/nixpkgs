@@ -17,13 +17,13 @@ let
 in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "hermes-webui";
-  version = "0.51.124";
+  version = "0.51.492";
 
   src = fetchFromGitHub {
     owner = "nesquena";
     repo = "hermes-webui";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-n/58Gy67v+974AA+sloIB4eZ0o4S5O2I9kxK5vAO2TM=";
+    hash = "sha256-dMlrnz/7o2h1Ru7rW53Tj2g3187rE9OafeAuevkHFz4=";
   };
 
   nativeBuildInputs = [ makeWrapper ];
