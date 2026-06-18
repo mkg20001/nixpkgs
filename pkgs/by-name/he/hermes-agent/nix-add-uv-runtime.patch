@@ -1,18 +1,18 @@
---- a/nix/hermes-agent.nix	2026-05-20 19:45:55.944965493 +0200
-+++ b/nix/hermes-agent.nix	2026-05-20 19:46:13.270403681 +0200
-@@ -16,6 +16,7 @@
+--- a/nix/hermes-agent.nix
++++ b/nix/hermes-agent.nix
+@@ -17,6 +17,7 @@
    openssh,
    ffmpeg,
    tirith,
 +  uv,
-   # Flake inputs — passed explicitly by packages.nix and overlays.nix
-   uv2nix,
-   pyproject-nix,
-@@ -68,6 +69,7 @@
+
+   # linux-only deps
+   wl-clipboard,
+@@ -89,6 +90,7 @@
      openssh
      ffmpeg
      tirith
 +    uv
-   ];
- 
-   runtimePath = lib.makeBinPath runtimeDeps;
+   ]
+   ++ lib.optionals stdenv.isLinux [
+     wl-clipboard

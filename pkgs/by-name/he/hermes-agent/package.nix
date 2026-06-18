@@ -19,8 +19,8 @@
   mac-mgmt-systemctl-shim,
 }:
 let
-  tag = "v2026.5.16";
-  rev = "a91a57fa5a13d516c38b07a141a9ce8a3daabeb0";
+  tag = "v2026.6.5";
+  rev = "3c231eb3979ab9c57d5cd6d02f1d577a3b718b43";
 
   systemctlShim = mac-mgmt-systemctl-shim.override { serviceName = "hermes"; };
 
@@ -28,7 +28,7 @@ let
     owner = "NousResearch";
     repo = "hermes-agent";
     inherit tag;
-    hash = "sha256-d9qhrTy45Q5UsmjapqMHOVi9e+gR9zE8Nq9Z0wObLmc=";
+    hash = "sha256-ngpkopVczNrT0bfCXHm38QjgrZT96Bm/rO89NA/ls3Y=";
   };
 
   # Patches:
@@ -36,16 +36,12 @@ let
   #    of trying to pip-install into the read-only Nix store venv.
   # 2. hermes-agent.nix — add uv to runtimeDeps so the overlay venv installer
   #    has a working package manager on PATH.
-  # 3. codex-recover-null-output-pr-32963 — upstream PR #32963 (merged post-tag):
-  #    recover Codex Responses streams when chatgpt.com returns
-  #    response.completed.output = null instead of crashing the session.
   src = pkgs.applyPatches {
     name = "hermes-agent-patched-${tag}";
     src = upstreamSrc;
     patches = [
       ./nix-venv-lazy-deps.patch
       ./nix-add-uv-runtime.patch
-      ./codex-recover-null-output-pr-32963.patch
     ];
   };
 
