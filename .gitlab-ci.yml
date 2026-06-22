@@ -1,5 +1,5 @@
 build_x86_64-linux:
-  timeout: 10h
+  timeout: 3d
   tags:
   - nix
   script:
@@ -14,7 +14,7 @@ build_x86_64-linux:
   resource_group: production_linux
 
 build_aarch64-darwin:
-  timeout: 10h
+  timeout: 3d
   tags:
   - macos
   script:
