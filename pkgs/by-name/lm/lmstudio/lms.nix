@@ -46,7 +46,7 @@ let
     outputHashMode = "recursive";
     outputHash = if stdenv.hostPlatform.isDarwin
       then "sha256-Nwr4z3qKbcl1DxlSRwaCn6gRhvQr4Jz3bMY9fmbQnvo="
-      else "sha256-PdJBe6K9AvkM5iAv7wL1bdSdesDSMO6ewx0S+yc7sOU=";
+      else "sha256-4enVWUsxJdYFm3fDy6ZGxjHqbinlwm7nOBbMXjAnupQ=";
 
     impureEnvVars = lib.fetchers.proxyImpureEnvVars;
   };
