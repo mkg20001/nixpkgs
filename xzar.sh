@@ -16,20 +16,10 @@ flavours="cpu"
 if [ "$(uname)" != "Darwin" ]; then
   flavours="cpu rocm cuda vulkan"
 fi
-for flavour in $flavours; do
-  build "ollama-$flavour"
-  upload "ollama/$flavour"
-done
 build nix
 upload nix
 build mcporter
 upload mcporter
-if [ "$(uname)" != "Darwin" ]; then
-  build cudatoolkit
-  upload cudatoolkit
-  build rocmPackages.rocm-smi
-  upload rocmPackages.rocm-smi
-fi
 build lmstudio
 upload lmstudio
 build unsloth
@@ -38,3 +28,15 @@ build hermes-agent
 upload hermes-agent
 build hermes-webui
 upload hermes-webui
+
+for flavour in $flavours; do
+  build "ollama-$flavour"
+  upload "ollama/$flavour"
+done
+
+if [ "$(uname)" != "Darwin" ]; then
+  build cudatoolkit
+  upload cudatoolkit
+  build rocmPackages.rocm-smi
+  upload rocmPackages.rocm-smi
+fi
