@@ -38,7 +38,6 @@
 +    global _overlay_venv_activated
 +    if _overlay_venv_activated:
 +        return
-+    _overlay_venv_activated = True
 +    venv = _overlay_venv_dir()
 +    if not venv.is_dir():
 +        return
@@ -49,6 +48,7 @@
 +        sp = pydir / "site-packages"
 +        if sp.is_dir():
 +            site.addsitedir(str(sp))
++            _overlay_venv_activated = True
 +            break
 +
 +
